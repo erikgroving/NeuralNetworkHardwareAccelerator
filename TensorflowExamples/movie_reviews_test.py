@@ -15,7 +15,6 @@ print("Training entries: {}, labels: {}".format(len(train_data), len(train_label
 
 len(train_data[0]), len(train_data[1])
 
-
 # A dictionary mapping words to an integer index
 word_index = imdb.get_word_index()
 
