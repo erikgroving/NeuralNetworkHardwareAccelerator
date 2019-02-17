@@ -24,10 +24,10 @@ images4 = db4[b'data']
 images5 = db5[b'data']
 
 images = images1
-np.append(images, images2)
-print(len(images))
-print(len(db1[b'data']))
-print(len(db2[b'data']))
+images = np.append(images1, images2, axis=0)
+images = np.append(images, images3, axis=0)
+images = np.append(images, images4, axis=0)
+images = np.append(images, images5, axis=0)
 
 labels = db1[b'labels'] + db2[b'labels'] + db3[b'labels'] + db4[b'labels'] + db5[b'labels']
 onehot_labels = tf.one_hot(labels, depth=10)
@@ -39,6 +39,9 @@ test_labels = test_data[b'labels']
 test_onehot_labels = tf.one_hot(test_labels, depth=10)
 test_image_tensor = tf.convert_to_tensor(test_images, dtype='float32') / 255
 test_image_tensor = tf.reshape(test_image_tensor, [-1, 3, 32, 32])
+
+dataset = tf.data.Dataset.from_tensor_slices((image_tensor, onehot_labels))
+dataset.batch(1)
 
 print(image_tensor.shape)
 print(onehot_labels.shape)
@@ -65,5 +68,5 @@ model.compile(optimizer='adam',
               loss=tf.losses.softmax_cross_entropy,
               metrics=['accuracy'])
 
-model.fit(image_tensor, onehot_labels, epochs=20, steps_per_epoch=100, verbose=1)
+model.fit(image_tensor, onehot_labels, epochs=10, steps_per_epoch=50000, verbose=1)
 model.evaluate(test_image_tensor, test_onehot_labels, verbose=1)
