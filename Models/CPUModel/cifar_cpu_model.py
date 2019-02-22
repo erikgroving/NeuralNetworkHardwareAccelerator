@@ -28,4 +28,3 @@ images = np.append(images, images5, axis=0)
 images /= 255
 
 labels = db1[b'labels'] + db2[b'labels'] + db3[b'labels'] + db4[b'labels'] + db5[b'labels']
-
