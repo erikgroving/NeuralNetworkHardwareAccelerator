@@ -46,21 +46,28 @@ Regarding the software engineering aspects of the project, weekly meetings have 
         time slot unit = day
         ]{2019-02-1}{2019-06-27}
         \gantttitlecalendar{year, month=name} \\
+        \ganttbar[inline]{PP}{2019-02-01}{2019-02-27} 
+        \ganttbar[inline]{PP}{2019-06-13}{2019-06-27}\\
         \ganttbar[inline]{LR}{2019-02-01}{2019-02-21}\\
         \ganttbar[inline]{M}{2019-02-17}{2019-02-24}\\
-        \ganttbar[inline]{PP}{2019-02-01}{2019-02-27}\\
-        \ganttbar[inline]{MD}{2019-02-21}{2019-03-01}\\
-        \ganttbar[inline]{SW}{2019-03-01}{2019-03-31}\\
-        \ganttbar[inline]{HW}{2019-04-01}{2019-06-21}\\
+        \ganttbar[inline]{SW}{2019-03-07}{2019-03-31}\\
+        \ganttbar[inline]{SWT}{2019-04-01}{2019-04-11}\\
+        \ganttbar[inline]{MD}{2019-02-21}{2019-04-11}\\
+        \ganttbar[inline]{HW}{2019-04-11}{2019-05-21}\\
+        \ganttbar[inline]{HWT}{2019-05-21}{2019-06-07}\\
+        \ganttbar[inline]{EV}{2019-06-07}{2019-06-24}\\
         \ganttbar[inline]{WR}{2019-03-01}{2019-06-27}
     \end{ganttchart}
     \begin{tabular}{l l}
+        \textbf{PP} & Project plan \\
         \textbf{LR} & Literature review \\
         \textbf{M} & Creating CPU/GPU models for benchmarking \\
-        \textbf{PP} & Project plan \\
         \textbf{MD} & Hardware model design \\ 
         \textbf{SW} & Software implementation of the accelerator model\\
+        \textbf{SW} & Testing of software implementation\\
         \textbf{HW} & Hardware implementation on FPGA of the accelerator\\
+        \textbf{HWT} & Testing of hardware implementation\\
+        \textbf{EV} & Evaluation of results/benchmarks and data gathering\\
         \textbf{WR} & Ongoing writing of report and reading literature
     \end{tabular}
 \end{center}
