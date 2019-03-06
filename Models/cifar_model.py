@@ -112,7 +112,7 @@ def shuffleTensor(in_tensor):
 epochs = 30
 batch_size = 4
 acc_check = 10
-lrate = 0.0001
+lrate = 0.001
 momen = 0.9
 
 criterion = nn.CrossEntropyLoss()
@@ -125,6 +125,9 @@ for i in range(epochs):
     running_loss = 0.0
     
     #TODO, shuffle
+    idx = torch.randperm(len(x_train))
+    x_train = x_train[idx]
+    y_train = y_train[idx]
 
     lb = 0
     ub = batch_size
