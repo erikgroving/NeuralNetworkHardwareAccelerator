@@ -10,32 +10,33 @@ import torchvision.transforms as transforms
 import torch.multiprocessing
 from timeit import default_timer as timer
 
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(3, 16, 3, padding = 1)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding = 1)
+        self.conv3 = nn.Conv2d(32, 32, 1)
+        self.conv4 = nn.Conv2d(32, 64, 3, padding = 1)
+        self.fc1 = nn.Linear(64 * 8 * 8, 128)
+        self.fc2 = nn.Linear(128, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = self.pool(F.relu(self.conv4(x)))
+        x = x.view(-1, 64 * 8 * 8)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+
 def unpickle(file):
     import pickle
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
     return dict
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, 5, padding = 2)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(32, 64, 5, padding = 2)
-        self.conv3 = nn.Conv2d(64, 128, 3, padding = 1)
-        self.fc1 = nn.Linear(128 * 8 * 8, 120)
-        self.fc2 = nn.Linear(120, 80)
-        self.fc3 = nn.Linear(80, 10)
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = F.relu(self.conv2(x))
-        x = self.pool(F.relu(self.conv3(x)))
-        x = x.view(-1, 128 * 8 * 8)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        return x
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
@@ -109,10 +110,10 @@ def shuffleTensor(in_tensor):
     in_tensor 
 
 
-epochs = 30
-batch_size = 4
+epochs = 200
+batch_size = 10
 acc_check = 10
-lrate = 0.001
+lrate = 0.0001
 momen = 0.9
 
 criterion = nn.CrossEntropyLoss()
