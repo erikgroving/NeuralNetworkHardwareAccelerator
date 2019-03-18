@@ -33,7 +33,7 @@ GTEST_DIR = ./googletest
 
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 
-CXXFLAGS += -g -Wall -pthread
+CXXFLAGS += -std=c++14 -g -Wall -pthread
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
