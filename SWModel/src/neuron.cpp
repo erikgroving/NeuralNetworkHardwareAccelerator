@@ -11,5 +11,9 @@ Neuron::Neuron(const Neuron& n) {
 }
 
 Neuron::~Neuron() {
-    
+
+}
+
+void Neuron::initWeights() {
+
 }

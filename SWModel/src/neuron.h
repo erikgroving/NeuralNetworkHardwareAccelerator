@@ -12,7 +12,9 @@ public:
     Neuron(const Neuron& n);
     ~Neuron();
 
-    void computeOutput(std::vector<double> input) {output = 2;}
+    void initWeights();
+    double computeOutput(std::vector<double> input) {output = 2;}
+
 
     double getOutput() { return output; }
 
