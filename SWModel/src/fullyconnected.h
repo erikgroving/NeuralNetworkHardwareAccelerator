@@ -2,8 +2,9 @@
 #include <vector>
 
 #include "neuron.h"
+#include "layer.h"
 
-class FullyConnected {
+class FullyConnected : public Layer {
 
     uint32_t input_size;
     uint32_t output_size;
