@@ -1,3 +1,6 @@
+#ifndef __NEURON_H
+#define __NEURON_H
+
 #include <stdint.h>
 #include <vector>
 
@@ -25,3 +28,5 @@ public:
     void setWeights(std::vector<double> weights) { this->weights = weights; }
     const std::vector<double>& getWeights() { return weights; }
 };
+
+#endif

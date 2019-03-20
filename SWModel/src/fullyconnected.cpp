@@ -8,6 +8,14 @@ void FullyConnected::forward(std::vector<double> input) {
         output[i] = neurons[i].computeOutput();
     }
 }
+    
+void FullyConnected::backward(std::vector<double> gradients) {
+
+}
+
+void FullyConnected::updateWeights() {
+
+}
 
 FullyConnected::FullyConnected(uint32_t in, uint32_t out) : input_size(in), output_size(out) {
     neurons.reserve(out);

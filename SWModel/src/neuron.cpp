@@ -60,6 +60,6 @@ double Neuron::computeActivation(std::vector<double> input) {
  * Compute output for neuron
  */
 double Neuron::computeOutput() {
-    output = (activation > 0) ? activation : 0;
+    output = std::max(activation, 0.);    // ReLU
     return output;
 }

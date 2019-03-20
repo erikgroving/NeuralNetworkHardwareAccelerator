@@ -1,3 +1,6 @@
+#ifndef __FULLYCONNECTED_H
+#define __FULLYCONNECTED_H
+
 #include <stdint.h>
 #include <vector>
 
@@ -22,9 +25,12 @@ public:
     ~FullyConnected() {}
 
     void forward(std::vector<double> input);
-
+    void backward(std::vector<double> gradients);
+    void updateWeights();
 
     void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
 
     const std::vector<double>& getOutput() { return output; }
 };
+
+#endif
