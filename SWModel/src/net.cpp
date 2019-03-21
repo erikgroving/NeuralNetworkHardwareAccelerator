@@ -42,6 +42,7 @@ double Net::computeLoss(std::vector<double> labeled) {
 
     // Compute loss for each output and total loss
     for (size_t j = 0; j < labeled.size(); j++) {
+        loss_per_output[labeled[j]]
         bool correct = labeled[j] == pred_class[j];
 
         for (size_t i = 0; i < output_size; i++) {
