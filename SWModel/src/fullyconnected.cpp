@@ -9,7 +9,7 @@ void FullyConnected::forward(std::vector<double> input) {
     }
 }
     
-void FullyConnected::backward(std::vector<double> gradients) {
+void FullyConnected::backward(std::vector< std::vector<double> > gradients) {
 
 }
 

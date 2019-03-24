@@ -8,16 +8,18 @@
 class Net {
     std::vector<Layer*> layers;
     std::vector< std::vector<double> > batch_output;
+    std::vector< std::vector<double> > cost_ps;
     std::vector<double> loss_per_output;
     uint32_t batch_size;
     uint32_t input_size;
     uint32_t output_size;
 
 public:
-    void addLayer(Layer*);
 
-    std::vector<double> inference(std::vector<double> input);
-    double computeLoss(std::vector<double> labeled);
+    std::vector< std::vector<double> > operator() (std::vector < std::vector<double> > input);
+    void addLayer(Layer*);
+    std::vector< std::vector<double> > inference(std::vector< std::vector<double> > input);
+    double computeLoss(std::vector<int> labeled);
     void backpropLossAndUpdate();
     void resetLoss();
 

@@ -7,53 +7,64 @@ void Net::addLayer(Layer* layer) {
     layers.push_back(layer);
 }
 
-std::vector<double> Net::inference(std::vector<double> input) {
-    if (input.size() != input_size) {
-        std::cout << "Input size does not match, expected: " + std::to_string(input_size) + ", got: " + std::to_string(input.size());
-        exit(1);
-    }
-    
-    for (Layer*& l : layers) {
-        l->forward(input);
-        input = l->getOutput();
-    }
-
-    if (input.size() != output_size) {
-        std::cout << "Output size does not match, expected: " + std::to_string(output_size) + ", got: " + std::to_string(input.size());
-        std::cout << std::endl;
-        exit(1);
-    }
-    input = convLogitToProb(input);
-    batch_output.push_back(input);
-
-    return input;
+std::vector< std::vector<double> > Net::operator() (std::vector < std::vector<double> > input) {
+    return inference(input); 
 }
 
-double Net::computeLoss(std::vector<double> labeled) {
-    if (labeled.size() != output_size) {
-        std::cout << "Labeled data size does not match the net's output size, expected: " + std::to_string(output_size) + ", got: " + std::to_string(labeled.size());
+std::vector< std::vector<double> > Net::inference(std::vector< std::vector<double> > input) {
+
+    batch_output = std::vector< std::vector<double> >();
+    for (std::vector<double> in : input) {
+        if (in.size() != input_size) {
+            std::cout << "Input size does not match, expected: " + std::to_string(input_size) + ", got: " + std::to_string(in.size());
+            exit(1);
+        }
+        for (Layer*& l : layers) {
+            l->forward(in);
+            in = l->getOutput();
+        }
+
+        if (in.size() != output_size) {
+            std::cout << "Output size does not match, expected: " + std::to_string(output_size) + ", got: " + std::to_string(in.size());
+            std::cout << std::endl;
+            exit(1);
+        }
+        std::vector<double> output = convLogitToProb(in);
+        batch_output.push_back(output);
+    }
+
+    return batch_output;
+}
+
+double Net::computeLoss(std::vector<int> labeled) {
+    if (labeled.size() != batch_output.size()) {
+        std::cout << "Labeled data size does not match the net's output size, expected: " + 
+                    std::to_string(batch_output.size()) + ", got: " + std::to_string(labeled.size()) << std::endl;
         std::cout << std::endl;
         exit(1);
     }
 
-    // Get the predicted out for each item in batch
-    std::vector<double> pred_class;
-    pred_class = getPredictions();
+    cost_ps = std::vector< std::vector<double> >();
+    double loss = 0;
+    // Compute cross entropy loss for each output
+    // CrossEntropy loss -q(x) * log(p(x))
+    // q(x) is true distribution, so it is 1 for our labeled data on the correct sample
+    for (size_t i = 0; i < labeled.size(); i++) { 
+        std::vector<double> cost(output_size, 0);
+        short label = labeled[i];
+        cost[label] = -log(batch_output[i][label]);
+        loss += cost[label];
+        cost_ps.push_back(cost);
+    }
+    
+    return loss;
+}
 
-    // Compute loss for each output and total loss
-    for (size_t j = 0; j < labeled.size(); j++) {
-        loss_per_output[labeled[j]]
-        bool correct = labeled[j] == pred_class[j];
-
-        for (size_t i = 0; i < output_size; i++) {
-            // 0 if correct, 1 if incorrect
-            int y = 0;
-            if ((correct && i == labeled[j]) || 
-                (!correct && i == labeled[j])) { // mispredict
-                y = 1;
-            }
-            //local_loss[i] += y * -log(batch_output[j][i]);
-        }
+// Backpropagate the gradients of the error
+void Net::backpropLossAndUpdate() {
+    // Outer layer gradients is just the loss
+    for (int i = layers.size() - 1; i >= 0; i--) {
+        layers[i]->backward(cost_ps);
     }
 }
 
