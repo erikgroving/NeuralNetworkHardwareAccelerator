@@ -38,6 +38,7 @@ class Net(nn.Module):
         return x
 
 use_cuda = torch.cuda.is_available()
+use_cuda = False
 device = torch.device("cuda:0" if use_cuda else "cpu")
 print(device)
 db1 = unpickle('d:/CIFAR10/python/data_batch_1')
@@ -80,7 +81,7 @@ print(x_test.shape)
 print(y_test.shape)
 
 net = Net()
-net.cuda() 
+#net.cuda() 
 
 
 
@@ -169,9 +170,7 @@ for i in range(epochs):
 
     print("Epoch " + str(i) + " accuracy: " + str(n_correct/len(y_test)))
     print(str(n_correct) + " / " + str(len(y_test)))
-
-end = timer()
-
-print("Training time: " + str(end - start) + " seconds")
+    end = timer()
+    print("Training time: " + str(end - start) + " seconds")
 
 #TODO write accuracies and losses to a csv file

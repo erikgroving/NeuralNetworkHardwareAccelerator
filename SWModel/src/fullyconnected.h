@@ -25,8 +25,8 @@ public:
     ~FullyConnected() {}
 
     void forward(std::vector<double> input);
-    void backward(std::vector< std::vector<double> > gradients_ps);
-    void updateWeights();
+    std::vector< std::vector<double> > backward(std::vector< std::vector<double> > gradients_ps);
+    void updateWeights(uint32_t lr);
 
     void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
 

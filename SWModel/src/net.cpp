@@ -16,7 +16,8 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
     batch_output = std::vector< std::vector<double> >();
     for (std::vector<double> in : input) {
         if (in.size() != input_size) {
-            std::cout << "Input size does not match, expected: " + std::to_string(input_size) + ", got: " + std::to_string(in.size());
+            std::cout << "Input size does not match, expected: " + std::to_string(input_size) + 
+            ", got: " + std::to_string(in.size()) << std::endl;
             exit(1);
         }
         for (Layer*& l : layers) {
@@ -49,12 +50,33 @@ double Net::computeLoss(std::vector<int> labeled) {
     // Compute cross entropy loss for each output
     // CrossEntropy loss -q(x) * log(p(x))
     // q(x) is true distribution, so it is 1 for our labeled data on the correct sample
-    for (size_t i = 0; i < labeled.size(); i++) { 
+    /*for (size_t i = 0; i < labeled.size(); i++) { 
         std::vector<double> cost(output_size, 0);
         short label = labeled[i];
         cost[label] = -log(batch_output[i][label]);
         loss += cost[label];
         cost_ps.push_back(cost);
+    }*/
+
+
+    // Compute mean square error
+    for (size_t i = 0; i < labeled.size(); i++) {
+        unsigned short label = labeled[i];
+        std::vector<double> gradient(output_size, 0);
+        for (size_t j = 0; j < output_size; j++) {
+            double err, grad;
+            if (j == label) {
+                grad = 1 - batch_output[i][j];
+                err = 0.5 * pow(grad, 2);
+            }
+            else {
+                grad = 0 - batch_output[i][j];
+                err = 0.5 * pow(grad, 2);
+            }
+            gradient.push_back(grad);
+            loss += err;
+        }
+        ol_gradient.push_back(gradient);
     }
     
     return loss;
@@ -62,9 +84,13 @@ double Net::computeLoss(std::vector<int> labeled) {
 
 // Backpropagate the gradients of the error
 void Net::backpropLossAndUpdate() {
+    std::vector< std::vector<double> > gradients = ol_gradient;
     // Outer layer gradients is just the loss
     for (int i = layers.size() - 1; i >= 0; i--) {
-        layers[i]->backward(cost_ps);
+     //   std::vector< std::vector<double> > gradients = layers[i]->backward(gradients);
+    }
+    for (int i = layers.size() - 1; i >= 0; i--) {
+        layers[i]->updateWeights(learning_rate);
     }
 }
 
@@ -104,12 +130,13 @@ void Net::resetLoss() {
     }
 }
 
-Net::Net(uint32_t in, uint32_t out, uint32_t bs) {
+Net::Net(uint32_t in, uint32_t out, uint32_t bs, uint32_t lr) {
     layers = std::vector<Layer*>();
     loss_per_output.resize(out);
     input_size = in;
     output_size = out;
     batch_size = bs;
+    learning_rate = lr;
 }
 
 Net::Net(const Net& net) {

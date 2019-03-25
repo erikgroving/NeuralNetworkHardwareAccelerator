@@ -8,7 +8,7 @@ int main () {
 
     std::cout << "Running software model...\n";
 
-    Net net(4, 2, 1);
+    Net net(4, 2, 1, 0.1);
 
     Layer* fc = new FullyConnected(4, 3);
     Layer* fc2 = new FullyConnected(3, 2);

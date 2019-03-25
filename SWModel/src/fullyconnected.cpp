@@ -9,11 +9,11 @@ void FullyConnected::forward(std::vector<double> input) {
     }
 }
     
-void FullyConnected::backward(std::vector< std::vector<double> > gradients) {
+std::vector< std::vector<double> > FullyConnected::backward(std::vector< std::vector<double> > gradients) {
 
 }
 
-void FullyConnected::updateWeights() {
+void FullyConnected::updateWeights(uint32_t lr) {
 
 }
 
