@@ -11,7 +11,6 @@ class FullyConnected : public Layer {
 
     uint32_t input_size;
     uint32_t output_size;
-
     std::vector<Neuron> neurons;
     std::vector<double> output;
 
@@ -25,8 +24,13 @@ public:
     ~FullyConnected() {}
 
     void forward(std::vector<double> input);
-    std::vector< std::vector<double> > backward(std::vector< std::vector<double> > gradients_ps);
-    void updateWeights(uint32_t lr);
+
+    std::vector< std::vector<double> > backward(
+        std::vector< std::vector<double> > gradients_ps, 
+        std::vector< std::vector<double> > in_activations,
+        std::vector< std::vector<double> > out_activations);
+
+    void updateWeights(double lr);
 
     void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
 

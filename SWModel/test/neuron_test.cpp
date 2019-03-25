@@ -26,7 +26,7 @@ TEST(NeuronTest, SetWeightsAndGetOutput) {
 
     double result = 1 * 1 + 2 * 3 + 3 * 5 + 4 * 7 + 5 * 9 + 13;
     
-    n.computeActivation(input);
+    n.computeNet(input);
     
-    ASSERT_EQ(n.computeOutput(), result);
+    ASSERT_EQ(n.computeActivation(), result);
 }

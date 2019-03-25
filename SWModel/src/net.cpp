@@ -12,25 +12,35 @@ std::vector< std::vector<double> > Net::operator() (std::vector < std::vector<do
 }
 
 std::vector< std::vector<double> > Net::inference(std::vector< std::vector<double> > input) {
-
     batch_output = std::vector< std::vector<double> >();
+    activations = std::vector< std::vector< std::vector<double> > > ();
+    for (size_t i = 0; i < layers.size() + 1; i++) {
+        activations.push_back(std::vector< std::vector<double> >());
+    }
+
     for (std::vector<double> in : input) {
         if (in.size() != input_size) {
             std::cout << "Input size does not match, expected: " + std::to_string(input_size) + 
             ", got: " + std::to_string(in.size()) << std::endl;
             exit(1);
         }
-        for (Layer*& l : layers) {
+
+        for (size_t i = 0; i < layers.size(); i++) {
+            Layer*&l = layers[i];
+            activations[i].push_back(in);
             l->forward(in);
             in = l->getOutput();
         }
+
 
         if (in.size() != output_size) {
             std::cout << "Output size does not match, expected: " + std::to_string(output_size) + ", got: " + std::to_string(in.size());
             std::cout << std::endl;
             exit(1);
         }
-        std::vector<double> output = convLogitToProb(in);
+        //std::vector<double> output = convLogitToProb(in);
+        std::vector<double> output = in;
+        activations[layers.size()].push_back(output);
         batch_output.push_back(output);
     }
 
@@ -44,8 +54,7 @@ double Net::computeLoss(std::vector<int> labeled) {
         std::cout << std::endl;
         exit(1);
     }
-
-    cost_ps = std::vector< std::vector<double> >();
+    ol_gradient = std::vector< std::vector<double> > ();
     double loss = 0;
     // Compute cross entropy loss for each output
     // CrossEntropy loss -q(x) * log(p(x))
@@ -73,7 +82,7 @@ double Net::computeLoss(std::vector<int> labeled) {
                 grad = 0 - batch_output[i][j];
                 err = 0.5 * pow(grad, 2);
             }
-            gradient.push_back(grad);
+            gradient[j] = grad;
             loss += err;
         }
         ol_gradient.push_back(gradient);
@@ -87,8 +96,9 @@ void Net::backpropLossAndUpdate() {
     std::vector< std::vector<double> > gradients = ol_gradient;
     // Outer layer gradients is just the loss
     for (int i = layers.size() - 1; i >= 0; i--) {
-     //   std::vector< std::vector<double> > gradients = layers[i]->backward(gradients);
+        gradients = layers[i]->backward(gradients, activations[i], activations[i + 1]);
     }
+    
     for (int i = layers.size() - 1; i >= 0; i--) {
         layers[i]->updateWeights(learning_rate);
     }
@@ -124,15 +134,14 @@ std::vector<double> Net::getPredictions() {
     return preds;
 }
 
-void Net::resetLoss() {
-    for (size_t i = 0; i < loss_per_output.size(); i++) {
-        loss_per_output[i] = 0;
-    }
+void Net::clearSavedData() {
+    activations = std::vector< std::vector< std::vector<double> > >();
+    batch_output = std::vector< std::vector<double> >();
+    ol_gradient = std::vector< std::vector<double> >();
 }
 
-Net::Net(uint32_t in, uint32_t out, uint32_t bs, uint32_t lr) {
+Net::Net(uint32_t in, uint32_t out, uint32_t bs, double lr) {
     layers = std::vector<Layer*>();
-    loss_per_output.resize(out);
     input_size = in;
     output_size = out;
     batch_size = bs;
@@ -141,7 +150,6 @@ Net::Net(uint32_t in, uint32_t out, uint32_t bs, uint32_t lr) {
 
 Net::Net(const Net& net) {
     layers = net.layers;
-    loss_per_output = net.loss_per_output;
     input_size = net.input_size;
     output_size = net.output_size;
 }

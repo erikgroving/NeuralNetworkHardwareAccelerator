@@ -6,15 +6,17 @@
 #include <iostream>
 
 Neuron::Neuron(uint32_t in) {
-    this->fan_in = in;
+    fan_in = in;
+    gradient_per_weight = std::vector<double> (fan_in, 0);
 }
 
 Neuron::Neuron(const Neuron& n) {
     weights = n.weights;
+    gradient_per_weight = n.gradient_per_weight;
     offset = n.offset;
     fan_in = n.fan_in;
+    net = n.net;
     activation = n.activation;
-    output = n.output;
 }
 
 Neuron::~Neuron() {
@@ -38,9 +40,9 @@ void Neuron::initWeights() {
 }
 
 /**
- * Compute activation for the neuron
+ * Compute net for the neuron
  */
-double Neuron::computeActivation(std::vector<double> input) {
+double Neuron::computeNet(std::vector<double> input) {
     if (input.size() != weights.size()) {
         std::cerr << "Input size did not match size of weights. Input size: " << 
                         input.size() << " Weight size: " << weights.size() << std::endl;
@@ -48,18 +50,39 @@ double Neuron::computeActivation(std::vector<double> input) {
     }
 
     // Dot product and sum offset    
-    activation = offset;
+    net = offset;
     for (size_t i = 0; i < fan_in; i++) {
-        activation += input[i] * weights[i];
+        net += input[i] * weights[i];
     }
 
-    return activation;
+    return net;
 }
 
 /**
  * Compute output for neuron
  */
-double Neuron::computeOutput() {
-    output = std::max(activation, 0.);    // ReLU
-    return output;
+double Neuron::computeActivation() {
+    activation = std::max(net, 0.);    // ReLU
+    return activation;
+}
+
+void Neuron::calculateGradient(double grad, std::vector<double> act_in, double act_out) {
+    double dact_dnet = (act_out > 0) ? 1 : 0;
+    de_dnet = grad * dact_dnet;
+    //std::cout << act_out << " " << dact_dnet << " " << de_dnet << " " << grad << std::endl;
+    for (size_t i = 0; i < fan_in; i++) {
+        gradient_per_weight[i] += (de_dnet * act_in[i]);
+    }
+}
+
+void Neuron::updateWeights(double lr) {
+    // update weights
+    for (size_t i = 0; i < fan_in; i++) {
+        weights[i] += (lr * gradient_per_weight[i]);
+    }
+    clearBackwardData();
+}
+
+void Neuron::clearBackwardData() {
+    gradient_per_weight = std::vector<double>(fan_in, 0);
 }
