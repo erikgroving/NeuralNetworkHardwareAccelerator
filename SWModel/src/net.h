@@ -20,7 +20,7 @@ public:
     std::vector< std::vector<double> > operator() (std::vector < std::vector<double> > input);
     void addLayer(Layer*);
     std::vector< std::vector<double> > inference(std::vector< std::vector<double> > input);
-    double computeLoss(std::vector<int> labeled);
+    double computeLossAndGradients(std::vector<int> labeled);
     void backpropLossAndUpdate();
     void clearSavedData();
 

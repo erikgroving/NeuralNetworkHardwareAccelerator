@@ -12,26 +12,25 @@ int main () {
 
     std::cout << "Running software model...\n";
 
-    int input_size = 2;
+    int input_size = 20;
     int output_size = 2;
     int batch_size = 1;
-    double lr = 0.0001;
+    double lr = 0.01;
 
     Net net(input_size, output_size, batch_size, lr);
 
-    Layer* fc = new FullyConnected(input_size, 5);
-    Layer* fc2 = new FullyConnected(5, 5);
-    Layer* fc3 = new FullyConnected(5, output_size);
+    Layer* fc = new FullyConnected(input_size, 15);
+    Layer* fc2 = new FullyConnected(15, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
 
-    int in_size = 100;
-    std::uniform_real_distribution<double> distribution(0, 1.0);  
-    std::uniform_int_distribution<int> distribution_out(0, output_size);  
+    std::uniform_real_distribution<double> distribution(-1.0, 1.0);  
+    std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
-    for (int i = 0; i < in_size; i++) {
+    int test_size = 10;
+    for (int i = 0; i < test_size; i++) {
         std::vector<double> smpl;
         for (int j = 0; j < input_size; j++) {
             smpl.push_back(distribution(generator));
@@ -42,23 +41,22 @@ int main () {
 
     net.addLayer(fc);
     net.addLayer(fc2);
-    net.addLayer(fc3);
 
-    int epochs = 5000;
-    //int i = 0;
+    int epochs = 1000;
     printAccuracy(net, in, out);
     for (int j = 0; j < epochs; j++) {
         auto result = net(in);
-        double loss = net.computeLoss(out);
+        double loss = net.computeLossAndGradients(out);
         if (j == 0 || j == epochs - 1) {
-            /*std::cout << "-------- ROUND " << i++ << " ---------\n";
             int k = 0;
             for (auto res : result) {
-                std::cout << "---" << k++ << "---\n";
+                std::cout << "---" << k++ << "---" <<"\n";
+                std::cout << "Target: " << out[k - 1] << std::endl;
+                std::cout << "---------\n";
                 for (double d : res) {
                     std::cout << d << std::endl;
                 }
-            }*/
+            }
             std::cout << "Loss: " << loss << std::endl << std::endl;
         }
 

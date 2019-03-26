@@ -1,6 +1,7 @@
 #include "net.h"
 #include <string>
 #include <math.h>
+#include <algorithm>
 #include <iostream>
 
 void Net::addLayer(Layer* layer) {
@@ -38,8 +39,8 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
             std::cout << std::endl;
             exit(1);
         }
-        //std::vector<double> output = convLogitToProb(in);
-        std::vector<double> output = in;
+        std::vector<double> output = convLogitToProb(in);
+        //std::vector<double> output = in;
         activations[layers.size()].push_back(output);
         batch_output.push_back(output);
     }
@@ -47,7 +48,7 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
     return batch_output;
 }
 
-double Net::computeLoss(std::vector<int> labeled) {
+double Net::computeLossAndGradients(std::vector<int> labeled) {
     if (labeled.size() != batch_output.size()) {
         std::cout << "Labeled data size does not match the net's output size, expected: " + 
                     std::to_string(batch_output.size()) + ", got: " + std::to_string(labeled.size()) << std::endl;
@@ -59,17 +60,25 @@ double Net::computeLoss(std::vector<int> labeled) {
     // Compute cross entropy loss for each output
     // CrossEntropy loss -q(x) * log(p(x))
     // q(x) is true distribution, so it is 1 for our labeled data on the correct sample
-    /*for (size_t i = 0; i < labeled.size(); i++) { 
-        std::vector<double> cost(output_size, 0);
-        short label = labeled[i];
-        cost[label] = -log(batch_output[i][label]);
-        loss += cost[label];
-        cost_ps.push_back(cost);
-    }*/
+    for (size_t i = 0; i < labeled.size(); i++) { 
+        std::vector<double> gradient(output_size, 0);
+        unsigned short label = labeled[i];
+
+        for (size_t j = 0; j < output_size; j++) {
+            if (j == label) {
+                gradient[j] = batch_output[i][j] * (1 - batch_output[i][j]);
+            }
+            else {
+                gradient[j] = -batch_output[i][j] * batch_output[i][label];
+            }
+        }
+        loss += -log(batch_output[i][label]);
+        ol_gradient.push_back(gradient);
+    }
 
 
     // Compute mean square error
-    for (size_t i = 0; i < labeled.size(); i++) {
+    /*for (size_t i = 0; i < labeled.size(); i++) {
         unsigned short label = labeled[i];
         std::vector<double> gradient(output_size, 0);
         for (size_t j = 0; j < output_size; j++) {
@@ -86,7 +95,7 @@ double Net::computeLoss(std::vector<int> labeled) {
             loss += err;
         }
         ol_gradient.push_back(gradient);
-    }
+    }*/
     
     return loss;
 }
@@ -106,14 +115,15 @@ void Net::backpropLossAndUpdate() {
 
 std::vector<double> Net::convLogitToProb(std::vector<double> logits) {
     double sum = 0;
+    double max = *std::max_element(logits.begin(), logits.end());
     for (auto l : logits) {
-        sum += exp(l);
+        sum += exp(l - max);
     }
     std::vector<double> prob;
     prob.reserve(logits.size());
 
     for (auto l : logits) {
-        prob.push_back(exp(l) / sum);
+        prob.push_back(exp(l - max) / sum);
     }
 
     return prob;

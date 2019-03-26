@@ -7,6 +7,7 @@
 class Neuron {
     std::vector<double> weights;
     std::vector<double> gradient_per_weight;
+    double              offset_gradient;
     double              offset;
     double              de_dnet;
     uint32_t            fan_in;
