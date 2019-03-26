@@ -12,15 +12,15 @@ int main () {
 
     std::cout << "Running software model...\n";
 
-    int input_size = 20;
+    int input_size = 2;
     int output_size = 2;
     int batch_size = 1;
-    double lr = 0.01;
+    double lr = 0.001;
 
     Net net(input_size, output_size, batch_size, lr);
 
-    Layer* fc = new FullyConnected(input_size, 15);
-    Layer* fc2 = new FullyConnected(15, output_size);
+    Layer* fc = new FullyConnected(input_size, 6);
+    Layer* fc2 = new FullyConnected(6, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
@@ -29,7 +29,7 @@ int main () {
     std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
-    int test_size = 10;
+    int test_size = 100;
     for (int i = 0; i < test_size; i++) {
         std::vector<double> smpl;
         for (int j = 0; j < input_size; j++) {
@@ -49,14 +49,14 @@ int main () {
         double loss = net.computeLossAndGradients(out);
         if (j == 0 || j == epochs - 1) {
             int k = 0;
-            for (auto res : result) {
+            /*for (auto res : result) {
                 std::cout << "---" << k++ << "---" <<"\n";
                 std::cout << "Target: " << out[k - 1] << std::endl;
                 std::cout << "---------\n";
                 for (double d : res) {
                     std::cout << d << std::endl;
                 }
-            }
+            }*/
             std::cout << "Loss: " << loss << std::endl << std::endl;
         }
 
