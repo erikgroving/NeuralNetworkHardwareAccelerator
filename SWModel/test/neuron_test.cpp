@@ -25,8 +25,20 @@ TEST(NeuronTest, SetWeightsAndGetOutput) {
     n.setWeights(weights);
 
     double result = 1 * 1 + 2 * 3 + 3 * 5 + 4 * 7 + 5 * 9 + 13;
-    
+
     n.computeNet(input);
     
     ASSERT_EQ(n.computeActivation(), result);
+}
+
+TEST(NeuronTest, CalculateGradient) {
+    Neuron n(5);
+    std::vector<double> act_in = {1, 2, 3, 4, 5};
+    std::vector<double> weights = {2, 1, 3, 4, 1};
+    double out = 0;
+    for (int i = 0; i < 5; i++) {
+        out += act_in[i] * weights[i];
+    }
+    double grad = 0.2;
+    n.calculateGradient(grad, act_in, out);
 }

@@ -39,9 +39,9 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
             std::cout << std::endl;
             exit(1);
         }
+        activations[layers.size()].push_back(in);
         std::vector<double> output = convLogitToProb(in);
         //std::vector<double> output = in;
-        activations[layers.size()].push_back(output);
         batch_output.push_back(output);
     }
 
@@ -120,7 +120,6 @@ std::vector<double> Net::convLogitToProb(std::vector<double> logits) {
         sum += exp(l - max);
     }
     std::vector<double> prob;
-    prob.reserve(logits.size());
 
     for (auto l : logits) {
         prob.push_back(exp(l - max) / sum);

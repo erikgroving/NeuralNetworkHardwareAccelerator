@@ -12,15 +12,16 @@ int main () {
 
     std::cout << "Running software model...\n";
 
-    int input_size = 2;
+    int input_size = 16*16;
     int output_size = 2;
-    int batch_size = 1;
+    int batch_size = 10;
     double lr = 0.001;
 
     Net net(input_size, output_size, batch_size, lr);
 
-    Layer* fc = new FullyConnected(input_size, 6);
-    Layer* fc2 = new FullyConnected(6, output_size);
+    Layer* fc = new FullyConnected(input_size, 100);
+    //Layer* fc2 = new FullyConnected(100, 10);
+    Layer* fc3 = new FullyConnected(100, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
@@ -29,7 +30,7 @@ int main () {
     std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
-    int test_size = 100;
+    int test_size = 30;
     for (int i = 0; i < test_size; i++) {
         std::vector<double> smpl;
         for (int j = 0; j < input_size; j++) {
@@ -40,28 +41,23 @@ int main () {
     }
 
     net.addLayer(fc);
-    net.addLayer(fc2);
+    //net.addLayer(fc2);
+    net.addLayer(fc3);
 
-    int epochs = 1000;
+    int epochs = 100000;
     printAccuracy(net, in, out);
-    for (int j = 0; j < epochs; j++) {
+    for (int j = 1; j <= epochs; j++) {
         auto result = net(in);
         double loss = net.computeLossAndGradients(out);
-        if (j == 0 || j == epochs - 1) {
-            int k = 0;
-            /*for (auto res : result) {
-                std::cout << "---" << k++ << "---" <<"\n";
-                std::cout << "Target: " << out[k - 1] << std::endl;
-                std::cout << "---------\n";
-                for (double d : res) {
-                    std::cout << d << std::endl;
-                }
-            }*/
-            std::cout << "Loss: " << loss << std::endl << std::endl;
-        }
 
         net.backpropLossAndUpdate();
         net.clearSavedData();
+        
+        if ((j) % 100 == 0) {
+            std::cout << "Epoch: " << j<< std::endl;
+            printAccuracy(net, in, out);
+            std::cout << "Loss: " << loss / out.size() << std::endl << std::endl;
+        }
     }
 
     printAccuracy(net, in, out);
