@@ -38,7 +38,7 @@ class Net(nn.Module):
         return x
 
 use_cuda = torch.cuda.is_available()
-use_cuda = False
+#use_cuda = False
 device = torch.device("cuda:0" if use_cuda else "cpu")
 print(device)
 db1 = unpickle('d:/CIFAR10/python/data_batch_1')
@@ -81,7 +81,7 @@ print(x_test.shape)
 print(y_test.shape)
 
 net = Net()
-#net.cuda() 
+net.cuda() 
 
 
 
