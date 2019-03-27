@@ -15,13 +15,13 @@ int main () {
     int input_size = 16*16;
     int output_size = 2;
     int batch_size = 10;
-    double lr = 0.001;
+    double lr = 0.0004;
 
     Net net(input_size, output_size, batch_size, lr);
 
-    Layer* fc = new FullyConnected(input_size, 100);
-    //Layer* fc2 = new FullyConnected(100, 10);
-    Layer* fc3 = new FullyConnected(100, output_size);
+    Layer* fc = new FullyConnected(input_size, 12);
+    //Layer* fc2 = new FullyConnected(16, 10);
+    Layer* fc3 = new FullyConnected(12, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
@@ -30,7 +30,7 @@ int main () {
     std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
-    int test_size = 30;
+    int test_size = 50;
     for (int i = 0; i < test_size; i++) {
         std::vector<double> smpl;
         for (int j = 0; j < input_size; j++) {
@@ -46,18 +46,20 @@ int main () {
 
     int epochs = 100000;
     printAccuracy(net, in, out);
-    for (int j = 1; j <= epochs; j++) {
-        auto result = net(in);
-        double loss = net.computeLossAndGradients(out);
-
-        net.backpropLossAndUpdate();
-        net.clearSavedData();
-        
+    for (int j = 0; j <= epochs; j++) {
         if ((j) % 100 == 0) {
+            auto result = net(in);
+            double loss = net.computeLossAndGradients(out);
             std::cout << "Epoch: " << j<< std::endl;
             printAccuracy(net, in, out);
             std::cout << "Loss: " << loss / out.size() << std::endl << std::endl;
         }
+        auto result = net(in);
+        net.computeLossAndGradients(out);
+
+        net.backpropLossAndUpdate();
+        net.clearSavedData();
+        
     }
 
     printAccuracy(net, in, out);
