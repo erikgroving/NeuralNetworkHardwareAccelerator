@@ -30,7 +30,7 @@ public:
         std::vector< std::vector<double> > in_activations,
         std::vector< std::vector<double> > out_activations);
 
-    void updateWeights(double lr);
+    void updateWeights(double lr, double momentum);
 
     void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
 

@@ -25,9 +25,9 @@ std::vector< std::vector<double> > FullyConnected::backward(
     return sensitivity;
 }
 
-void FullyConnected::updateWeights(double lr) {
+void FullyConnected::updateWeights(double lr, double momentum) {
     for (Neuron& n : neurons) {
-        n.updateWeights(lr);
+        n.updateWeights(lr, momentum);
     }
 }
 

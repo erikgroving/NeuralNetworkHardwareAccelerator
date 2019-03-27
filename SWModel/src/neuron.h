@@ -7,7 +7,9 @@
 class Neuron {
     std::vector<double> weights;
     std::vector<double> gradient_per_weight;
+    std::vector<double> momentum_per_weight;
     double              offset_gradient;
+    double              offset_momentum;
     double              offset;
     double              de_dnet;
     uint32_t            fan_in;
@@ -24,7 +26,7 @@ public:
     double computeNet(std::vector<double> input);   
     double computeActivation();
     void calculateGradient(double grad, std::vector<double> act_in, double act_out);
-    void updateWeights(double lr);
+    void updateWeights(double lr, double momentum);
     void clearBackwardData();
 
     const double& getActivation() { return activation; }

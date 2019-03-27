@@ -14,6 +14,7 @@ class Net {
     uint32_t input_size;
     uint32_t output_size;
     double learning_rate;
+    double momentum;
 
 public:
 
@@ -27,7 +28,7 @@ public:
     std::vector<double> convLogitToProb(std::vector<double> logits);
     std::vector<double> getPredictions();
 
-    Net(uint32_t in, uint32_t out, uint32_t bs, double lr);
+    Net(uint32_t in, uint32_t out, uint32_t bs, double lr, double momentum);
     Net(const Net& net);
     ~Net();
 };

@@ -109,7 +109,7 @@ void Net::backpropLossAndUpdate() {
     }
     
     for (int i = layers.size() - 1; i >= 0; i--) {
-        layers[i]->updateWeights(learning_rate);
+        layers[i]->updateWeights(learning_rate, momentum);
     }
 }
 
@@ -149,12 +149,13 @@ void Net::clearSavedData() {
     ol_gradient = std::vector< std::vector<double> >();
 }
 
-Net::Net(uint32_t in, uint32_t out, uint32_t bs, double lr) {
+Net::Net(uint32_t in, uint32_t out, uint32_t bs, double lr, double moment) {
     layers = std::vector<Layer*>();
     input_size = in;
     output_size = out;
     batch_size = bs;
     learning_rate = lr;
+    momentum = moment;
 }
 
 Net::Net(const Net& net) {

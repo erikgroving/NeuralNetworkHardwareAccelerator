@@ -9,7 +9,7 @@ public:
     virtual std::vector< std::vector<double> > backward(std::vector< std::vector<double> >,
                                                         std::vector< std::vector<double> >,
                                                         std::vector< std::vector<double> >) = 0;
-    virtual void updateWeights(double lr) = 0;
+    virtual void updateWeights(double lr, double momentum) = 0;
     virtual const std::vector<double>& getOutput() = 0;
     virtual ~Layer() {};
 };

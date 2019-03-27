@@ -8,13 +8,17 @@
 Neuron::Neuron(uint32_t in) {
     fan_in = in;
     gradient_per_weight = std::vector<double> (fan_in, 0);
+    momentum_per_weight = std::vector<double> (fan_in, 0);
     offset_gradient = 0;
+    offset_momentum = 0;
 }
 
 Neuron::Neuron(const Neuron& n) {
     weights = n.weights;
     gradient_per_weight = n.gradient_per_weight;
+    momentum_per_weight = n.momentum_per_weight;
     offset_gradient = n.offset_gradient;
+    offset_momentum = n.offset_momentum;
     offset = n.offset;
     fan_in = n.fan_in;
     net = n.net;
@@ -80,12 +84,14 @@ void Neuron::calculateGradient(double grad, std::vector<double> act_in, double a
     offset_gradient += de_dnet;
 }
 
-void Neuron::updateWeights(double lr) {
+void Neuron::updateWeights(double lr, double momentum) {
     // update weights
     for (size_t i = 0; i < fan_in; i++) {
-        weights[i] += (lr * gradient_per_weight[i]);
+        momentum_per_weight[i] = momentum * momentum_per_weight[i] + (lr * gradient_per_weight[i]);
+        weights[i] += momentum_per_weight[i];
     }
-    offset += (lr * offset_gradient);
+    offset_momentum = offset_momentum * momentum + (lr * offset_gradient);
+    offset += offset_momentum;
     clearBackwardData();
 }
 

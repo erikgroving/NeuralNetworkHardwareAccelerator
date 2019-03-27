@@ -15,13 +15,14 @@ int main () {
     int input_size = 16*16;
     int output_size = 2;
     int batch_size = 10;
-    double lr = 0.0004;
+    double momentum = 0.9;
+    double lr = 0.0001;
 
-    Net net(input_size, output_size, batch_size, lr);
+    Net net(input_size, output_size, batch_size, lr, momentum);
 
-    Layer* fc = new FullyConnected(input_size, 12);
-    //Layer* fc2 = new FullyConnected(16, 10);
-    Layer* fc3 = new FullyConnected(12, output_size);
+    Layer* fc = new FullyConnected(input_size, 32);
+    //Layer* fc2 = new FullyConnected(10, 4);
+    Layer* fc3 = new FullyConnected(32, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
