@@ -46,9 +46,8 @@ int main () {
     net.addLayer(fc3);
 
     int epochs = 100000;
-    printAccuracy(net, in, out);
     for (int j = 0; j <= epochs; j++) {
-        if ((j) % 100 == 0) {
+        if ((j) % 50 == 0) {
             auto result = net(in);
             double loss = net.computeLossAndGradients(out);
             std::cout << "Epoch: " << j<< std::endl;
