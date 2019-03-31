@@ -19,18 +19,18 @@ def unpickle(file):
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 8, 3, padding = 1)
+        self.conv1 = nn.Conv2d(3, 6, 3, padding = 1, stride=2)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(8, 8, 3, padding = 1)
-        self.conv3 = nn.Conv2d(8, 16, 3, padding = 1)
-        self.fc1 = nn.Linear(16 * 8 * 8, 64)
-        self.fc2 = nn.Linear(64, 10)
+        self.conv2 = nn.Conv2d(6, 8, 3, padding = 1)
+        self.conv3 = nn.Conv2d(8, 10, 3, padding = 1)
+        self.fc1 = nn.Linear(10 * 4 * 4, 32)
+        self.fc2 = nn.Linear(32, 10)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = F.relu(self.conv3(x))
-        x = x.view(-1, 16 * 8 * 8)
+        x = x.view(-1, 10 * 4 * 4)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return x
@@ -108,10 +108,10 @@ def shuffleTensor(in_tensor):
     in_tensor 
 
 
-epochs = 100
-batch_size = 4
+epochs = 2000
+batch_size = 64
 acc_check = 10
-lrate = 0.0001
+lrate = 0.01
 momen = 0.9
 
 criterion = nn.CrossEntropyLoss()
@@ -130,6 +130,17 @@ for i in range(epochs):
 
     lb = 0
     ub = batch_size
+    
+    if i == 25:
+        lrate = 1e-3
+    elif i == 50:
+        lrate = 1e-4
+    elif i == 75:
+        lrate = 1e-5
+
+    for g in optimizer.param_groups:
+        g['lr'] = lrate
+    
 
     while ub <= len(x_train):
 
@@ -147,9 +158,10 @@ for i in range(epochs):
 
         # print statistics
         running_loss += loss.item()
-        if ub % 10000 == 0:    # print every time ub % 10000 = 0
+        print_interval = 200
+        if ub % (batch_size * print_interval) == 0:    # print every time ub % 10000 = 0
             print('[%d, %5d] loss: %.3f' %
-                (i + 1, ub, running_loss / 10000))
+                (i + 1, ub, running_loss / print_interval))
             running_loss = 0.0
 
         lb += batch_size

@@ -16,13 +16,13 @@ int main () {
     int output_size = 2;
     int batch_size = 10;
     double momentum = 0.9;
-    double lr = 0.0001;
+    double lr = 0.001;
 
     Net net(input_size, output_size, batch_size, lr, momentum);
 
-    Layer* fc = new FullyConnected(input_size, 64);
+    Layer* fc = new FullyConnected(input_size, 20);
     //Layer* fc2 = new FullyConnected(10, 4);
-    Layer* fc3 = new FullyConnected(64, output_size);
+    Layer* fc3 = new FullyConnected(20, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
@@ -31,7 +31,7 @@ int main () {
     std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
-    int test_size = 100;
+    int test_size = 50;
     for (int i = 0; i < test_size; i++) {
         std::vector<double> smpl;
         for (int j = 0; j < input_size; j++) {
@@ -45,7 +45,7 @@ int main () {
     //net.addLayer(fc2);
     net.addLayer(fc3);
 
-    int epochs = 100000;
+    int epochs = 10000;
     for (int j = 0; j <= epochs; j++) {
         if ((j) % 50 == 0) {
             auto result = net(in);
