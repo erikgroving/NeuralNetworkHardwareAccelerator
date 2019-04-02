@@ -10,6 +10,8 @@ class ConvLayer : public Layer {
 
     uint32_t dim;
     uint32_t filt_size;
+    uint32_t stride;
+    uint32_t padding;
     uint32_t in_channels;
     uint32_t out_channels;
 
@@ -17,7 +19,7 @@ class ConvLayer : public Layer {
     std::vector<double> output;
 
 public:
-    ConvLayer (uint32_t dim, uint32_t filt_size, uint32_t in_channels, uint32_t out_channels);
+    ConvLayer (uint32_t dim, uint32_t filt_size, uint32_t stride, uint32_t padding, uint32_t in_channels, uint32_t out_channels);
     ConvLayer(const ConvLayer& A);
     ~ConvLayer ();
 
@@ -28,6 +30,7 @@ public:
     void updateWeights(double lr, double momentum);
     const std::vector<double>& getOutput() { return output; };
 
+    std::vector<double> getWindowPixels(const std::vector<double>& input, int ch, int row, int col);
 
 };
 

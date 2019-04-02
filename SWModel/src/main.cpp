@@ -2,6 +2,7 @@
 #include <random>
 #include <chrono>
 
+#include "convolutional.h"
 #include "fullyconnected.h"
 #include "layer.h" 
 #include "net.h"
@@ -18,7 +19,11 @@ int main () {
     double momentum = 0.9;
     double lr = 0.0004;
 
-    Net net(input_size, output_size, batch_size, lr, momentum);
+    Layer* conv1 = new ConvLayer(32, 3, 1, 0, 1, 1);
+    Layer* conv2 = new ConvLayer(32, 3, 1, 1, 1, 1);
+    Layer* conv3 = new ConvLayer(32, 3, 2, 1, 1, 1);
+    Layer* conv4 = new ConvLayer(32, 3, 2, 0, 1, 1);
+  /*  Net net(input_size, output_size, batch_size, lr, momentum);
 
     Layer* fc = new FullyConnected(input_size, 20);
     //Layer* fc2 = new FullyConnected(10, 4);
@@ -62,7 +67,7 @@ int main () {
         
     }
 
-    printAccuracy(net, in, out);
+    printAccuracy(net, in, out);*/
 }
 
 
