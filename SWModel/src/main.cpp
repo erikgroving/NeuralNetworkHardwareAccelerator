@@ -16,7 +16,7 @@ int main () {
     int output_size = 2;
     int batch_size = 10;
     double momentum = 0.9;
-    double lr = 0.001;
+    double lr = 0.0004;
 
     Net net(input_size, output_size, batch_size, lr, momentum);
 
