@@ -28,6 +28,10 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
 
         for (size_t i = 0; i < layers.size(); i++) {
             Layer*&l = layers[i];
+            double max = *(std::max_element(in.begin(), in.end()));
+            for (double& e : in) {
+                e /= max;
+            }
             activations[i].push_back(in);
             l->forward(in);
             in = l->getOutput();

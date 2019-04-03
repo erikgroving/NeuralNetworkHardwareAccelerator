@@ -29,8 +29,8 @@ public:
                                                  std::vector< std::vector<double> >) ;
     void updateWeights(double lr, double momentum);
     const std::vector<double>& getOutput() { return output; };
+    std::vector<double> getWindowPixels(const std::vector<double>& input, int row, int col);
 
-    std::vector<double> getWindowPixels(const std::vector<double>& input, int ch, int row, int col);
 
 };
 

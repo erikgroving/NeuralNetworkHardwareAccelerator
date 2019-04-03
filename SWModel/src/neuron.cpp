@@ -34,7 +34,7 @@ Neuron::~Neuron() {
  */ 
 void Neuron::initWeights() {
     weights.reserve(fan_in);
-    std::normal_distribution<double> distribution(0, sqrt(2. / fan_in));
+    std::normal_distribution<double> distribution(0, sqrt(2. / (fan_in)));
     
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
@@ -77,6 +77,7 @@ void Neuron::calculateGradient(double grad, std::vector<double> act_in, double a
     grad = std::min(grad, 0.5);
     grad = std::max(grad, -0.5);
     de_dnet = grad * dact_dnet;
+
     //std::cout << act_out << " " << dact_dnet << " " << de_dnet << " " << grad << std::endl;
     for (size_t i = 0; i < fan_in; i++) {
         gradient_per_weight[i] += (de_dnet * act_in[i]);
