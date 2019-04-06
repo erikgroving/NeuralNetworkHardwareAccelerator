@@ -24,6 +24,7 @@ public:
     ~FullyConnected() {}
 
     void forward(std::vector<double> input);
+    void forward(std::vector<double> input, bool last_layer);
 
     std::vector< std::vector<double> > backward(
         std::vector< std::vector<double> > gradients_ps, 

@@ -8,6 +8,17 @@ void FullyConnected::forward(std::vector<double> input) {
         output[i] = neurons[i].computeActivation();
     }
 }
+
+void FullyConnected::forward(std::vector<double> input, bool last_layer) {
+    if (last_layer) {
+        for (size_t i = 0; i < output_size; i++) {
+            output[i] = neurons[i].computeNet(input);
+        }
+    } 
+    else {
+        forward(input);
+    }
+}
     
 std::vector< std::vector<double> > FullyConnected::backward(
                     std::vector< std::vector<double> > gradients, 

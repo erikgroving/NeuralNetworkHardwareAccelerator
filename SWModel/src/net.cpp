@@ -33,7 +33,12 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
                 e /= max;
             }
             activations[i].push_back(in);
-            l->forward(in);
+            if (i == layers.size() - 1) {
+                l->forward(in, true);
+            }
+            else {
+                l->forward(in);
+            }
             in = l->getOutput();
         }
 

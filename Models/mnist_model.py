@@ -18,7 +18,8 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(3, 6, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(6 , 8, kernel_size=3, padding=1)
         self.mp = nn.MaxPool2d(2)
-        self.fc = nn.Linear(8*7*7, 10)
+        self.fc = nn.Linear(8*7*7, 32)
+        self.fc2 = nn.Linear(32, 10)
 
     def forward(self, x):
         in_size = x.size(0)
@@ -26,7 +27,8 @@ class Net(nn.Module):
         x = self.mp(F.relu(self.conv2(x)))
         x = F.relu(self.conv3(x))
         x = x.view(in_size, -1)  # flatten the tensor
-        x = self.fc(x)
+        x = F.relu(self.fc(x))
+        x = self.fc2(x)
         #return x
         return F.log_softmax(x, dim=0)
 
@@ -42,81 +44,6 @@ print(Y_train.shape)
 print(X_test.shape)
 print(Y_test.shape)
 
-
-def kFoldValidation():
-    n_epochs = []
-    indices = np.arange(len(X_train))
-    tr_lb = 0
-    tr_ub = int(0.8 * len(X_train))
-    val_lb = tr_ub
-
-    cv_tr_size = int(0.8*len(X_train))
-    val_size = len(X_train) - cv_tr_size
-
-
-
-
-
-    #Test with 5 k-folds to find a somewhat optimal amount of training epochs
-
-    for t in range(5):
-        net = Net()
-        net.cuda()    
-        optimizer = optim.Adam(net.parameters(), lr=0.0001)
-        criterion = nn.NLLLoss()
-
-        np.random.shuffle(indices)
-        X_tr = torch.zeros((cv_tr_size, 1, 28, 28), dtype=torch.float, device=device)
-        Y_tr = torch.zeros((cv_tr_size), dtype=torch.long, device=device)
-        X_val = torch.zeros((val_size, 1, 28, 28), dtype=torch.float, device=device)
-        Y_val = torch.zeros((val_size), dtype=torch.long, device=device)
-        for i in range(tr_ub):
-            X_tr[i] = X_train[indices[i]]
-            Y_tr[i] = Y_train[indices[i]]
-        for i in range(tr_ub, len(X_train)):
-            X_val[i - tr_ub] = X_train[indices[i]]
-            Y_val[i - tr_ub] = Y_train[indices[i]]
-
-        min_err = 10000
-        min_it = 0
-        errors = []
-        it = 0
-        while it < 12 or errors[int(it-1)] < errors[int(it - 10)]:
-            lb = 0
-            ub = 10
-            batch_s = 10
-            while ub <= len(X_tr):
-                optimizer.zero_grad() 
-                output = net(X_tr[lb: ub])
-                loss = criterion(output, Y_tr[lb: ub])
-                loss.backward()
-                optimizer.step()
-                lb += batch_s
-                ub += batch_s
-
-            num_correct = 0
-            val_guess = net(X_val)
-
-            for j in range(len(Y_val)):
-                if torch.argmax(val_guess[j]) == Y_val[j]:
-                    num_correct += 1
-
-            err = 1 - (num_correct / len(Y_val))
-
-
-            it += 1
-        
-            if err < min_err:
-                min_err = err
-                min_it = it
-            print("Epoch: " + str(it) + ": " + str(err))
-            errors.append(err)
-
-        print("MIN_EPOCH: " + str(min_it))
-        n_epochs.append(min_it)
-
-    return n_epochs
-
 def finalTrainAndTest():
     start = timer()
     n_epochs = 100
@@ -130,16 +57,15 @@ def finalTrainAndTest():
     for i in range(n_epochs):
         running_loss = 0.0
 
-        print("Epoch: " + str(i))
         lb = 0
-        ub = 200
-        batch_s = 200
+        ub = 100
+        batch_s = 100
         
-        if i == 20:
+        if i == 15:
             lrate = 1e-3
-        elif i == 40:
+        elif i == 30:
             lrate = 1e-4
-        elif i == 60:
+        elif i == 45:
             lrate = 1e-5
 
         for g in optimizer.param_groups:
@@ -157,6 +83,7 @@ def finalTrainAndTest():
         
         num_correct = 0
         val_guess = net(X_test)
+        loss = criterion(val_guess, Y_test)
 
         for j in range(len(Y_test)):
             if torch.argmax(val_guess[j]) == Y_test[j]:
@@ -164,11 +91,13 @@ def finalTrainAndTest():
 
         acc = (num_correct / len(Y_test))
 
+        test_loss = 0.0 + loss.item()
 
         print("Epoch: " + str(i) + ": " + str(acc))
-        print("Loss: " + str((batch_s * running_loss) / len(X_train)))
+        print("Training loss: " + str((batch_s * running_loss) / len(X_train)))
+        print("Test loss: " + str(test_loss))
         end = timer()
-        print("Training time: " + str(end - start) + " seconds")
+        print("Training time: " + str(end - start) + " seconds\n")
 
     #lb = 0
     #ub = 10
