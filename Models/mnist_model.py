@@ -6,6 +6,7 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 import numpy as np
 import parse_data
+from timeit import default_timer as timer
 from sklearn.model_selection import train_test_split
 import csv
 
@@ -13,29 +14,33 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 4, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(4, 8, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(8 , 12, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(1, 3, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(3, 6, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(6 , 8, kernel_size=3, padding=1)
         self.mp = nn.MaxPool2d(2)
-        self.fc = nn.Linear(12*7*7, 10)
+        self.fc = nn.Linear(8*7*7, 10)
 
     def forward(self, x):
         in_size = x.size(0)
-        x = F.relu(self.mp(self.conv1(x)))
-        x = F.relu(self.mp(self.conv2(x)))
+        x = self.mp(F.relu(self.conv1(x)))
+        x = self.mp(F.relu(self.conv2(x)))
         x = F.relu(self.conv3(x))
         x = x.view(in_size, -1)  # flatten the tensor
         x = self.fc(x)
         #return x
-        return F.log_softmax(x)
+        return F.log_softmax(x, dim=0)
 
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 
 
-X_train, Y_train, X_test = parse_data.loadData('train.csv', 'test.csv', device)
+X_train, Y_train, X_test, Y_test = parse_data.loadData('mnist_train.csv', 'mnist_test.csv', device)
 print(X_train.device)
+print(X_train.shape)
+print(Y_train.shape)
+print(X_test.shape)
+print(Y_test.shape)
 
 
 def kFoldValidation():
@@ -113,17 +118,33 @@ def kFoldValidation():
     return n_epochs
 
 def finalTrainAndTest():
-    n_epochs = 50
+    start = timer()
+    n_epochs = 100
     net = Net()
     net.cuda()    
-    optimizer = optim.Adam(net.parameters(), lr=0.0001)
-    criterion = nn.NLLLoss()
+    lrate = 0.01
+    momen = 0.9
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=lrate, momentum=0.9)
     #Test for number of epochs we found with above function
     for i in range(n_epochs):
+        running_loss = 0.0
+
         print("Epoch: " + str(i))
         lb = 0
-        ub = 10
-        batch_s = 10
+        ub = 200
+        batch_s = 200
+        
+        if i == 20:
+            lrate = 1e-3
+        elif i == 40:
+            lrate = 1e-4
+        elif i == 60:
+            lrate = 1e-5
+
+        for g in optimizer.param_groups:
+            g['lr'] = lrate
+
         while ub <= len(X_train):
             optimizer.zero_grad() 
             output = net(X_train[lb: ub])
@@ -132,39 +153,43 @@ def finalTrainAndTest():
             optimizer.step()
             lb += batch_s
             ub += batch_s
+            running_loss += loss.item()
         
         num_correct = 0
-        val_guess = net(X_train)
+        val_guess = net(X_test)
 
-        for j in range(len(Y_train)):
-            if torch.argmax(val_guess[j]) == Y_train[j]:
+        for j in range(len(Y_test)):
+            if torch.argmax(val_guess[j]) == Y_test[j]:
                 num_correct += 1
 
-        err = 1 - (num_correct / len(Y_train))
+        acc = (num_correct / len(Y_test))
 
 
-        print("Epoch: " + str(i) + ": " + str(err))
+        print("Epoch: " + str(i) + ": " + str(acc))
+        print("Loss: " + str((batch_s * running_loss) / len(X_train)))
+        end = timer()
+        print("Training time: " + str(end - start) + " seconds")
 
-    lb = 0
-    ub = 10
-    batch_s = 10
-    Y_test_pred = []
-    while ub <= len(X_test): 
-        Y_test = net(X_test[lb:ub])
-        lb += batch_s
-        ub += batch_s
-        for pred in Y_test:
-            Y_test_pred.append(torch.argmax(pred))
-    with open('cnn_submission.csv', mode='w', newline='') as sub:
-        sub_writer = csv.writer(sub, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    #lb = 0
+    #ub = 10
+    #batch_s = 10
+    #Y_test_pred = []
+    #while ub <= len(X_test): 
+    #    Y_test = net(X_test[lb:ub])
+    #    lb += batch_s
+    #    ub += batch_s
+    #    for pred in Y_test:
+    #        Y_test_pred.append(torch.argmax(pred))
+    #with open('cnn_submission.csv', mode='w', newline='') as sub:
+    #    sub_writer = csv.writer(sub, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        sub_writer.writerow(['ImageId', 'Label'])    
+    #    sub_writer.writerow(['ImageId', 'Label'])    
 
 
-        for i in range(len(Y_test_pred)):
-            sub_writer.writerow([str(i + 1), str(Y_test_pred[i].item())])
+    #    for i in range(len(Y_test_pred)):
+    #        sub_writer.writerow([str(i + 1), str(Y_test_pred[i].item())])
     
-    print("Submission csv written.")
+    #print("Submission csv written.")
     
 
 #n_epochs = kFoldValidation()

@@ -62,10 +62,20 @@ std::vector<double> ConvLayer::getWindowPixels(const std::vector<double>& input,
     return pixels;
 }
 
-std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector<double> >,
-                                                std::vector< std::vector<double> >,
-                                                std::vector< std::vector<double> >) {
+std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector<double> > gradients,
+                                                std::vector< std::vector<double> > in_activations,
+                                                std::vector< std::vector<double> > out_activations) {
     
+    for (size_t i = 0; i < gradients.size(); i++) {
+        
+        for (size_t j = 0; j < neurons.size(); j++) {
+
+
+            
+        }
+
+    }
+
     return std::vector< std::vector<double> > ();
 }
 

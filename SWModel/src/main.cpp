@@ -31,9 +31,9 @@ int main () {
     conv2->forward(out);*/
     Net net(input_size, output_size, batch_size, lr, momentum);
 
-    Layer* fc = new FullyConnected(input_size, 100);
+    Layer* fc = new FullyConnected(input_size, 64);
     //Layer* fc2 = new FullyConnected(64, 32);
-    Layer* fc3 = new FullyConnected(100, output_size);
+    Layer* fc3 = new FullyConnected(64, output_size);
 
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
@@ -42,7 +42,7 @@ int main () {
     std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::default_random_engine generator(seed);
-    int test_size = 1000;
+    int test_size = 100;
     for (int i = 0; i < test_size; i++) {
         std::vector<double> smpl;
         for (int j = 0; j < input_size; j++) {
