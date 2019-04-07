@@ -34,7 +34,7 @@ class Net(nn.Module):
 
 
 use_cuda = torch.cuda.is_available()
-use_cuda = False
+#use_cuda = False
 device = torch.device("cuda:0" if use_cuda else "cpu")
 
 
@@ -49,7 +49,7 @@ def finalTrainAndTest():
     start = timer()
     n_epochs = 100
     net = Net()
-    #net.cuda()    
+    net.cuda()    
     lrate = 0.01
     momen = 0.9
     criterion = nn.CrossEntropyLoss()

@@ -24,6 +24,7 @@ public:
     ~ConvLayer ();
 
     void forward(std::vector<double>);
+    void forward(std::vector<double>, bool in);
     std::vector< std::vector<double> > backward (std::vector< std::vector<double> >,
                                                  std::vector< std::vector<double> >,
                                                  std::vector< std::vector<double> >) ;

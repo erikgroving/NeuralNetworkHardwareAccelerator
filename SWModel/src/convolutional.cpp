@@ -35,6 +35,10 @@ void ConvLayer::forward(std::vector<double> input) {
 
 }
     
+void ConvLayer::forward(std::vector<double> input, bool in) {
+    forward(input);
+}
+    
 std::vector<double> ConvLayer::getWindowPixels(const std::vector<double>& input, int row, int col) {
     std::vector<double> pixels;
 
