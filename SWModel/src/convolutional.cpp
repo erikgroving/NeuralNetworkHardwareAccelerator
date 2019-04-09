@@ -69,18 +69,26 @@ std::vector<double> ConvLayer::getWindowPixels(const std::vector<double>& input,
 std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector<double> > gradients,
                                                 std::vector< std::vector<double> > in_activations,
                                                 std::vector< std::vector<double> > out_activations) {
+
+    std::vector< std::vector<double> > sensitivity;
+    int dim_sq = dim_o * dim_o;
     
     for (size_t i = 0; i < gradients.size(); i++) {
-        
-        for (size_t j = 0; j < neurons.size(); j++) {
-
-
-            
+        std::vector<double> single_sens;
+        for (size_t j = 0; j < out_channels; j++) {
+            for (size_t k = 0; k < dim_o; k++) {
+                for (size_t l = 0; l < dim_o; l++) {
+                    // Neuron at row k, column l, in output channel j
+                    int idx = l + k * dim_o + j * dim_sq;
+                    std::vector<double> in_act = getWindowPixels(in_activations[i], k, l);
+                    neurons[idx].calculateGradient(gradients[i][idx], in_act, out_activations[i][idx]);
+                    single_sens.push_back(neurons[idx].getSensitivity());
+                }
+            }            
         }
-
+        sensitivity.push_back(single_sens);
     }
-
-    return std::vector< std::vector<double> > ();
+    return sensitivity;
 }
 
 
@@ -105,6 +113,8 @@ ConvLayer::ConvLayer(uint32_t d, uint32_t fsize, uint32_t str, uint32_t pad, uin
     uint32_t steps = 1 + ((dim + (padding * 2) - filt_size) / stride);
 //    std::cout << steps << std::endl;
     uint32_t num_neurons = steps * steps * out_channels;
+
+    dim_o = steps;
 
 //    std::cout << num_neurons << std::endl;    
 

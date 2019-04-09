@@ -14,6 +14,7 @@ class ConvLayer : public Layer {
     uint32_t padding;
     uint32_t in_channels;
     uint32_t out_channels;
+    uint32_t dim_o;
 
     std::vector<Neuron> neurons;
     std::vector<double> output;

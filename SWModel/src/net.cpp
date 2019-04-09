@@ -112,9 +112,20 @@ double Net::computeLossAndGradients(std::vector<int> labeled) {
 // Backpropagate the gradients of the error
 void Net::backpropLossAndUpdate() {
     std::vector< std::vector<double> > gradients = ol_gradient;
+    std::vector< std::vector<double> > sens;
     // Outer layer gradients is just the loss
     for (int i = layers.size() - 1; i >= 0; i--) {
-        gradients = layers[i]->backward(gradients, activations[i], activations[i + 1]);
+        sens = layers[i]->backward(gradients, activations[i], activations[i + 1]);
+        // fully connected gradients
+        // if fully connected check, on layers[i]
+        gradients = std::vector< std::vector<double> >();
+        Layer* l = layers[i];
+        for (size_t j = 0; j < gradients.size(); j++) {
+            // The gradient of neuron i in prev layer is the sum of the weights[i] * dednet of all 
+            // neurons in layer j
+        }
+
+        
     }
     
     for (int i = layers.size() - 1; i >= 0; i--) {
