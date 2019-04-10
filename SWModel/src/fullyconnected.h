@@ -36,6 +36,8 @@ public:
     void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
 
     const std::vector<double>& getOutput() { return output; }
+    const std::vector<Neuron>& getNeurons() { return neurons; }
+    int getType() { return FULLY; }
 };
 
 #endif

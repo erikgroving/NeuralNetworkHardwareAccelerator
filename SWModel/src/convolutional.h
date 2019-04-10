@@ -30,8 +30,10 @@ public:
                                                  std::vector< std::vector<double> >,
                                                  std::vector< std::vector<double> >) ;
     void updateWeights(double lr, double momentum);
+    const std::vector<Neuron>& getNeurons() { return neurons; };
     const std::vector<double>& getOutput() { return output; };
     std::vector<double> getWindowPixels(const std::vector<double>& input, int row, int col);
+    int getType() { return CONV; }
 
 
 };

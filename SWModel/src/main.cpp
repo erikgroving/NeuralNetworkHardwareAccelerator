@@ -17,7 +17,7 @@ int main () {
     int output_size = 2;
     int batch_size = 10;
     double momentum = 0.9;
-    double lr = 0.001;
+    double lr = 0.01;
 
    /* Layer* conv1 = new ConvLayer(32, 3, 1, 0, 1, 1);
     Layer* conv2 = new ConvLayer(32, 3, 1, 1, 1, 1);
@@ -31,8 +31,8 @@ int main () {
     conv2->forward(out);*/
     Net net(input_size, output_size, batch_size, lr, momentum);
 
-    Layer* fc = new FullyConnected(input_size, 64);
-    //Layer* fc2 = new FullyConnected(64, 32);
+    Layer* fc = new FullyConnected(input_size, 128);
+    Layer* fc2 = new FullyConnected(128, 64);
     Layer* fc3 = new FullyConnected(64, output_size);
 
     std::vector< std::vector<double> > in; 
@@ -53,7 +53,7 @@ int main () {
     }
 
     net.addLayer(fc);
-    //net.addLayer(fc2);
+    net.addLayer(fc2);
     net.addLayer(fc3);
 
     int epochs = 10000;

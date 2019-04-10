@@ -3,6 +3,7 @@
 #include <math.h>
 #include <algorithm>
 #include <iostream>
+#include "fullyconnected.h"
 
 void Net::addLayer(Layer* layer) {
     layers.push_back(layer);
@@ -28,10 +29,10 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
 
         for (size_t i = 0; i < layers.size(); i++) {
             Layer*&l = layers[i];
-            double max = *(std::max_element(in.begin(), in.end()));
+            /*double max = *(std::max_element(in.begin(), in.end()));
             for (double& e : in) {
                 e /= max;
-            }
+            }*/
             activations[i].push_back(in);
             if (i == layers.size() - 1) {
                 l->forward(in, true);
@@ -115,14 +116,33 @@ void Net::backpropLossAndUpdate() {
     std::vector< std::vector<double> > sens;
     // Outer layer gradients is just the loss
     for (int i = layers.size() - 1; i >= 0; i--) {
+        //std::cout << "Grad len: " << gradients[0].size() << " Layer len: " << layers[i]->getNeurons().size() << std::endl;
         sens = layers[i]->backward(gradients, activations[i], activations[i + 1]);
         // fully connected gradients
         // if fully connected check, on layers[i]
         gradients = std::vector< std::vector<double> >();
         Layer* l = layers[i];
-        for (size_t j = 0; j < gradients.size(); j++) {
-            // The gradient of neuron i in prev layer is the sum of the weights[i] * dednet of all 
-            // neurons in layer j
+        std::vector<Neuron> neurons = l->getNeurons();
+
+
+        for (size_t j = 0; j < sens.size(); j++) {
+
+            if (l->getType() == FULLY) {
+                // The gradient of neuron i in prev layer is the sum of the weights[i] * de_dnet of all 
+                // neurons in layer j
+                std::vector<double> grad(neurons[0].getWeights().size(), 0);
+                for (size_t k = 0; k < neurons.size(); k++) {
+                    std::vector<double> weights = neurons[k].getWeights();
+                    for (size_t l = 0; l < weights.size(); l++) {
+                        grad[l] += sens[j][k] * weights[l];
+                    }
+                }
+                gradients.push_back(grad);
+            }
+            else if (l->getType() == CONV) {
+                // If the sensitivities of i + 1 layer was a convolution
+
+            }
         }
 
         
