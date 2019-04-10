@@ -17,7 +17,7 @@ int main () {
     int output_size = 2;
     int batch_size = 10;
     double momentum = 0.9;
-    double lr = 0.01;
+    double lr = 0.001;
 
    /* Layer* conv1 = new ConvLayer(32, 3, 1, 0, 1, 1);
     Layer* conv2 = new ConvLayer(32, 3, 1, 1, 1, 1);
@@ -29,12 +29,30 @@ int main () {
     conv2->forward(in_test);
     auto out = conv2->getOutput();
     conv2->forward(out);*/
+
     Net net(input_size, output_size, batch_size, lr, momentum);
 
+    Layer* conv1 = new ConvLayer(16, 3, 1, 1, 1, 1);
+    Layer* conv2 = new ConvLayer(16, 3, 1, 1, 1, 2);
+    Layer* fc1_ = new FullyConnected(16*16*2, output_size);
+    Layer* fc2_ = new FullyConnected(32, output_size);
+
+    net.addLayer(conv1);
+    net.addLayer(conv2);
+    net.addLayer(fc1_);
+    //net.addLayer(fc2_);
+
+/*
     Layer* fc = new FullyConnected(input_size, 128);
     Layer* fc2 = new FullyConnected(128, 64);
     Layer* fc3 = new FullyConnected(64, output_size);
 
+
+    net.addLayer(fc);
+    net.addLayer(fc2);
+    net.addLayer(fc3);*/
+    
+    
     std::vector< std::vector<double> > in; 
     std::vector<int> out; 
 
@@ -52,9 +70,6 @@ int main () {
         out.push_back(distribution_out(generator));
     }
 
-    net.addLayer(fc);
-    net.addLayer(fc2);
-    net.addLayer(fc3);
 
     int epochs = 10000;
     for (int j = 0; j <= epochs; j++) {

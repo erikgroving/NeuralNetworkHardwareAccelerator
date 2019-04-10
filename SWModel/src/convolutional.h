@@ -32,6 +32,10 @@ public:
     void updateWeights(double lr, double momentum);
     const std::vector<Neuron>& getNeurons() { return neurons; };
     const std::vector<double>& getOutput() { return output; };
+    const uint32_t getDim() const { return dim; }
+    const uint32_t getInChannels() const { return in_channels; }
+    const uint32_t getOutChannels() const { return out_channels; }
+    const uint32_t getFiltSize() const { return filt_size; }
     std::vector<double> getWindowPixels(const std::vector<double>& input, int row, int col);
     int getType() { return CONV; }
 

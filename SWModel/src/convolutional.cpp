@@ -17,8 +17,8 @@ void ConvLayer::forward(std::vector<double> input) {
     
 
 
-    std::cout << "Neurons: " << neurons.size() << std::endl;
-    std::cout << "Start: " << start << std::endl;
+    /*std::cout << "Neurons: " << neurons.size() << std::endl;
+    std::cout << "Start: " << start << std::endl;*/
     for (unsigned int i = 0; i < out_channels; i++) { // channel of output
         for (unsigned int j = 0; j < in_channels; j++) { // channel of input
             for (unsigned int k = start; k < end; k += stride) { // row
@@ -27,7 +27,7 @@ void ConvLayer::forward(std::vector<double> input) {
                     int out_idx = i * d_step + ((k - start) / stride) * h_steps + ((l - start) / stride);
                     neurons[out_idx].computeNet(pixels);
                     output[out_idx] = neurons[out_idx].computeActivation();
-                    std::cout << output[out_idx] << std::endl;
+                    /*std::cout << output[out_idx] << std::endl;*/
                 }
             }
         }
