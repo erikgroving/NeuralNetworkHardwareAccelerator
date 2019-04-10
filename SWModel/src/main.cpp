@@ -17,7 +17,7 @@ int main () {
     int output_size = 2;
     int batch_size = 10;
     double momentum = 0.9;
-    double lr = 0.001;
+    double lr = 0.001; 
 
    /* Layer* conv1 = new ConvLayer(32, 3, 1, 0, 1, 1);
     Layer* conv2 = new ConvLayer(32, 3, 1, 1, 1, 1);
@@ -32,15 +32,15 @@ int main () {
 
     Net net(input_size, output_size, batch_size, lr, momentum);
 
-    Layer* conv1 = new ConvLayer(16, 3, 1, 1, 1, 1);
-    Layer* conv2 = new ConvLayer(16, 3, 1, 1, 1, 2);
-    Layer* fc1_ = new FullyConnected(16*16*2, output_size);
-    Layer* fc2_ = new FullyConnected(32, output_size);
+   // Layer* conv1 = new ConvLayer(16, 3, 1, 1, 1, 1);
+    //Layer* conv2 = new ConvLayer(16, 3, 1, 1, 1, 8);
+    Layer* fc1_ = new FullyConnected(16*16, 16*16*8);
+    Layer* fc2_ = new FullyConnected(16*16*8, output_size);
 
-    net.addLayer(conv1);
-    net.addLayer(conv2);
+    //net.addLayer(conv1);
+    //net.addLayer(conv2);
     net.addLayer(fc1_);
-    //net.addLayer(fc2_);
+    net.addLayer(fc2_);
 
 /*
     Layer* fc = new FullyConnected(input_size, 128);

@@ -141,7 +141,7 @@ void Net::backpropLossAndUpdate() {
                 gradients.push_back(grad);
             }
             else if (l->getType() == CONV) {
-                ConvLayer* cl = static_cast<ConvLayer* >(l);
+                ConvLayer* cl = dynamic_cast<ConvLayer* >(l);
                 // If the sensitivities of i + 1 layer were from a convolution, then the
                 // neurons for layer i only need to do weights[i] * de_dnet for
                 // the relevant windows that the activation was in 
@@ -158,6 +158,7 @@ void Net::backpropLossAndUpdate() {
                     int row = (k - (chan * dim * dim)) / dim;
                     int col = (k - (chan * dim * dim + row * dim)) % dim;
                     int filt_size = cl->getFiltSize();
+                    int filt_sq = filt_size * filt_size;
                     // Iterate over the neurons in the window for this gradient
                     int dim_sq = dim * dim;
                     int start_row = row - (filt_size / 2);
@@ -175,8 +176,8 @@ void Net::backpropLossAndUpdate() {
                                     continue;
                                 }
                                 int o_neur_idx = o * dim_sq + m * dim + n;
-                                int filt_offset = (filt_size * filt_size) - (count + 1);
-                                int weight_idx = chan * dim_sq + filt_offset;
+                                int filt_offset = (filt_sq) - (count + 1);
+                                int weight_idx = (chan * filt_sq) + filt_offset;
 
                                 grad[k] += sens[j][o_neur_idx] * neurons[o_neur_idx].getWeights()[weight_idx];
                             }
