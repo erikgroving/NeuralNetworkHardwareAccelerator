@@ -32,15 +32,17 @@ int main () {
 
     Net net(input_size, output_size, batch_size, lr, momentum);
 
-   // Layer* conv1 = new ConvLayer(16, 3, 1, 1, 1, 1);
+    Layer* conv1 = new ConvLayer(16, 1, 1, 0, 1, 1);
     //Layer* conv2 = new ConvLayer(16, 3, 1, 1, 1, 8);
-    Layer* fc1_ = new FullyConnected(16*16, 16*16*8);
-    Layer* fc2_ = new FullyConnected(16*16*8, output_size);
+    Layer* fc1_ = new FullyConnected(16*16, 16*16*1);
+    Layer* fc2_ = new FullyConnected(16*16*1, 16*16*1);
+    Layer* fc3_ = new FullyConnected(16*16*1, output_size);
 
-    //net.addLayer(conv1);
+    net.addLayer(conv1);
     //net.addLayer(conv2);
-    net.addLayer(fc1_);
+    //net.addLayer(fc1_);
     net.addLayer(fc2_);
+    net.addLayer(fc3_);
 
 /*
     Layer* fc = new FullyConnected(input_size, 128);
