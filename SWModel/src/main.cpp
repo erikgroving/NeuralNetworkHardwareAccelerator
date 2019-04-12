@@ -9,47 +9,73 @@
 #include "net.h"
 
 void printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out);
-
+void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out, int n_epochs);
 int main () {
 
     std::cout << "Running software model...\n";
 
-    int input_size = 16*16;
-    int output_size = 2;
-    int batch_size = 10;
+    int input_size = 28*28;
+    int output_size = 10;
+    int batch_size = 100;
     double momentum = 0.9;
     double lr = 0.001; 
+    int n_epochs = 100;
 
-   /* Layer* conv1 = new ConvLayer(32, 3, 1, 0, 1, 1);
-    Layer* conv2 = new ConvLayer(32, 3, 1, 1, 1, 1);
-    Layer* conv3 = new ConvLayer(32, 3, 2, 1, 1, 1);
-    Layer* conv4 = new ConvLayer(32, 3, 2, 0, 1, 1);
-
-    //conv1->forward(std::vector<double>());
-    std::vector<double> in_test(32*32*1, 1);
-    conv2->forward(in_test);
-    auto out = conv2->getOutput();
-    conv2->forward(out);*/
-
-    Net net(input_size, output_size, batch_size, lr, momentum);
-
-    Layer* conv1 = new ConvLayer(16, 3, 1, 1, 1, 1);
-    //Layer* conv2 = new ConvLayer(16, 3, 1, 1, 2, 4);
-    Layer* fc1_ = new FullyConnected(16*16, 16);
-    Layer* fc2_ = new FullyConnected(16*16, 16*16);
-    Layer* fc3_ = new FullyConnected(16*16, output_size);
-
-    net.addLayer(conv1);
-    //net.addLayer(conv2);
-    //net.addLayer(fc1_);
-    net.addLayer(fc2_);
-    net.addLayer(fc3_);
-
-    //std::vector< std::vector<double> > trainX = readImages("");
     std::vector< std::vector<double> > trainX;
     std::vector<int> trainY;
     trainX = readImages("data/train-images.idx3-ubyte");
     trainY = readLabels("data/train-labels.idx1-ubyte");
+    Net net(input_size, output_size, batch_size, lr, momentum);
+
+    Layer* fc = new FullyConnected(28*28, 300);
+    Layer* fc2 = new FullyConnected(300, 100);
+    Layer* fc3 = new FullyConnected(100, 10);
+
+    net.addLayer(fc);
+    net.addLayer(fc2);
+    net.addLayer(fc3);
+    
+    trainNet(net, trainX, trainY, n_epochs);
+
+    printAccuracy(net, trainX, trainY);   
+}
+
+void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out, int n_epochs) {
+    std::cout << "Starting Accuracy" << std::endl;
+    printAccuracy(net, in, out);
+    std::cout <<std::endl;
+    for (int i = 0; i <= n_epochs; i++) {
+        double loss = 0.0;
+        int batch_size = net.getBatchSize();
+        int lb = 0;
+        int ub = batch_size;
+        int size = in.size();
+        while (ub <= size) {
+            
+            /* Get the batch */
+            std::vector< std::vector<double> >::iterator startX = in.begin() + lb;
+            std::vector< std::vector<double> >::iterator endX = in.begin() + ub;
+            std::vector<int>::iterator startY = out.begin() + lb;
+            std::vector<int>::iterator endY = out.begin() + ub;
+
+            std::vector< std::vector<double> > in_batch(startX, endX);
+            std::vector<int> out_batch(startY, endY);
+            /* Train by batch size! */
+            auto result = net(in_batch);
+            loss += net.computeLossAndGradients(out_batch);
+
+            net.backpropLossAndUpdate();
+            net.clearSavedData();
+
+            lb += batch_size;
+            ub += batch_size;
+        }
+        std::cout << "Epoch: " << i << std::endl;
+        printAccuracy(net, in, out);
+        std::cout << "Loss: " << loss / (double)in.size() << std::endl << std::endl;
+        
+    }
+}
 
 /*
     Layer* fc = new FullyConnected(input_size, 128);
@@ -97,8 +123,8 @@ int main () {
         
     }
 
-    printAccuracy(net, in, out);*/
-}
+    printAccuracy(net, in, out);
+}*/
 
 
 void printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out) {

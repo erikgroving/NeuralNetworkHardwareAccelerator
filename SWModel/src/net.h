@@ -28,6 +28,8 @@ public:
     std::vector<double> convLogitToProb(std::vector<double> logits);
     std::vector<double> getPredictions();
 
+    const uint32_t getBatchSize() const { return batch_size; }
+
     Net(uint32_t in, uint32_t out, uint32_t bs, double lr, double momentum);
     Net(const Net& net);
     ~Net();
