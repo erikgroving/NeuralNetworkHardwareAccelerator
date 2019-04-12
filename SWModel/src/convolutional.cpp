@@ -11,24 +11,17 @@ void ConvLayer::forward(std::vector<double> input) {
         exit(1);
     }
     
-    
     unsigned start = (filt_size / 2) - padding;
-    unsigned end = (dim + padding) - (filt_size / 2);
-    
 
-
-    /*std::cout << "Neurons: " << neurons.size() << std::endl;
-    std::cout << "Start: " << start << std::endl;*/
     for (unsigned int i = 0; i < out_channels; i++) { // channel of output
-        for (unsigned int j = 0; j < in_channels; j++) { // channel of input
-            for (unsigned int k = start; k < end; k += stride) { // row
-                for (unsigned int l = start; l < end; l += stride) { // column
-                    std::vector<double> pixels = getWindowPixels(input, k, l);
-                    int out_idx = i * d_step + ((k - start) / stride) * h_steps + ((l - start) / stride);
-                    neurons[out_idx].computeNet(pixels);
-                    output[out_idx] = neurons[out_idx].computeActivation();
-                    /*std::cout << output[out_idx] << std::endl;*/
-                }
+        for (unsigned int k = 0; k < dim_o; k++) { // row
+            for (unsigned int l = 0; l < dim_o; l++) { // column
+                int x = l * stride + start;
+                int y = k * stride + start;
+                std::vector<double> pixels = getWindowPixels(input, y, x);
+                int out_idx = i * dim_o * dim_o + k * dim_o + l;
+                neurons[out_idx].computeNet(pixels);
+                output[out_idx] = neurons[out_idx].computeActivation();
             }
         }
     }
@@ -111,12 +104,10 @@ ConvLayer::ConvLayer(uint32_t d, uint32_t fsize, uint32_t str, uint32_t pad, uin
     uint32_t weights_per_fmap = filt_size * filt_size * in_channels;
     
     uint32_t steps = 1 + ((dim + (padding * 2) - filt_size) / stride);
-//    std::cout << steps << std::endl;
     uint32_t num_neurons = steps * steps * out_channels;
 
     dim_o = steps;
 
-//    std::cout << num_neurons << std::endl;    
 
     output.resize(num_neurons);
     neurons.reserve(num_neurons);

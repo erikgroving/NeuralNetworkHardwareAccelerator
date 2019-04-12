@@ -117,7 +117,7 @@ void Net::backpropLossAndUpdate() {
     std::vector< std::vector<double> > sens;
     // Outer layer gradients is just the loss
     for (int i = layers.size() - 1; i >= 0; i--) {
-        //std::cout << "Grad len: " << gradients[0].size() << " Layer len: " << layers[i]->getNeurons().size() << std::endl;
+        //std::cout << "Grad len: " << gradients[0].size() << " Layer len: " << layers[i]->getNeurons().size() << " Prev: " << activations[i].size() << " Next: " << activations[i+1].size() << std::endl;
         sens = layers[i]->backward(gradients, activations[i], activations[i + 1]);
         // fully connected gradients
         // if fully connected check, on layers[i]
