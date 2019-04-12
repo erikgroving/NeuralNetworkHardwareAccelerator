@@ -3,8 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <stdint.h>
 
-std::vector<double> readLabels(std::string filename);
+std::vector<int> readLabels(std::string filename);
 std::vector< std::vector<double> > readImages(std::string filename);
 
 #endif

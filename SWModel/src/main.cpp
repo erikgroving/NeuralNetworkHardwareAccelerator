@@ -45,9 +45,11 @@ int main () {
     net.addLayer(fc2_);
     net.addLayer(fc3_);
 
-    std::vector< std::vector<double> > trainX = readImages("");
-    std::vector<double> trainY = readLabels("");
-
+    //std::vector< std::vector<double> > trainX = readImages("");
+    std::vector< std::vector<double> > trainX;
+    std::vector<int> trainY;
+    trainX = readImages("data/train-images.idx3-ubyte");
+    trainY = readLabels("data/train-labels.idx1-ubyte");
 
 /*
     Layer* fc = new FullyConnected(input_size, 128);
@@ -93,9 +95,9 @@ int main () {
         net.backpropLossAndUpdate();
         net.clearSavedData();
         
-    }*/
+    }
 
-    printAccuracy(net, in, out);
+    printAccuracy(net, in, out);*/
 }
 
 
