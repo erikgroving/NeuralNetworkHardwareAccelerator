@@ -18,8 +18,8 @@ int main () {
     int output_size = 10;
     int batch_size = 100;
     double momentum = 0.9;
-    double lr = 0.0001; 
-    int n_epochs = 100;
+    double lr = 0.001; 
+    int n_epochs = 1000;
 
     std::vector< std::vector<double> > trainX;
     std::vector<int> trainY;
@@ -31,11 +31,11 @@ int main () {
     trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 100);
     trainY = std::vector<int> (trainY.begin(), trainY.begin() + 100);
 
-    Layer* fc = new FullyConnected(28*28, 64);
+    Layer* fc = new FullyConnected(28*28, 300);
     //Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 4);
     //Layer* conv2 = new ConvLayer(28, 3, 1, 1, 3, 6);
     Layer* fc2 = new FullyConnected(300, 100);
-    Layer* fc3 = new FullyConnected(64, 10);
+    Layer* fc3 = new FullyConnected(300, 10);
 
     net.addLayer(fc);
     //net.addLayer(conv1);
