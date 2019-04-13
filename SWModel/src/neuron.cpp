@@ -74,8 +74,8 @@ double Neuron::computeActivation() {
 
 void Neuron::calculateGradient(double grad, std::vector<double> act_in, double act_out) {
     double dact_dnet = (act_out > 0) ? 1 : 0;
-   /* grad = std::min(grad, 0.5);
-    grad = std::max(grad, -0.5)*/;
+    grad = std::min(grad, 0.5);
+    grad = std::max(grad, -0.5);
     de_dnet = grad * dact_dnet;
 
     //std::cout << act_out << " " << dact_dnet << " " << de_dnet << " " << grad << std::endl;

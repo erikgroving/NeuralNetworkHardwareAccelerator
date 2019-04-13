@@ -66,6 +66,7 @@ std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector
     std::vector< std::vector<double> > sensitivity;
     int dim_sq = dim_o * dim_o;
     
+    unsigned start = (filt_size / 2) - padding;
     for (size_t i = 0; i < gradients.size(); i++) {
         std::vector<double> single_sens;
         for (size_t j = 0; j < out_channels; j++) {
@@ -73,7 +74,10 @@ std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector
                 for (size_t l = 0; l < dim_o; l++) {
                     // Neuron at row k, column l, in output channel j
                     int idx = l + k * dim_o + j * dim_sq;
-                    std::vector<double> in_act = getWindowPixels(in_activations[i], k, l);
+                    int x = l * stride + start;
+                    int y = k * stride + start;
+
+                    std::vector<double> in_act = getWindowPixels(in_activations[i], y, x);
                     neurons[idx].calculateGradient(gradients[i][idx], in_act, out_activations[i][idx]);
                     single_sens.push_back(neurons[idx].getSensitivity());
                 }

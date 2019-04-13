@@ -31,7 +31,7 @@ std::vector< std::vector<double> > readImages(std::string s) {
         std::vector<double> img;
         for (unsigned i = 0; i < rows * cols; i++) {
             f.read((char*)&pixel, 1);
-            double p = (double)pixel / 255.;
+            double p = ((double)pixel / 255.) - 0.5;
             img.push_back(p);
         }
         if (!f.eof()) {
