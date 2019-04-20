@@ -31,6 +31,7 @@ set_property target_language Verilog [current_project]
 set_property board_part em.avnet.com:zed:part0:1.4 [current_project]
 set_property ip_output_repo c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
+add_files c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1.coe
 read_verilog -library xil_defaultlib -sv C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv
 # Mark all dcp files as not used in implementation to prevent them from being
 # stitched into the results of this synthesis run. Any black boxes in the

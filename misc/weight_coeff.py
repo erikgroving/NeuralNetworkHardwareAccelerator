@@ -42,7 +42,7 @@ for p in params:
 print(params[0])
 print(binary_params[0])
 
-contents = "memory_initialization_radix=2'\nmemory_initialization_vector=\n"
+contents = "memory_initialization_radix=2;\nmemory_initialization_vector=\n"
 for b in binary_params:
     contents += str(b) + ",\n" 
 contents = contents[:-2] + ";"

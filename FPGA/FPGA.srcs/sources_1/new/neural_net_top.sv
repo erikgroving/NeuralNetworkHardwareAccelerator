@@ -25,22 +25,10 @@ module neural_net_top(
     input                   reset,
     output  logic [7: 0]    led_o
     );
-    
-    
-    logic [31: 0] cntr;
-    
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            cntr <= 28'b0;
-        end
-        else begin
-            cntr <= cntr + 1'b1;
-        end
-    end
-    
+
 
     always_comb begin
-        led_o[7:0] = cntr[31:24];
+        led_o[7:0] = 8'hA3;
     end
     
     
