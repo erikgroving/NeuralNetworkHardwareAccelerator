@@ -19,7 +19,7 @@ int main () {
     int output_size = 10;
     int batch_size = 100;
     double momentum = 0.9;
-    double lr = 0.0001; 
+    double lr = 0.001; 
     int n_epochs = 1000;
 
     std::vector< std::vector<double> > trainX;
@@ -29,21 +29,22 @@ int main () {
     Net net(input_size, output_size, batch_size, lr, momentum);
 
     /* use a smaller dataset for testing, 1000 samples */
-    trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 100);
-    trainY = std::vector<int> (trainY.begin(), trainY.begin() + 100);
+    trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 500);
+    trainY = std::vector<int> (trainY.begin(), trainY.begin() + 500);
 
     Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
-    Layer* pool1 = new PoolingLayer(28, 14, 3);
+    Layer* pool1 = new PoolingLayer(8, 4, 5);
     Layer* conv2 = new ConvLayer(14, 3, 1, 1, 3, 6);
-    Layer* pool2 = new PoolingLayer(14, 7, 6);
-    Layer* fc1 = new FullyConnected(6*7*7, 32);
-    Layer* fc2 = new FullyConnected(32, 10);
+    Layer* pool2 = new PoolingLayer(28, 14, 1);
+    Layer* fc1 = new FullyConnected(14*14, 320);
+    Layer* fc2 = new FullyConnected(80, 10);
 
-    net.addLayer(conv1);
-    net.addLayer(pool1);
-    net.addLayer(conv2);
+    //net.addLayer(conv1);
     net.addLayer(pool2);
     net.addLayer(fc1);
+    net.addLayer(pool1);
+    /*net.addLayer(conv2);*/
+    //net.addLayer(pool2);
     net.addLayer(fc2);
     
     trainNet(net, trainX, trainY, n_epochs);
