@@ -30,8 +30,8 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
 
         for (size_t i = 0; i < layers.size(); i++) {
             Layer*&l = layers[i];
-            double max = *(std::max_element(in.begin(), in.end()));
-            /*for (double& e : in) {
+            /*double max = *(std::max_element(in.begin(), in.end()));
+            for (double& e : in) {
                 e /= max;
             }*/
             activations[i].push_back(in);
@@ -125,67 +125,71 @@ void Net::backpropLossAndUpdate() {
         Layer* l = layers[i];
         std::vector<Neuron> neurons = l->getNeurons();
 
+        if (l->getType() == POOL) {
+            gradients = sens;
+        }
+        else {
+            for (size_t j = 0; j < sens.size(); j++) {
 
-        for (size_t j = 0; j < sens.size(); j++) {
-
-            if (l->getType() == FULLY) {
-                // The gradient of neuron i in prev layer is the sum of the weights[i] * de_dnet of all 
-                // neurons in layer j
-                std::vector<double> grad(neurons[0].getWeights().size(), 0);
-                for (size_t k = 0; k < neurons.size(); k++) {
-                    std::vector<double> weights = neurons[k].getWeights();
-                    for (size_t l = 0; l < weights.size(); l++) {
-                        grad[l] += sens[j][k] * weights[l];
-                    }
-                }
-                gradients.push_back(grad);
-            }
-            else if (l->getType() == CONV) {
-                ConvLayer* cl = dynamic_cast<ConvLayer* >(l);
-                // If the sensitivities of i + 1 layer were from a convolution, then the
-                // neurons for layer i only need to do weights[i] * de_dnet for
-                // the relevant windows that the activation was in 
-                int dim = cl->getDim();
-                int in_chan = cl->getInChannels();
-                int out_chan = cl->getOutChannels();
-
-                int num_neurons = dim * dim * in_chan;  // amount of gradients to give previous layer
-                std::vector<double> grad(num_neurons, 0);
-
-                for (int k = 0; k < num_neurons; k++) {
-                    // for each window it goes to... need to know which weight to use
-                    int chan = k / (dim * dim);
-                    int row = (k - (chan * dim * dim)) / dim;
-                    int col = (k - (chan * dim * dim + row * dim)) % dim;
-                    int filt_size = cl->getFiltSize();
-                    int filt_sq = filt_size * filt_size;
-                    // Iterate over the neurons in the window for this gradient
-                    int dim_sq = dim * dim;
-                    int start_row = row - (filt_size / 2);
-                    int end_row = row + (filt_size / 2);
-                    int start_col = col - (filt_size / 2);
-                    int end_col = col + (filt_size / 2);
-
-                    //std::cout << "\n--------------------------------\n";
-                    //std::cout << "Channel: " << chan << "\t\tRow: " << row << "\t\tCol: " << col << std::endl;
-                    for (int o = 0; o < out_chan; o++) {
-                        int count = 0;
-                        for (int m = start_row; m <= end_row; m++) {
-                            for (int n = start_col; n <= end_col; n++) {
-                                if (m < 0 || m >= dim || n < 0 || n >= dim) {
-                                    continue;
-                                }
-                                int o_neur_idx = o * dim_sq + m * dim + n;
-                                int filt_offset = (filt_sq) - (count + 1);
-                                int weight_idx = (chan * filt_sq) + filt_offset;
-
-                                grad[k] += sens[j][o_neur_idx] * neurons[o_neur_idx].getWeights()[weight_idx];
-                            }
-                            count++;
+                if (l->getType() == FULLY) {
+                    // The gradient of neuron i in prev layer is the sum of the weights[i] * de_dnet of all 
+                    // neurons in layer j
+                    std::vector<double> grad(neurons[0].getWeights().size(), 0);
+                    for (size_t k = 0; k < neurons.size(); k++) {
+                        std::vector<double> weights = neurons[k].getWeights();
+                        for (size_t l = 0; l < weights.size(); l++) {
+                            grad[l] += sens[j][k] * weights[l];
                         }
                     }
+                    gradients.push_back(grad);
                 }
-                gradients.push_back(grad);
+                else if (l->getType() == CONV) {
+                    ConvLayer* cl = dynamic_cast<ConvLayer* >(l);
+                    // If the sensitivities of i + 1 layer were from a convolution, then the
+                    // neurons for layer i only need to do weights[i] * de_dnet for
+                    // the relevant windows that the activation was in 
+                    int dim = cl->getDim();
+                    int in_chan = cl->getInChannels();
+                    int out_chan = cl->getOutChannels();
+
+                    int num_neurons = dim * dim * in_chan;  // amount of gradients to give previous layer
+                    std::vector<double> grad(num_neurons, 0);
+
+                    for (int k = 0; k < num_neurons; k++) {
+                        // for each window it goes to... need to know which weight to use
+                        int chan = k / (dim * dim);
+                        int row = (k - (chan * dim * dim)) / dim;
+                        int col = (k - (chan * dim * dim + row * dim)) % dim;
+                        int filt_size = cl->getFiltSize();
+                        int filt_sq = filt_size * filt_size;
+                        // Iterate over the neurons in the window for this gradient
+                        int dim_sq = dim * dim;
+                        int start_row = row - (filt_size / 2);
+                        int end_row = row + (filt_size / 2);
+                        int start_col = col - (filt_size / 2);
+                        int end_col = col + (filt_size / 2);
+
+                        //std::cout << "\n--------------------------------\n";
+                        //std::cout << "Channel: " << chan << "\t\tRow: " << row << "\t\tCol: " << col << std::endl;
+                        for (int o = 0; o < out_chan; o++) {
+                            int count = 0;
+                            for (int m = start_row; m <= end_row; m++) {
+                                for (int n = start_col; n <= end_col; n++) {
+                                    if (m < 0 || m >= dim || n < 0 || n >= dim) {
+                                        continue;
+                                    }
+                                    int o_neur_idx = o * dim_sq + m * dim + n;
+                                    int filt_offset = (filt_sq) - (count + 1);
+                                    int weight_idx = (chan * filt_sq) + filt_offset;
+
+                                    grad[k] += sens[j][o_neur_idx] * neurons[o_neur_idx].getWeights()[weight_idx];
+                                }
+                                count++;
+                            }
+                        }
+                    }
+                    gradients.push_back(grad);
+                }
             }
         }
 

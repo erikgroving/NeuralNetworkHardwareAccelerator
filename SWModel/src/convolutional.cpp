@@ -3,7 +3,6 @@
 #include <iostream>
 
 void ConvLayer::forward(std::vector<double> input) {
-    unsigned d_step = neurons.size() / out_channels;   // amount of neurons per output channel
     uint32_t h_steps = 1 + ((dim + (padding * 2) - filt_size) / stride);
 
     if (input.size() != h_steps * h_steps * in_channels) {
