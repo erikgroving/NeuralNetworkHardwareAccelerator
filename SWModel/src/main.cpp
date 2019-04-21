@@ -29,8 +29,8 @@ int main () {
     Net net(input_size, output_size, batch_size, lr, momentum);
 
     /* use a smaller dataset for testing, 1000 samples */
-    trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 500);
-    trainY = std::vector<int> (trainY.begin(), trainY.begin() + 500);
+    trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 10000);
+    trainY = std::vector<int> (trainY.begin(), trainY.begin() + 10000);
 
     Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
     Layer* pool1 = new PoolingLayer(8, 4, 5);
