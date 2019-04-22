@@ -15,9 +15,9 @@ void ConvLayer::forward(std::vector<double> input) {
     for (unsigned int i = 0; i < out_channels; i++) { // channel of output
         for (unsigned int k = 0; k < dim_o; k++) { // row
             for (unsigned int l = 0; l < dim_o; l++) { // column
-                int x = l * stride + start;
-                int y = k * stride + start;
-                std::vector<double> pixels = getWindowPixels(input, y, x);
+                int row = k * stride + start;
+                int col = l * stride + start;
+                std::vector<double> pixels = getWindowPixels(input, row, col);
                 int out_idx = i * dim_o * dim_o + k * dim_o + l;
                 neurons[out_idx].computeNet(pixels);
                 output[out_idx] = neurons[out_idx].computeActivation();
@@ -54,7 +54,6 @@ std::vector<double> ConvLayer::getWindowPixels(const std::vector<double>& input,
             }
         }
     }
-
     return pixels;
 }
 
@@ -73,10 +72,9 @@ std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector
                 for (size_t l = 0; l < dim_o; l++) {
                     // Neuron at row k, column l, in output channel j
                     int idx = l + k * dim_o + j * dim_sq;
-                    int x = l * stride + start;
-                    int y = k * stride + start;
-
-                    std::vector<double> in_act = getWindowPixels(in_activations[i], y, x);
+                    int row = k * stride + start;
+                    int col = l * stride + start;
+                    std::vector<double> in_act = getWindowPixels(in_activations[i], row, col);
                     neurons[idx].calculateGradient(gradients[i][idx], in_act, out_activations[i][idx]);
                     single_sens.push_back(neurons[idx].getSensitivity());
                 }
