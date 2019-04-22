@@ -27,6 +27,10 @@ module neural_net_top(
     );
 
 
+    // FC1
+    fc1_layer fc1_layer_i (
+        );
+
     always_comb begin
         led_o[7:0] = 8'hA3;
     end
