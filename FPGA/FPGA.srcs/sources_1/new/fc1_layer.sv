@@ -1,21 +1,21 @@
 `timescale 1ns / 1ps
 
 module fc1_layer(
-        input                                                                   clk,
-        input                                                                   rst,
+        input                                                           clk,
+        input                                                           rst,
+       
+        input  [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]  activations_i,
+        input                                                           valid_i,
         
-        input   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]         activations_i,
-        input                                                                   valid_i,
         
-        
-        output logic [`FC1_KERNEL_SIZE - 1: 0]                                  activations_used,
-        output logic [`FC1_N_KERNELS - 1: 0][15: 0]                             activation_o,
-        output logic                                                            valid_o
+        output logic [`FC1_KERNEL_SIZE - 1: 0]                          activations_used,
+        output logic [`FC1_N_KERNELS - 1: 0][15: 0]                     activation_o,
+        output logic                                                    valid_o
     );
     
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]                           addrs_o;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           addrs_a;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           addrs_b;
+    logic   [(2 * `FC1_KERNEL_SIZE) - 1: 0][`FC1_ADDR - 1: 0]          addrs_o;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]                addrs_a;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]                addrs_b;
     logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_in_a;
     logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_in_b;
     logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_out_a;
@@ -26,7 +26,7 @@ module fc1_layer(
     logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]    weights;
     logic   [`FC1_N_KERNELS - 1: 0][15: 0]                             bias;
     logic   [`FC1_N_KERNELS - 1: 0]                                    has_bias;
-    logic                                                               forward;
+    logic                                                              forward;
     
     assign forward = 1'b1;    
     assign bias = data_out_a[0];
@@ -37,10 +37,10 @@ module fc1_layer(
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            activations_i_reg = 0;
+            activations_i_reg <= 0;
         end
-        else if (valid_i) begin
-            activations_i_reg = activations_i;
+        else begin
+            activations_i_reg <= activations_i;
         end
     end
  
@@ -55,6 +55,7 @@ module fc1_layer(
         .forward(forward),
         // outputs
         .has_bias(has_bias),
+        .activations_used(activations_used),
         .addrs_o(addrs_o)
     );
     
