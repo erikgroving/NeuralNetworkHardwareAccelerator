@@ -19,7 +19,8 @@ def intToBinaryString(x, l):
     
     if neg:
         str = "1" + str
-
+    while (len(str) != l):
+        str = "0" + str
     return str
 
 
