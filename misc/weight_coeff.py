@@ -23,8 +23,9 @@ def intToBinaryString(x, l):
     return str
 
 
-n_neurons = 32
-fan_in = 8 * 7 * 7          #include the offset
+n_neurons = 4
+params_per_neuron = 8 * 7 * 7
+fan_in = 8 * 7 * 7         #include the offset
 params = []
 binary_params = []
 
@@ -32,7 +33,7 @@ int_bits = 3
 dec_bits = 13
 
 for i in range(n_neurons):
-    for j in range(fan_in):
+    for j in range(params_per_neuron):
         param = gauss(0, math.sqrt(2/(fan_in - 1)))
         params.append(param)
 
