@@ -1,43 +1,80 @@
 `timescale 1ns / 1ps
 
 module fc1_layer(
-        input                                       clk,
-        input                                       rst,
+        input                                           clk,
+        input                                           rst,
         
-        input   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    input_activations
+        input   [`FC1_KERNEL_SIZE - 1: 0][15: 0]        activations_i,
+        input                                           valid_i,
+        
+        
+        output logic [`FC1_KERNEL_SIZE - 1: 0]          activations_used,
+        output logic [15: 0]                            activation_o,
+        output logic                                    valid_o
     );
     
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    addrs_a;
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    addrs_b;
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    data_in_a;
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    data_in_b;
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    data_out_a;
-    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    data_out_b;
-    
-    
+    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    addrs_o;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    addrs_a;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    addrs_b;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    data_in_a;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    data_in_b;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    data_out_a;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    data_out_b;
+        
+        
+    logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    activations_i_reg;    
     logic   [`FC1_KERNEL_SIZE - 1: 0][15: 0]    weights;
+    logic   [15: 0]                             bias;
+    logic                                       has_bias;
+    logic                                       forward;
+    
+    assign forward = 1'b1;    
+    assign bias = data_out_a[0];
+    assign weights = has_bias ? { data_out_b, data_out_a[`FC1_WEIGHT_BRAM - 1: 1] } : 
+                                { data_out_b[`FC1_WEIGHT_BRAM - 2: 0], data_out_a };
     
     
     
-    assign weights = { data_out_b, data_out_a };
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            activations_i_reg = 0;
+        end
+        else if (valid_i) begin
+            activations_i_reg = activations_i;
+        end
+    end
+ 
     
     
-    
+    // Scheduler for the fully connected layer
     fc1_scheduler fc1_scheduler_i (
-        
-        // outputs
-        
-    );
-    
-    fc1_kernel fc1_kernel_i (
+        //inputs
         .clk(clk),
         .rst(rst),
-        .in_act(input_activations),
-        .weights(weights),
-        .bias(),
-        .activation_o()
+        .valid_i(valid_i),
+        .forward(forward),
+        // outputs
+        .has_bias(has_bias),
+        .addrs_o(addrs_o)
     );
     
+    
+    // Computational kernel for the fully connected layer
+    fc1_kernel fc1_kernel_i (
+        // input
+        .clk(clk),
+        .rst(rst),
+        .activations_i(activations_i_reg),
+        .weights(weights),
+        .bias(bias),
+        .has_bias(has_bias),
+        // output
+        .activation_o(activation_o)
+    );
+    
+    
+    // BRAM for the weights of the fully connected layer
     fc1_weight_bram_controller fc1_weight_bram_controller_i (
         // inputs
         .clk(clk),
@@ -46,16 +83,19 @@ module fc1_layer(
         .addrs_a(addrs_a),
         .data_in_a(),
         .en_a(1'b1),
-        .we_a(1'b0),
+        .we_a(~forward),
         
         .addrs_b(addrs_b),
         .data_in_b(),
         .en_b(1'b1),
-        .we_b(1'b0),
+        .we_b(~forward),
         
         // outputs
         .data_out_a(data_out_a),
         .data_out_b(data_out_b)
     ); 
+    
+    
+    
     
 endmodule

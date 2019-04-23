@@ -24,7 +24,7 @@ def intToBinaryString(x, l):
 
 
 n_neurons = 32
-fan_in = 8 * 7 * 7 + 1          #include the offset
+fan_in = 8 * 7 * 7          #include the offset
 params = []
 binary_params = []
 

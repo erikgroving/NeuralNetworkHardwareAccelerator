@@ -18,7 +18,7 @@ module fc1_weight_bram_controller(
     
     output logic    [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    data_out_a,
     output logic    [`FC1_WEIGHT_BRAM - 1: 0][15: 0]    data_out_b
-        
+    
     );
     
     
