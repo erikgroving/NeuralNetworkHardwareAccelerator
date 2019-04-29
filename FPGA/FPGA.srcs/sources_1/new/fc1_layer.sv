@@ -13,23 +13,25 @@ module fc1_layer(
         output logic                                                    valid_o
     );
     
-    logic   [(2 * `FC1_KERNEL_SIZE) - 1: 0][`FC1_ADDR - 1: 0]          addrs_o;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]                addrs_a;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]                addrs_b;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_in_a;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_in_b;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_out_a;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                           data_out_b;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                            data_in_a;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                            data_in_b;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                            data_out_a;
+    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                            data_out_b;
         
         
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]    activations_i_reg;    
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]    weights;
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]                             bias;
-    logic   [`FC1_N_KERNELS - 1: 0]                                    has_bias;
-    logic                                                              forward;
+    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]     activations_i_reg;    
+    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]     activations_i_reg2;    
+    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]     weights;
+    logic   [`FC1_N_KERNELS - 1: 0][15: 0]                              bias;
+    logic                                                               forward;
+    
+    logic                                                               bias_o;
+    logic                                                               bias_o_r;
+    logic  [`FC1_BIAS_ADDR - 1: 0]                                      bias_ptr;
+    logic  [`FC1_ADDR - 1: 0]                                           head_ptr;
+    logic  [`FC1_ADDR - 1: 0]                                           mid_ptr;
     
     assign forward = 1'b1;    
-    assign bias = data_out_a[0];
     assign weights = { data_out_b, data_out_a };
     
     
@@ -37,10 +39,14 @@ module fc1_layer(
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            activations_i_reg <= 0;
+            activations_i_reg   <= 0;
+            activations_i_reg2  <= 0;
+            bias_o_r            <= 0;
         end
         else begin
-            activations_i_reg <= activations_i;
+            activations_i_reg   <= activations_i;
+            activations_i_reg2  <= activations_i_reg;
+            bias_o_r            <= bias_o;
         end
     end
  
@@ -51,12 +57,13 @@ module fc1_layer(
         //inputs
         .clk(clk),
         .rst(rst),
-        .valid_i(valid_i),
         .forward(forward),
+        .activation_rdy(valid_i),
         // outputs
-        .has_bias(has_bias),
-        .activations_used(activations_used),
-        .addrs_o(addrs_o)
+        .bias_o(bias_o),
+        .bias_ptr(bias_ptr),
+        .head_ptr(head_ptr),
+        .mid_ptr(mid_ptr)
     );
     
     
@@ -68,10 +75,10 @@ module fc1_layer(
                 // input
                 .clk(clk),
                 .rst(rst),
-                .activations_i(activations_i_reg[i]),
+                .activations_i(activations_i_reg2[i]),
                 .weights(weights[i]),
                 .bias(bias[i]),
-                .has_bias(has_bias[i]),
+                .has_bias(bias_o_r),
                 // output
                 .activation_o(activation_o[i])
             );
@@ -85,12 +92,12 @@ module fc1_layer(
         .clk(clk),
         .rst(rst),
         
-        .addrs_a(addrs_a),
+        .addrs_a(head_ptr),
         .data_in_a(),
         .en_a(1'b1),
         .we_a(~forward),
         
-        .addrs_b(addrs_b),
+        .addrs_b(mid_ptr),
         .data_in_b(),
         .en_b(1'b1),
         .we_b(~forward),
@@ -101,6 +108,22 @@ module fc1_layer(
     ); 
     
     
+    
+    biases_fc1_blk_mem_gen_1 biases_fc1_blk_mem_gen_1_i (
+        .addra(bias_ptr),
+        .clka(clk),
+        .dina(),
+        .douta(bias[0]),
+        .ena(1'b1),
+        .wea(1'b0),
+        
+        .addrb(bias_ptr + 1'b1),
+        .clkb(clk),
+        .dinb(),
+        .doutb(bias[1]),
+        .enb(1'b1),
+        .web(1'b0)   
+    );
     
     
 endmodule

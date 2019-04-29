@@ -60,9 +60,7 @@ module fc1_scheduler(
             bias_ptr        <= bias_ptr;
             bias_o          <= 1'b0;
             set_bias_pipe   <= set_bias_pipe;
-        end
-        
-        
+        end       
     end
 
 

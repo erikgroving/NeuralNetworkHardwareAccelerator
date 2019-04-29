@@ -2,16 +2,16 @@
 
 `include "sys_defs.vh"
 
-module fc1_weight_bram_controller(
+module fc1_weight_bram_controller (
     input                                                   clk,
     input                                                   rst,
 
-    input  [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]      addrs_a,
+    input  [`FC1_ADDR - 1: 0]                               addr_a,
     input  [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                 data_in_a,
     input                                                   en_a,
     input                                                   we_a,
 
-    input  [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]      addrs_b,
+    input  [`FC1_ADDR - 1: 0]                               addr_b,
     input  [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                 data_in_b,
     input                                                   en_b,
     input                                                   we_b,
@@ -23,14 +23,14 @@ module fc1_weight_bram_controller(
     
     
     fc1_weights_bram_0 fc1_weights_bram_0_i (
-        .addra(addrs_a[0]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[0]),
         .douta(data_out_a[0]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[0]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[0]),
         .doutb(data_out_b[0]),
@@ -39,14 +39,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_1 fc1_weights_bram_1_i (
-        .addra(addrs_a[1]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[1]),
         .douta(data_out_a[1]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[1]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[1]),
         .doutb(data_out_b[1]),
@@ -55,14 +55,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_2 fc1_weights_bram_2_i (
-        .addra(addrs_a[2]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[2]),
         .douta(data_out_a[2]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[2]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[2]),
         .doutb(data_out_b[2]),
@@ -71,14 +71,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_3 fc1_weights_bram_3_i (
-        .addra(addrs_a[3]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[3]),
         .douta(data_out_a[3]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[3]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[3]),
         .doutb(data_out_b[3]),
@@ -87,14 +87,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_4 fc1_weights_bram_4_i (
-        .addra(addrs_a[4]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[4]),
         .douta(data_out_a[4]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[4]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[4]),
         .doutb(data_out_b[4]),
@@ -103,14 +103,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_5 fc1_weights_bram_5_i (
-        .addra(addrs_a[5]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[5]),
         .douta(data_out_a[5]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[5]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[5]),
         .doutb(data_out_b[5]),
@@ -119,14 +119,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_6 fc1_weights_bram_6_i (
-        .addra(addrs_a[6]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[6]),
         .douta(data_out_a[6]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[6]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[6]),
         .doutb(data_out_b[6]),
@@ -135,14 +135,14 @@ module fc1_weight_bram_controller(
     );
     
      fc1_weights_bram_7 fc1_weights_bram_7_i (
-        .addra(addrs_a[7]),
+        .addra(addr_a),
         .clka(clk),
         .dina(data_in_a[7]),
         .douta(data_out_a[7]),
         .ena(en_a),
         .wea(we_a),
         
-        .addrb(addrs_b[7]),
+        .addrb(addr_b),
         .clkb(clk),
         .dinb(data_in_b[7]),
         .doutb(data_out_b[7]),
