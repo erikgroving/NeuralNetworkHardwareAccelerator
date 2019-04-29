@@ -1,53 +1,69 @@
 `timescale 1ns / 1ps
 
 module fc1_scheduler(
-    input                                                               clk,
-    input                                                               rst,
-    input                                                               forward,
-    input                                                               activation_rdy,
-    
-    output logic                                                        has_bias,    
+    input                                   clk,
+    input                                   rst,
+    input                                   forward,
+    input                                   activation_rdy,
 
-    output logic    [(2 * `FC1_KERNEL_SIZE) - 1: 0][`FC1_ADDR - 1: 0]   addrs_o
+    output logic                            bias_o,
+    output logic  [`FC1_BIAS_ADDR - 1: 0]   bias_ptr,
+    output logic  [`FC1_ADDR - 1: 0]        head_ptr,
+    output logic  [`FC1_ADDR - 1: 0]        mid_ptr
 
     );
     
-    bit     [`FC1_WEIGHT_BRAM - 1: 0] i;
+    logic                                   rdy;
+    logic   [2: 0]                          set_bias_pipe;
+    logic   [`FC1_ADDR - 1: 0]              next_head_ptr;
+    logic   [`FC1_ADDR - 1: 0]              next_mid_ptr;
+    logic   [`FC1_BIAS_ADDR - 1: 0]         next_bias_ptr;
     
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     head_ptrs;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     mid_ptrs;
-    logic   [`FC1_KERNEL_SIZE - 1: 0]                       active_pe;
-    logic   [`FC1_KERNEL_SIZE - 2: 0]                       active_pe_r;
-
-    assign active_pe = {active_pe_r, valid_i};
-    assign addrs_o = {head_ptrs, mid_ptrs};
+    assign next_head_ptr    = (head_ptr == `FC1_MID_PTR_OFFSET - 1'b1)  ? 0 : head_ptr + 1'b1;
+    assign next_mid_ptr     = (head_ptr == `FC1_MID_PTR_OFFSET - 1'b1)  ? `FC1_MID_PTR_OFFSET : mid_ptr + 1'b1;
+    assign next_bias_ptr    = (bias_ptr == `FC1_BIAS_ADDR'd30)          ? 0 : bias_ptr + 2'd2;        
+    assign rdy              = activation_rdy;
     
-    always_ff @ (posedge clk) begin
+    
+    always_ff @(posedge clk) begin
         if (rst) begin
-            active_pe_r         <= 0;
+            head_ptr    <= 0;
+            mid_ptr     <= `FC1_MID_PTR_OFFSET;
+        end
+        else if (!rdy) begin
+            head_ptr    <= head_ptr;
+            mid_ptr     <= mid_ptr;
         end
         else begin
-            active_pe_r         <= active_pe[`FC1_KERNEL_SIZE - 2: 0];
-        end
+            head_ptr    <= next_head_ptr;
+            mid_ptr     <= next_mid_ptr;
+        end       
     end
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            head_ptrs   <= 0;
-            mid_ptrs    <= `FC1_MID_PTR_OFFSET;
+            bias_ptr        <= 0;
+            bias_o          <= 1'b0;
+            set_bias_pipe   <= 0;
+        end
+        else if (rdy && (head_ptr == 0 || head_ptr == `FC1_FAN_IN - 1'b1)) begin
+            bias_ptr        <= next_bias_ptr;
+            bias_o          <= 1'b1;
+            set_bias_pipe   <= 3'd7;
+        end
+        else if (rdy && |set_bias_pipe) begin
+            bias_ptr        <= next_bias_ptr;
+            bias_o          <= 1'b1;
+            set_bias_pipe   <= set_bias_pipe - 1'b1;
         end
         else begin
-            for (i = 0; i < `FC1_WEIGHT_BRAM; i = i + 1) begin
-                if (active_pe[i]) begin
-                    head_ptrs[i]    <= head_ptrs[i] + 1'b1;
-                    mid_ptrs[i]     <= mid_ptrs[i] + 1'b1;
-                end
-                else if (activation_rdy) begin
-                    head_ptrs[i]    <= 0;
-                    mid_ptrs[i]     <= `FC1_MID_PTR_OFFSET;
-                end
-            end
+            bias_ptr        <= bias_ptr;
+            bias_o          <= 1'b0;
+            set_bias_pipe   <= set_bias_pipe;
         end
+        
+        
     end
+
 
 endmodule
