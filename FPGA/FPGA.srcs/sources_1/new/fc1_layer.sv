@@ -5,12 +5,12 @@ module fc1_layer(
         input                                                           rst,
        
         input  [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]  activations_i,
-        input                                                           valid_i,
+        input  [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0]         valid_i,
         
         
         output logic [`FC1_KERNEL_SIZE - 1: 0]                          activations_used,
         output logic [`FC1_N_KERNELS - 1: 0][15: 0]                     activation_o,
-        output logic                                                    valid_o
+        output logic                                                    valid_act_o
     );
     
     logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                            data_in_a;
@@ -25,6 +25,8 @@ module fc1_layer(
     logic   [`FC1_N_KERNELS - 1: 0][15: 0]                              bias;
     logic                                                               forward;
     
+    logic                                                               valid_sch_o;
+    logic                                                               valid_sch_o_r;
     logic                                                               bias_o;
     logic                                                               bias_o_r;
     logic  [`FC1_BIAS_ADDR - 1: 0]                                      bias_ptr;
@@ -47,6 +49,7 @@ module fc1_layer(
             activations_i_reg   <= activations_i;
             activations_i_reg2  <= activations_i_reg;
             bias_o_r            <= bias_o;
+            valid_sch_o_r       <= valid_sch_o;
         end
     end
  
@@ -58,15 +61,20 @@ module fc1_layer(
         .clk(clk),
         .rst(rst),
         .forward(forward),
+        .activations_i(activations_i),
         .activation_rdy(valid_i),
         // outputs
+        .activations_o(activations_o),
         .bias_o(bias_o),
         .bias_ptr(bias_ptr),
         .head_ptr(head_ptr),
-        .mid_ptr(mid_ptr)
+        .mid_ptr(mid_ptr),
+        .valid_o(valid_sch_o)
     );
     
-    
+    // Start filling buffers
+    logic   [`FC1_KERNEL_SIZE - 1: 0][`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]    buff;
+    logic   [`FC1_KERNEL_SIZE - 1: 0][`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0]           offset;
     genvar i;
     generate
         for (i = 0; i < `FC1_N_KERNELS; i=i+1) begin
@@ -79,6 +87,7 @@ module fc1_layer(
                 .weights(weights[i]),
                 .bias(bias[i]),
                 .has_bias(bias_o_r),
+                .valid_i(valid_sch_o),
                 // output
                 .activation_o(activation_o[i])
             );

@@ -5,23 +5,26 @@
 module fc1_kernel(
     input                                           clk,
     input                                           rst,
-    input   [`FC1_KERNEL_SIZE - 1: 0]  [15: 0]      activations_i,         
+    input   [`FC1_KERNEL_SIZE - 1: 0]  [15: 0]      activations_i,
     input   [`FC1_KERNEL_SIZE - 1: 0]  [15: 0]      weights,
     input   [`FC1_KERNEL_SIZE - 1: 0]               bias,
     input                                           has_bias,
-    output logic    [15: 0]                         activation_o
+    input                                           valid_i,
+    output logic    [15: 0]                         activation_o,
+    output logic                                    valid_o
 );
     
     logic [`FC1_KERNEL_SIZE - 1: 0][15: 0]     inter_mac;
     
     
-    logic [`FC1_KERNEL_SIZE - 1: 0][15: 0]     sum;
+    logic [`FC1_KERNEL_SIZE - 1: 0][15: 0]      sum;
+    logic [`FC1_KERNEL_SIZE - 1: 0]             valids;
+    logic [15: 0]                               kernel_in;
     
-    logic [15: 0]   kernel_in;
-    
-    assign kernel_in = has_bias ? bias : activation_o;
-    assign sum = {inter_mac[`FC1_KERNEL_SIZE - 2: 0], kernel_in};
+    assign kernel_in    = has_bias ? bias : activation_o;
+    assign sum          = {inter_mac[`FC1_KERNEL_SIZE - 2: 0], kernel_in};
     assign activation_o = inter_mac[`FC1_KERNEL_SIZE - 1];
+    assign valid_o      = valids[`FC1_KERNEL_SIZE - 1];
    
     genvar i;    
     generate 
@@ -36,6 +39,15 @@ module fc1_kernel(
             );
 		end	
 	endgenerate
+	
+	always_ff @(posedge clk) begin
+	   if (rst) begin
+	       valids  <= 0;
+	   end
+	   else begin 
+	       valids  <= {valids[`FC1_KERNEL_SIZE - 2: 0], valid_i};
+	   end  
+	end
 
     
 endmodule
