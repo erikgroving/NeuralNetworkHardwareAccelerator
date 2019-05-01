@@ -6,65 +6,63 @@ module fc1_scheduler(
     input                                                           forward,
     input                                                           valid_i,
     
-    output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     head_ptrs,
-    output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     mid_ptrs
+    output logic    [`FC1_ADDR - 1: 0]                              head_ptr,
+    output logic    [`FC1_ADDR - 1: 0]                              mid_ptr,
+    output logic    [`FC1_BIAS_ADDR - 1: 0]                         bias_ptr,
+    output logic                                                    has_bias
     
-    );
+    );    
     
-    bit     [`FC1_KERNEL_SIZE - 1: 0]   i, j, k;
-    
-    
-    logic   [`FC1_KERNEL_SIZE - 1: 0]   start;
+    logic                               start;
     logic   [`FC1_ADDR - 1: 0]          h_thresh;
-    logic   [`FC1_ADDR - 1: 0]          m_thresh;
+    logic   [`FC1_ADDR - 1: 0]          next_head_ptr;
+    logic   [`FC1_ADDR - 1: 0]          next_mid_ptr;
+    logic   [`FC1_BIAS_ADDR - 1: 0]     next_bias_ptr;
     
-    assign h_thresh = `FC1_MID_PTR_OFFSET - `FC1_ADDR'd2;
-    assign m_thresh = `FC1_MID_PTR_END - `FC1_ADDR'd2;
+    assign h_thresh         = `FC1_MID_PTR_OFFSET - `FC1_ADDR'd2;
+    assign next_head_ptr    = (!valid_i) ? head_ptr     :
+                                        (!start) ? 0    : head_ptr + 1'b1;
+    assign next_mid_ptr     = (!valid_i) ? mid_ptr      :
+                                (!start) ? `FC1_ADDR'd`FC1_FAN_IN : mid_ptr + 1'b1;
+    assign next_bias_ptr    = (!valid_i) ? bias_ptr     :
+                                (!start) ? 0            : bias_ptr + 1'b1;
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            head_ptrs   <= 0;
-            mid_ptrs    <= {`FC1_WEIGHT_BRAM{`FC1_ADDR'd`FC1_FAN_IN}};
-            start       <= 1'b0;
+            head_ptr    <= 0;
+            mid_ptr     <= `FC1_ADDR'd`FC1_FAN_IN;
         end
         else begin
-        
-            for (i = 0; i < `FC1_WEIGHT_BRAM; i=i+1) begin
-                if (valid_i[i] && !start[i]) begin
-                    head_ptrs[i]    <= 0;
-                end
-                else if (valid_i[i] && start[i]) begin
-                    head_ptrs[i]    <= head_ptrs[i] + 1'b1;
-                end
-                
-                if (valid_i[i] && !start[i]) begin
-                    start[i]    <= 1'b1;
-                end
-                else if (valid_i[i] && head_ptrs[i] == h_thresh) begin
-                    start[i]    <= 1'b0;
-                end
-            end
-            
-            for (j = 0, k = `FC1_WEIGHT_BRAM; j < `FC1_WEIGHT_BRAM; j=j+1, k=k+1) begin
-                if (valid_i[k] && !start[k]) begin
-                    mid_ptrs[j]     <= `FC1_ADDR'd`FC1_FAN_IN;
-                end
-                else if (valid_i[k] && start[k]) begin
-                    mid_ptrs[j]     <= mid_ptrs[j] + 1'b1;
-                end
-                
-                if (valid_i[k] && !start[k]) begin
-                    start[k]    <= 1'b1;
-                end
-                else if (valid_i[k] && mid_ptrs[j] == m_thresh) begin
-                    start[k]    <= 1'b0;
-                end
-            end            
-            
+            head_ptr    <= next_head_ptr;
+            mid_ptr     <= next_mid_ptr;
         end
     end
-    
-    
-    
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            bias_ptr    <= 0;
+            has_bias    <= 0;
+        end
+        else if (valid_i && (next_head_ptr == 0 || next_head_ptr == `FC1_FAN_IN)) begin 
+            has_bias    <= 1'b1;
+            bias_ptr    <= next_bias_ptr;
+        end
+        else begin 
+            has_bias    <= 1'b0;
+            bias_ptr    <= bias_ptr;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            start   <= 1'b0;
+        end
+        else if (valid_i && !start) begin
+            start   <= 1'b1;
+        end
+        else if (valid_i && head_ptr == h_thresh) begin
+            start   <= 1'b0;
+        end
+    end
 
 endmodule
