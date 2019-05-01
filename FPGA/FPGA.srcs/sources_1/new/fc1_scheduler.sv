@@ -9,20 +9,20 @@ module fc1_scheduler(
     
     output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     head_ptrs,
     output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     mid_ptrs,
-    output logic                                                    bias_o,
-    output logic    [`FC1_BIAS_ADDR - 1: 0]                         bias_ptr,                       
     output logic    [`FC1_KERNEL_SIZE - 1: 0][15: 0]                act_o,
     output logic    [`FC1_KERNEL_SIZE - 1: 0]                       valid_o
     
     );
     
-    bit     [`FC1_WEIGHT_BRAM - 1: 0]   i;
+    bit     [`FC1_KERNEL_SIZE - 1: 0]   i, j, k;
     
     
-    logic   [`FC1_WEIGHT_BRAM - 1: 0]   start;
-    logic   [`FC1_ADDR - 1: 0]          thresh;
+    logic   [`FC1_KERNEL_SIZE - 1: 0]   start;
+    logic   [`FC1_ADDR - 1: 0]          h_thresh;
+    logic   [`FC1_ADDR - 1: 0]          m_thresh;
     
-    assign thresh = `FC1_FAN_IN - `FC1_ADDR'd2;
+    assign h_thresh = `FC1_MID_PTR_OFFSET - `FC1_ADDR'd2;
+    assign m_thresh = `FC1_MID_PTR_END - `FC1_ADDR'd2;
     
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -46,24 +46,35 @@ module fc1_scheduler(
             for (i = 0; i < `FC1_WEIGHT_BRAM; i=i+1) begin
                 if (valid_i[i] && !start[i]) begin
                     head_ptrs[i]    <= 0;
-                    mid_ptrs[i]     <= `FC1_ADDR'd`FC1_FAN_IN;
                 end
                 else if (valid_i[i] && start[i]) begin
                     head_ptrs[i]    <= head_ptrs[i] + 1'b1;
-                    mid_ptrs[i]     <= mid_ptrs[i] + 1'b1;
                 end
                 
                 if (valid_i[i] && !start[i]) begin
                     start[i]    <= 1'b1;
                 end
-                else if (valid_i[i] && head_ptrs[i] == thresh) begin
+                else if (valid_i[i] && head_ptrs[i] == h_thresh) begin
                     start[i]    <= 1'b0;
                 end
-                
-                if (valid_i[i] && !start[i]) begin
-                    
-                end
             end
+            
+            for (j = 0, k = `FC1_WEIGHT_BRAM; j < `FC1_WEIGHT_BRAM; j=j+1, k=k+1) begin
+                if (valid_i[k] && !start[k]) begin
+                    mid_ptrs[j]     <= `FC1_ADDR'd`FC1_FAN_IN;
+                end
+                else if (valid_i[k] && start[k]) begin
+                    mid_ptrs[j]     <= mid_ptrs[j] + 1'b1;
+                end
+                
+                if (valid_i[k] && !start[k]) begin
+                    start[k]    <= 1'b1;
+                end
+                else if (valid_i[k] && mid_ptrs[j] == m_thresh) begin
+                    start[k]    <= 1'b0;
+                end
+            end            
+            
         end
     end
     

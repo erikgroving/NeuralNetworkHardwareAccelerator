@@ -1,0 +1,48 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Mon Apr 29 14:40:01 2019
+# Process ID: 7104
+# Current directory: C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1
+# Command line: vivado.exe -log neural_net_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source neural_net_top.tcl
+# Log file: C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/neural_net_top.vds
+# Journal file: C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source neural_net_top.tcl -notrace
+Command: synth_design -top neural_net_top -part xc7z020clg484-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 780 
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:07 . Memory (MB): peak = 399.246 ; gain = 101.887
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'neural_net_top' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:23]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:31]
+INFO: [Synth 8-6157] synthesizing module 'fc1_layer' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:3]
+INFO: [Synth 8-6157] synthesizing module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_kernel.sv:5]
+INFO: [Synth 8-6157] synthesizing module 'sixteen_bit_MAC_dsp' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/sixteen_bit_MAC_dsp_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'sixteen_bit_MAC_dsp' (1#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/sixteen_bit_MAC_dsp_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_kernel' (2#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_kernel.sv:5]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:50]
+INFO: [Synth 8-6157] synthesizing module 'fc1_scheduler' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_scheduler.sv:3]
+WARNING: [Synth 8-5856] 3D RAM addrs_o_reg  for this pattern/configuration is not supported. This will most likely be implemented in registers
+INFO: [Synth 8-6155] done synthesizing module 'fc1_scheduler' (3#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_scheduler.sv:3]
+ERROR: [Synth 8-349] instance 'fc1_scheduler_i' of module 'fc1_scheduler' passed 7 connections, but takes just 5 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:50]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weight_bram_controller' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv:5]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_0' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/fc1_weights_bram_0_stub.v:6]
+ERROR: [Synth 8-6156] failed synthesizing module 'fc1_weights_bram_0' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/fc1_weights_bram_0_stub.v:6]
+ERROR: [Synth 8-6156] failed synthesizing module 'fc1_weight_bram_controller' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv:5]
+ERROR: [Synth 8-6156] failed synthesizing module 'fc1_layer' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:3]
+ERROR: [Synth 8-6156] failed synthesizing module 'neural_net_top' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:23]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 455.469 ; gain = 158.109
+---------------------------------------------------------------------------------
+RTL Elaboration failed
+INFO: [Common 17-83] Releasing license: Synthesis
+12 Infos, 3 Warnings, 0 Critical Warnings and 6 Errors encountered.
+synth_design failed
+ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
+INFO: [Common 17-206] Exiting Vivado at Mon Apr 29 14:40:24 2019...

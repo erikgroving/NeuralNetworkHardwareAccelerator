@@ -10,5 +10,6 @@
 `define FC1_BIAS_ADDR           5
 `define FC1_FAN_IN              392         // 8 * 7 * 7
 `define FC1_MID_PTR_OFFSET      12'd784
+`define FC1_MID_PTR_END					12'd1568
 
 `endif
