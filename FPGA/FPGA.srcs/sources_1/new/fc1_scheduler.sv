@@ -4,13 +4,10 @@ module fc1_scheduler(
     input                                                           clk,
     input                                                           rst,
     input                                                           forward,
-    input           [`FC1_KERNEL_SIZE - 1: 0]                       valid_i,
-    input           [`FC1_KERNEL_SIZE - 1: 0][15: 0]                act_i,
+    input                                                           valid_i,
     
     output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     head_ptrs,
-    output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     mid_ptrs,
-    output logic    [`FC1_KERNEL_SIZE - 1: 0][15: 0]                act_o,
-    output logic    [`FC1_KERNEL_SIZE - 1: 0]                       valid_o
+    output logic    [`FC1_WEIGHT_BRAM - 1: 0][`FC1_ADDR - 1: 0]     mid_ptrs
     
     );
     
@@ -23,17 +20,6 @@ module fc1_scheduler(
     
     assign h_thresh = `FC1_MID_PTR_OFFSET - `FC1_ADDR'd2;
     assign m_thresh = `FC1_MID_PTR_END - `FC1_ADDR'd2;
-    
-    always_ff @(posedge clk) begin
-        if (rst) begin
-            act_o   <= 0;
-            valid_o <= 0;
-        end
-        else begin
-            act_o   <= act_i;
-            valid_o <= valid_i;
-        end
-    end
     
     always_ff @(posedge clk) begin
         if (rst) begin

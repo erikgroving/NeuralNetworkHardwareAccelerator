@@ -2,8 +2,8 @@
 # Vivado v2018.3 (64-bit)
 # SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
 # IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
-# Start of session at: Tue Apr 23 12:38:15 2019
-# Process ID: 13104
+# Start of session at: Wed May  1 14:02:14 2019
+# Process ID: 14804
 # Current directory: C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/biases_fc1_blk_mem_gen_1_synth_1
 # Command line: vivado.exe -log biases_fc1_blk_mem_gen_1.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source biases_fc1_blk_mem_gen_1.tcl
 # Log file: C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/biases_fc1_blk_mem_gen_1_synth_1/biases_fc1_blk_mem_gen_1.vds

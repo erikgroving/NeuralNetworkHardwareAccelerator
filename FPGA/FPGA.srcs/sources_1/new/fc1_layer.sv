@@ -1,31 +1,38 @@
 `timescale 1ns / 1ps
 
 module fc1_layer(
-        input                                                                   clk,
-        input                                                                   rst,
+        input                                       clk,
+        input                                       rst,
        
-        input  [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]          activations_i,
-        input  [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0]                 valid_i,
+        input  [`FC1_N_KERNELS - 1: 0][15: 0]       activations_i,
+        input  [`FC1_N_KERNELS - 1: 0]              valid_i,        
         
-        
-        output logic [`FC1_KERNEL_SIZE - 1: 0]                                  activations_used,
-        output logic [`FC1_N_KERNELS - 1: 0][15: 0]                             activation_o,
-        output logic                                                            valid_act_o
+        output logic [`FC1_N_KERNELS - 1: 0][15: 0] activation_o,
+        output logic [`FC1_N_KERNELS - 1: 0][4: 0]  neuron_id_o,
+        output logic                                valid_act_o
     );
     
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                                    data_in_a;
-    logic   [`FC1_WEIGHT_BRAM - 1: 0][15: 0]                                    data_in_b;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_WEIGHT_BRAM - 1: 0][15: 0]             data_out_a;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_WEIGHT_BRAM - 1: 0][15: 0]             data_out_b;
+    logic   [`FC1_BRAM - 1: 0][15: 0]               data_in_a;
+    logic   [`FC1_BRAM - 1: 0][15: 0]               data_in_b;
+    logic   [`FC1_BRAM - 1: 0][15: 0]               data_out_a;
+    logic   [`FC1_BRAM - 1: 0][15: 0]               data_out_b;
 
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]             weights;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][`FC1_ADDR - 1: 0]  head_ptrs;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][`FC1_ADDR - 1: 0]  mid_ptrs;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]             sch_activations;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0]                    sch_valid;
+    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          weights;
+    logic   [`FC1_ADDR - 1: 0]                      head_ptr;
+    logic   [`FC1_ADDR - 1: 0]                      mid_ptr;
+    logic   [`FC1_BIAS_ADDR - 1: 0]                 bias_ptr;
+   
+    logic   [`FC1_N_KERNELS - 1: 0][15: 0]         sch_activations;
+    logic   [`FC1_N_KERNELS - 1: 0]                sch_valid;
+    logic   [`FC1_N_KERNELS - 1: 0][15: 0]         bram_activations;
+    logic   [`FC1_N_KERNELS - 1: 0]                bram_valid;
     
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]                                      bias;
-    logic                                                                       forward;
+    logic   [`FC1_N_KERNELS - 1: 0][15: 0]         bias;
+    logic   [`FC1_N_KERNELS - 1: 0]                has_bias;
+    logic   [`FC1_N_KERNELS - 1: 0][4: 0]          neuron_id;
+    logic   [`FC1_N_KERNELS - 1: 0]                last_weight;
+
+    logic                                          forward;
 
     
     assign forward = 1'b1;
@@ -37,30 +44,24 @@ module fc1_layer(
         end
     end
 
+
+
     // Scheduler for the fully connected layer
-    genvar j;
-    generate
-        for (j = 0; j < `FC1_N_KERNELS; j=j+1) begin
-            fc1_scheduler fc1_scheduler_i (
-                //inputs
-                .clk(clk),
-                .rst(rst),
-                .forward(forward),
-                .valid_i(valid_i[j]),
-                .act_i(activations_i[j]),
-                
-                //outputs
-                .head_ptrs(head_ptrs[j]),
-                .mid_ptrs(mid_ptrs[j]),
-                .act_o(sch_activations[j]),
-                .valid_o(sch_valid[j])
-            );
-        end
-    endgenerate
+    fc1_scheduler fc1_scheduler_i (
+        //inputs
+        .clk(clk),
+        .rst(rst),
+        .forward(forward),
+        .valid_i(valid_i),
+        
+        //outputs
+        .head_ptrs(head_ptr),
+        .mid_ptrs(mid_ptr),
+    );
+
     
 
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0][15: 0]             bram_activations;
-    logic   [`FC1_N_KERNELS - 1: 0][`FC1_KERNEL_SIZE - 1: 0]                    bram_valid;
+
     always_ff @(posedge clk) begin
         if (rst) begin
             bram_activations    <= 0;
@@ -94,6 +95,9 @@ module fc1_layer(
     ); 
     
     
+    always_comb begin
+        
+    end
     
     biases_fc1_blk_mem_gen_1 biases_fc1_blk_mem_gen_1_i (
         .addra(),
@@ -120,8 +124,8 @@ module fc1_layer(
                 // input
                 .clk(clk),
                 .rst(rst),
-                .activations_i(),
-                .weights(),
+                .activations_i(bram_activations[i]),
+                .weights(weights[i]),
                 .bias(),
                 .has_bias(),
                 .valid_i(),

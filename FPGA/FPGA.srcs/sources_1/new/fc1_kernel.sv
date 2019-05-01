@@ -1,53 +1,66 @@
 `timescale 1ns / 1ps
 `include "sys_defs.vh"
 
-/* 8 stage addition kernel */
+/* Addition kernel */
 module fc1_kernel(
-    input                                           clk,
-    input                                           rst,
-    input   [`FC1_KERNEL_SIZE - 1: 0]  [15: 0]      activations_i,
-    input   [`FC1_KERNEL_SIZE - 1: 0]  [15: 0]      weights,
-    input   [`FC1_KERNEL_SIZE - 1: 0]               bias,
-    input                                           has_bias,
-    input                                           valid_i,
-    output logic    [15: 0]                         activation_o,
-    output logic                                    valid_o
+    input                       clk,
+    input                       rst,
+    input   [15: 0]             activation_i,
+    input   [15: 0]             weight,
+    input   [15: 0]             bias,
+    input   [4: 0]              neuron_id_i,
+    input                       has_bias,
+    input                       valid_i,
+    output logic    [15: 0]     activation_o,
+    output logic    [4: 0]      neuron_id_o,
+    output logic                valid_o
 );
     
-    logic [`FC1_KERNEL_SIZE - 1: 0][15: 0]     inter_mac;
+    logic [15: 0]   dsp_o;
     
+    logic [4: 0]    neuron_id;
+    logic           valids;
+    logic [15: 0]   kernel_in;
     
-    logic [`FC1_KERNEL_SIZE - 1: 0][15: 0]      sum;
-    logic [`FC1_KERNEL_SIZE - 1: 0]             valids;
-    logic [15: 0]                               kernel_in;
+    logic [8: 0]    cnt;
+    logic [8: 0]    next_cnt;
     
-    assign kernel_in    = has_bias ? bias : activation_o;
-    assign sum          = {inter_mac[`FC1_KERNEL_SIZE - 2: 0], kernel_in};
-    assign activation_o = inter_mac[`FC1_KERNEL_SIZE - 1];
-    assign valid_o      = valids[`FC1_KERNEL_SIZE - 1];
-   
-    genvar i;    
-    generate 
-		for (i = 0; i < `FC1_KERNEL_SIZE; i=i+1) begin
-            // A*B + C
-            sixteen_bit_MAC_dsp dsp_i(
-                        .CLK(clk), 
-                        .A(weights[i]),
-                        .B(activations_i[i]),
-                        .C(sum[i]),
-                        .P(inter_mac[i])
-            );
-		end	
-	endgenerate
-	
-	always_ff @(posedge clk) begin
-	   if (rst) begin
-	       valids  <= 0;
-	   end
-	   else begin 
-	       valids  <= {valids[`FC1_KERNEL_SIZE - 2: 0], valid_i};
-	   end  
-	end
+    assign kernel_in    = has_bias ? bias : dsp_o;
+    assign next_cnt     = (cnt == `FC1_FAN_IN - 1'b1) ? 0 : cnt + 1'b1;
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            cnt <= 0;
+        end
+        if (valid_i) begin
+            cnt <= next_cnt;
+        end
+        
+        if (valid_i && cnt == `FC1_FAN_IN - 1'b1) begin
+            activation_o    <= dsp_o;
+            neuron_id_o     <= neuron_id;
+            valid_o         <= 1'b1;
+        end
+        else begin
+            activation_o    <= activation_o;
+            neuron_id_o     <= neuron_id_o;
+            valid_o         <= 1'b0;
+        end
+        
+        if (valid_i && cnt == 0) begin
+            neuron_id   <= neuron_id_i;
+        end
+    end
+
+    // A*B + C
+    sixteen_bit_MAC_dsp dsp_i(
+                .CLK(clk), 
+                .A(weight),
+                .B(activation_i),
+                .C(kernel_in),
+                .P(dsp_o)
+    );
+
 
     
 endmodule

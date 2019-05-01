@@ -1,9 +1,8 @@
 `ifndef __SYS_DEFS_VH__
 `define __SYS_DEFS_VH__
 
-`define FC1_N_KERNELS           2
+`define FC1_N_KERNELS           16
 `define FC1_ADDR                11
-`define FC1_KERNEL_SIZE         8
 `define FC1_SCH_ADDRS           (`FC1_KERNEL_SIZE * `FC1_N_KERNELS)
 `define FC1_WEIGHT_BRAM         4						// Per kernel
 `define FC1_BRAM								8						// total     
