@@ -25,6 +25,9 @@ module fc1_kernel(
     logic [8: 0]    cnt;
     logic [8: 0]    next_cnt;
     
+    logic [31: 0]   mult_res;
+    logic [31: 0]   mac_res;
+    
     assign kernel_in    = has_bias ? bias : dsp_o;
     assign next_cnt     = (cnt == `FC1_FAN_IN - 1'b1) ? 0 : cnt + 1'b1;
     
@@ -53,12 +56,21 @@ module fc1_kernel(
     end
     
     
+    assign mult_res = weight * activation_i;
+    assign mac_res  = mult_res + kernel_in;
+    
     always_ff @(posedge clk) begin
         if (rst) begin
             dsp_o   <= 0;
         end
+        else if ({mac_res[31], &mac_res[30:28]} == 2'b10) begin // negative saturation
+            dsp_o   <= 16'h8000;
+        end
+        else if ({mac_res[31], |mac_res[30:28]} == 2'b01) begin // positive saturation
+            dsp_o   <= 16'h7FFF;
+        end
         else begin
-            dsp_o   <= weight * activation_i + kernel_in;
+            dsp_o   <= mac_res[28:13]; 
         end
     end
     // A*B + C
