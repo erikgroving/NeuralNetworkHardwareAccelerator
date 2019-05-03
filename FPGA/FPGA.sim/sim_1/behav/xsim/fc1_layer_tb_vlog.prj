@@ -1,0 +1,24 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib "C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/sys_defs.vh" --include "../../../../FPGA.srcs/sources_1/new" \
+"../../../../FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/sim/biases_fc1_blk_mem_gen_1.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_7/sim/fc1_weights_bram_7.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_6/sim/fc1_weights_bram_6.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_5/sim/fc1_weights_bram_5.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_4/sim/fc1_weights_bram_4.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_3/sim/fc1_weights_bram_3.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_2/sim/fc1_weights_bram_2.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_1/sim/fc1_weights_bram_1.v" \
+"../../../../FPGA.srcs/sources_1/ip/fc1_weights_bram_0/sim/fc1_weights_bram_0.v" \
+
+sv xil_defaultlib "C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/sys_defs.vh" --include "../../../../FPGA.srcs/sources_1/new" \
+"../../../../FPGA.srcs/sources_1/new/fc1_kernel.sv" \
+"../../../../FPGA.srcs/sources_1/new/fc1_layer.sv" \
+"../../../../FPGA.srcs/sources_1/new/fc1_scheduler.sv" \
+"../../../../FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv" \
+"../../../../FPGA.srcs/sim_1/new/fc1_layer_tb.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

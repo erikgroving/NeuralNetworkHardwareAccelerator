@@ -14,34 +14,894 @@ Starting synth_design
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
 INFO: Launching helper process for spawning children vivado processes
-INFO: Helper process launched with PID 780 
+INFO: Helper process launched with PID 17156 
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:07 . Memory (MB): peak = 399.246 ; gain = 101.887
+Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:09 . Memory (MB): peak = 400.137 ; gain = 103.672
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'neural_net_top' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:23]
-WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:31]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:32]
 INFO: [Synth 8-6157] synthesizing module 'fc1_layer' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:3]
 INFO: [Synth 8-6157] synthesizing module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_kernel.sv:5]
-INFO: [Synth 8-6157] synthesizing module 'sixteen_bit_MAC_dsp' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/sixteen_bit_MAC_dsp_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'sixteen_bit_MAC_dsp' (1#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/sixteen_bit_MAC_dsp_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'sixteen_bit_MAC_dsp' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/sixteen_bit_MAC_dsp_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'sixteen_bit_MAC_dsp' (1#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/sixteen_bit_MAC_dsp_stub.v:6]
 INFO: [Synth 8-6155] done synthesizing module 'fc1_kernel' (2#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_kernel.sv:5]
-WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:50]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-689] width (256) of port connection 'bias' does not match port width (16) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:127]
+WARNING: [Synth 8-689] width (80) of port connection 'neuron_id_i' does not match port width (5) of module 'fc1_kernel' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:128]
+WARNING: [Synth 8-6104] Input port 'forward' has an internal driver [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:37]
 INFO: [Synth 8-6157] synthesizing module 'fc1_scheduler' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_scheduler.sv:3]
-WARNING: [Synth 8-5856] 3D RAM addrs_o_reg  for this pattern/configuration is not supported. This will most likely be implemented in registers
 INFO: [Synth 8-6155] done synthesizing module 'fc1_scheduler' (3#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_scheduler.sv:3]
-ERROR: [Synth 8-349] instance 'fc1_scheduler_i' of module 'fc1_scheduler' passed 7 connections, but takes just 5 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:50]
 INFO: [Synth 8-6157] synthesizing module 'fc1_weight_bram_controller' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv:5]
-INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_0' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/fc1_weights_bram_0_stub.v:6]
-ERROR: [Synth 8-6156] failed synthesizing module 'fc1_weights_bram_0' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-7104-erik/realtime/fc1_weights_bram_0_stub.v:6]
-ERROR: [Synth 8-6156] failed synthesizing module 'fc1_weight_bram_controller' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv:5]
-ERROR: [Synth 8-6156] failed synthesizing module 'fc1_layer' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:3]
-ERROR: [Synth 8-6156] failed synthesizing module 'neural_net_top' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:23]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_0' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_0' (4#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_1' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_1' (5#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_1_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_2' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_2_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_2' (6#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_2_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_3' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_3_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_3' (7#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_3_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_4' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_4_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_4' (8#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_4_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_5' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_5_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_5' (9#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_5_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_6' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_6_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_6' (10#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_6_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'fc1_weights_bram_7' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_7_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weights_bram_7' (11#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/fc1_weights_bram_7_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_weight_bram_controller' (12#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv:5]
+INFO: [Synth 8-6157] synthesizing module 'biases_fc1_blk_mem_gen_1' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/biases_fc1_blk_mem_gen_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'biases_fc1_blk_mem_gen_1' (13#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/.Xil/Vivado-8704-erik/realtime/biases_fc1_blk_mem_gen_1_stub.v:6]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv-52.18 with 1st driver pin 'fc1_layer:/forward' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:52]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv-52.18 with 2nd driver pin 'VCC' [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:52]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv-52.18 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:52]
+INFO: [Synth 8-6155] done synthesizing module 'fc1_layer' (14#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:3]
+INFO: [Synth 8-6155] done synthesizing module 'neural_net_top' (15#1) [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv:23]
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[7] driven by constant 1
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[6] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[5] driven by constant 1
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[4] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[3] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[2] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[1] driven by constant 1
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[0] driven by constant 1
+WARNING: [Synth 8-3331] design fc1_scheduler has unconnected port forward
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 455.469 ; gain = 158.109
+Finished RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:11 . Memory (MB): peak = 455.840 ; gain = 159.375
 ---------------------------------------------------------------------------------
-RTL Elaboration failed
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][11] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][10] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][9] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][8] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][7] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][6] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][5] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][4] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][3] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][2] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][1] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[7][0] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][11] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][10] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][9] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][8] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][7] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][6] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][5] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][4] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][3] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][2] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][1] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[6][0] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][11] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][10] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][9] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][8] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][7] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][6] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][5] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][4] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][3] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][2] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][1] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[5][0] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][11] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][10] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][9] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][8] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][7] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][6] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][5] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][4] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][3] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][2] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][1] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[4][0] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][11] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][10] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][9] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][8] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][7] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][6] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][5] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][4] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][3] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][2] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][1] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[3][0] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][11] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][10] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][9] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][8] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][7] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][6] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][5] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][4] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][3] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][2] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][1] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[2][0] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[1][15] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[1][14] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[1][13] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+WARNING: [Synth 8-3295] tying undriven pin fc1_weight_bram_controller_i:data_in_a[1][12] to constant 0 [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_layer.sv:83]
+INFO: [Common 17-14] Message 'Synth 8-3295' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:09 ; elapsed = 00:00:12 . Memory (MB): peak = 455.840 ; gain = 159.375
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:12 . Memory (MB): peak = 455.840 ; gain = 159.375
+---------------------------------------------------------------------------------
+INFO: [Device 21-403] Loading part xc7z020clg484-1
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[0].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[0].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[1].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[1].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[2].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[2].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[3].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[3].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[4].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[4].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[5].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[5].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[6].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[6].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[7].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[7].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[8].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[8].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[9].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[9].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[10].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[10].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[11].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[11].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[12].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[12].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[13].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[13].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[14].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[14].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[15].fc1_kernel_i/dsp_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_in_context.xdc] for cell 'fc1_layer_i/genblk1[15].fc1_kernel_i/dsp_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1_in_context.xdc] for cell 'fc1_layer_i/biases_fc1_blk_mem_gen_1_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1_in_context.xdc] for cell 'fc1_layer_i/biases_fc1_blk_mem_gen_1_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_0/fc1_weights_bram_0/fc1_weights_bram_0_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_0_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_0/fc1_weights_bram_0/fc1_weights_bram_0_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_0_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_1/fc1_weights_bram_1/fc1_weights_bram_1_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_1_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_1/fc1_weights_bram_1/fc1_weights_bram_1_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_1_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_2/fc1_weights_bram_2/fc1_weights_bram_2_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_2_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_2/fc1_weights_bram_2/fc1_weights_bram_2_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_2_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_3/fc1_weights_bram_3/fc1_weights_bram_3_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_3_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_3/fc1_weights_bram_3/fc1_weights_bram_3_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_3_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_4/fc1_weights_bram_4/fc1_weights_bram_4_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_4_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_4/fc1_weights_bram_4/fc1_weights_bram_4_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_4_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_5/fc1_weights_bram_5/fc1_weights_bram_5_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_5_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_5/fc1_weights_bram_5/fc1_weights_bram_5_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_5_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_6/fc1_weights_bram_6/fc1_weights_bram_6_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_6_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_6/fc1_weights_bram_6/fc1_weights_bram_6_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_6_i'
+Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_7/fc1_weights_bram_7/fc1_weights_bram_7_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_7_i'
+Finished Parsing XDC File [c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_7/fc1_weights_bram_7/fc1_weights_bram_7_in_context.xdc] for cell 'fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_7_i'
+Parsing XDC File [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc]
+WARNING: [Vivado 12-584] No ports matched '[get_ports -of_objects [get_iobanks 33]]'. [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc:362]
+WARNING: [Vivado 12-584] No ports matched '[get_ports -of_objects [get_iobanks 34]]'. [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc:367]
+WARNING: [Vivado 12-584] No ports matched '[get_ports -of_objects [get_iobanks 35]]'. [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc:372]
+WARNING: [Vivado 12-584] No ports matched '[get_ports -of_objects [get_iobanks 13]]'. [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc:375]
+Finished Parsing XDC File [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/constrs_1/new/zedboard_master.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/neural_net_top_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/neural_net_top_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 817.754 ; gain = 0.000
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 817.754 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 817.754 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.033 . Memory (MB): peak = 817.754 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:30 ; elapsed = 00:00:40 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7z020clg484-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:30 ; elapsed = 00:00:40 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[0].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[1].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[2].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[3].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[4].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[5].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[6].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[7].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[8].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[9].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[10].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[11].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[12].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[13].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[14].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/\genblk1[15].fc1_kernel_i /dsp_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/biases_fc1_blk_mem_gen_1_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_0_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_1_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_2_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_3_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_4_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_5_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_6_i. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for fc1_layer_i/fc1_weight_bram_controller_i/fc1_weights_bram_7_i. (constraint file  auto generated constraint, line ).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:31 ; elapsed = 00:00:40 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:32 ; elapsed = 00:00:43 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     11 Bit       Adders := 2     
+	   2 Input      9 Bit       Adders := 16    
+	   2 Input      5 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 50    
+	               11 Bit    Registers := 2     
+	                9 Bit    Registers := 16    
+	                5 Bit    Registers := 49    
+	                1 Bit    Registers := 19    
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 16    
+	   2 Input     11 Bit        Muxes := 6     
+	   2 Input      9 Bit        Muxes := 16    
+	   2 Input      5 Bit        Muxes := 24    
+	   2 Input      4 Bit        Muxes := 22    
+	   2 Input      1 Bit        Muxes := 3     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Hierarchical Component Statistics 
+---------------------------------------------------------------------------------
+Hierarchical RTL Component report 
+Module fc1_scheduler 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     11 Bit       Adders := 2     
+	   2 Input      5 Bit       Adders := 1     
++---Registers : 
+	               11 Bit    Registers := 2     
+	                5 Bit    Registers := 1     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input     11 Bit        Muxes := 6     
+	   2 Input      1 Bit        Muxes := 3     
+Module fc1_weight_bram_controller 
+Detailed RTL Component Info : 
++---Registers : 
+	                5 Bit    Registers := 16    
++---Muxes : 
+	   2 Input      5 Bit        Muxes := 24    
+	   2 Input      4 Bit        Muxes := 22    
+Module fc1_kernel__xdcDup__1 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__2 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__3 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__4 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__5 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__6 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__7 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__8 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__9 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__10 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__11 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__12 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__13 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__14 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel__xdcDup__15 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_kernel 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     16 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+Module fc1_layer 
+Detailed RTL Component Info : 
++---Registers : 
+	               16 Bit    Registers := 34    
+	                1 Bit    Registers := 1     
+---------------------------------------------------------------------------------
+Finished RTL Hierarchical Component Statistics
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 220 (col length:60)
+BRAMs: 280 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+Warning: Parallel synthesis criteria is not met 
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[7] driven by constant 1
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[6] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[5] driven by constant 1
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[4] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[3] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[2] driven by constant 0
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[1] driven by constant 1
+WARNING: [Synth 8-3917] design neural_net_top has port led_o[0] driven by constant 1
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:36 ; elapsed = 00:00:47 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:58 ; elapsed = 00:01:10 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:58 ; elapsed = 00:01:10 . Memory (MB): peak = 817.754 ; gain = 521.289
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:59 ; elapsed = 00:01:11 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[255]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[254]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[253]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[252]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[251]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[250]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[249]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[248]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[247]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[246]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[245]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[244]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[243]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[242]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[241]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[240]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[239]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[238]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[237]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[236]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[235]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[234]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[233]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[232]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[231]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[230]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[229]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[228]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[227]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[226]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[225]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[224]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[223]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[222]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[221]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[220]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[219]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[218]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[217]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[216]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[215]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[214]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[213]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[212]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[211]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[210]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[209]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[208]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[207]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[206]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[205]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[204]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[203]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[202]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[201]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[200]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[199]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[198]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[197]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[196]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[195]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[194]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[193]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[192]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[191]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[190]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[189]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[188]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[187]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[186]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[185]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[184]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[183]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[182]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[181]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[180]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[179]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[178]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[177]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[176]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[175]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[174]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[173]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[172]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[171]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[170]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[169]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[168]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[167]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[166]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[165]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[164]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[163]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[162]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[161]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[160]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[159]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[158]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[157]
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \fc1_layer_i/biases_fc1_blk_mem_gen_1_i  has unconnected pin dina[156]
+INFO: [Common 17-14] Message 'Synth 8-4442' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+-------------------------+----------+
+|      |BlackBox name            |Instances |
++------+-------------------------+----------+
+|1     |biases_fc1_blk_mem_gen_1 |         1|
+|2     |fc1_weights_bram_0       |         1|
+|3     |fc1_weights_bram_1       |         1|
+|4     |fc1_weights_bram_2       |         1|
+|5     |fc1_weights_bram_3       |         1|
+|6     |fc1_weights_bram_4       |         1|
+|7     |fc1_weights_bram_5       |         1|
+|8     |fc1_weights_bram_6       |         1|
+|9     |fc1_weights_bram_7       |         1|
+|10    |sixteen_bit_MAC_dsp      |        16|
++------+-------------------------+----------+
+
+Report Cell Usage: 
++------+-------------------------+------+
+|      |Cell                     |Count |
++------+-------------------------+------+
+|1     |biases_fc1_blk_mem_gen_1 |     1|
+|2     |fc1_weights_bram_0       |     1|
+|3     |fc1_weights_bram_1       |     1|
+|4     |fc1_weights_bram_2       |     1|
+|5     |fc1_weights_bram_3       |     1|
+|6     |fc1_weights_bram_4       |     1|
+|7     |fc1_weights_bram_5       |     1|
+|8     |fc1_weights_bram_6       |     1|
+|9     |fc1_weights_bram_7       |     1|
+|10    |sixteen_bit_MAC_dsp      |     1|
+|11    |sixteen_bit_MAC_dsp__16  |     1|
+|12    |sixteen_bit_MAC_dsp__17  |     1|
+|13    |sixteen_bit_MAC_dsp__18  |     1|
+|14    |sixteen_bit_MAC_dsp__19  |     1|
+|15    |sixteen_bit_MAC_dsp__20  |     1|
+|16    |sixteen_bit_MAC_dsp__21  |     1|
+|17    |sixteen_bit_MAC_dsp__22  |     1|
+|18    |sixteen_bit_MAC_dsp__23  |     1|
+|19    |sixteen_bit_MAC_dsp__24  |     1|
+|20    |sixteen_bit_MAC_dsp__25  |     1|
+|21    |sixteen_bit_MAC_dsp__26  |     1|
+|22    |sixteen_bit_MAC_dsp__27  |     1|
+|23    |sixteen_bit_MAC_dsp__28  |     1|
+|24    |sixteen_bit_MAC_dsp__29  |     1|
+|25    |sixteen_bit_MAC_dsp__30  |     1|
+|26    |IBUF                     |     1|
+|27    |OBUF                     |     8|
++------+-------------------------+------+
+
+Report Instance Areas: 
++------+---------------------------------+---------------------------+------+
+|      |Instance                         |Module                     |Cells |
++------+---------------------------------+---------------------------+------+
+|1     |top                              |                           |   777|
+|2     |  fc1_layer_i                    |fc1_layer                  |   768|
+|3     |    fc1_weight_bram_controller_i |fc1_weight_bram_controller |   256|
+|4     |    \genblk1[0].fc1_kernel_i     |fc1_kernel__xdcDup__1      |    16|
+|5     |    \genblk1[10].fc1_kernel_i    |fc1_kernel__xdcDup__11     |    16|
+|6     |    \genblk1[11].fc1_kernel_i    |fc1_kernel__xdcDup__12     |    16|
+|7     |    \genblk1[12].fc1_kernel_i    |fc1_kernel__xdcDup__13     |    16|
+|8     |    \genblk1[13].fc1_kernel_i    |fc1_kernel__xdcDup__14     |    16|
+|9     |    \genblk1[14].fc1_kernel_i    |fc1_kernel__xdcDup__15     |    16|
+|10    |    \genblk1[15].fc1_kernel_i    |fc1_kernel                 |    16|
+|11    |    \genblk1[1].fc1_kernel_i     |fc1_kernel__xdcDup__2      |    16|
+|12    |    \genblk1[2].fc1_kernel_i     |fc1_kernel__xdcDup__3      |    16|
+|13    |    \genblk1[3].fc1_kernel_i     |fc1_kernel__xdcDup__4      |    16|
+|14    |    \genblk1[4].fc1_kernel_i     |fc1_kernel__xdcDup__5      |    16|
+|15    |    \genblk1[5].fc1_kernel_i     |fc1_kernel__xdcDup__6      |    16|
+|16    |    \genblk1[6].fc1_kernel_i     |fc1_kernel__xdcDup__7      |    16|
+|17    |    \genblk1[7].fc1_kernel_i     |fc1_kernel__xdcDup__8      |    16|
+|18    |    \genblk1[8].fc1_kernel_i     |fc1_kernel__xdcDup__9      |    16|
+|19    |    \genblk1[9].fc1_kernel_i     |fc1_kernel__xdcDup__10     |    16|
++------+---------------------------------+---------------------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 256 critical warnings and 8 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:38 ; elapsed = 00:00:54 . Memory (MB): peak = 825.770 ; gain = 167.391
+Synthesis Optimization Complete : Time (s): cpu = 00:01:02 ; elapsed = 00:01:14 . Memory (MB): peak = 825.770 ; gain = 529.305
+INFO: [Project 1-571] Translating synthesized netlist
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 833.203 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
 INFO: [Common 17-83] Releasing license: Synthesis
-12 Infos, 3 Warnings, 0 Critical Warnings and 6 Errors encountered.
-synth_design failed
-ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
-INFO: [Common 17-206] Exiting Vivado at Mon Apr 29 14:40:24 2019...
+42 Infos, 155 Warnings, 103 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:01:05 ; elapsed = 00:01:20 . Memory (MB): peak = 833.203 ; gain = 544.785
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 833.203 ; gain = 0.000
+WARNING: [Constraints 18-5210] No constraints selected for write.
+Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
+INFO: [Common 17-1381] The checkpoint 'C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.runs/synth_1/neural_net_top.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file neural_net_top_utilization_synth.rpt -pb neural_net_top_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Fri May  3 13:03:53 2019...

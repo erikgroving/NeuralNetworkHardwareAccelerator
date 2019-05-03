@@ -53,6 +53,9 @@ read_verilog -library xil_defaultlib -sv {
 read_ip -quiet C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp.xci
 set_property used_in_implementation false [get_files -all c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_ooc.xdc]
 
+read_ip -quiet C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1.xci
+set_property used_in_implementation false [get_files -all c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1_ooc.xdc]
+
 read_ip -quiet C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_0/fc1_weights_bram_0.xci
 set_property used_in_implementation false [get_files -all c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/fc1_weights_bram_0/fc1_weights_bram_0_ooc.xdc]
 

@@ -3,7 +3,7 @@
 module fc1_layer(
         input                                       clk,
         input                                       rst,
-       
+        input                                       forward,
         input  [`FC1_N_KERNELS - 1: 0][15: 0]       activations_i,
         input  [`FC1_N_KERNELS - 1: 0]              valid_i,        
         
@@ -28,17 +28,59 @@ module fc1_layer(
     logic   [`FC1_N_KERNELS - 1: 0]                 bram_valid;
     
     logic   [`FC1_N_KERNELS - 1: 0][15: 0]          bias;
+    logic   [255: 0]                                bias_container;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
     logic   [`FC1_N_KERNELS - 1: 0][4: 0]           neuron_id;
     logic   [`FC1_N_KERNELS - 1: 0]                 last_weight;
 
-    logic                                           forward;
-
     
-    assign forward = 1'b1;
     assign weights = {data_out_b, data_out_a};    
+    
+    `ifdef DEBUG
+     integer clk_cycle;
+     integer it;
 
+     always_ff @(posedge clk) begin
+        if (rst) begin
+            clk_cycle   <= 0;
+        end
+        else begin
+            clk_cycle   <=  clk_cycle + 1'b1;
+        end
+        $display("\n\n------ CYCLE %04d ------", clk_cycle);
+        $display("\n--- SCHEDULER ---");
+        $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
+        $display("\n--- MEMORY CONTROLLER ---");
+        $display("data_out_a\t\tdata_out_b");
+        for (it = 0; it < `FC1_BRAM; it = it + 1) begin
+            $display("%04h\t\t\t%04h", data_out_a[it], data_out_b[it]);       
+        end
+        $display("\nBias");
+        for (it = 0; it < `FC1_N_KERNELS; it = it + 1) begin
+            $display("%04h", bias[it]);
+        end
+        
+        $display("\nneuron_id");
+        for (it = 0; it < `FC1_N_KERNELS / 4; it = it + 1) begin
+            $display("%01d\t%01d\t%01d\t%01d", neuron_id[4*it], neuron_id[4*it + 1], neuron_id[4*it + 2], neuron_id[4*it + 3]);       
+        end
+        $display("\n--- KERNELS---");
+        $display("has_bias: %01b", bram_has_bias);
+        $display("ACT_I\t\tWEIGHT\t\tBIAS\t\tBRAM_VALID");
+        for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t%04h\t\t%04h\t\t\t%01b",
+            bram_activations[it], weights[it], bias[it], bram_valid[it]);
+        end
+            
+        $display("\nACT_O\t\tNEURON_ID_O\t\tVALID_ACT_O");
+        for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t%02d\t\t\t\t%01b",
+            activation_o[it], neuron_id_o[it], valid_act_o[it]);
+        end        
+     end
+    `endif
+    
     always_ff @(posedge clk) begin
         if (rst) begin
             sch_activations <= 0;
@@ -87,12 +129,12 @@ module fc1_layer(
         .clk(clk),
         .rst(rst),
         
-        .addrs_a(head_ptr),
+        .addr_a(head_ptr),
         .data_in_a(),
         .en_a(1'b1),
         .we_a(~forward),
         
-        .addrs_b(mid_ptr),
+        .addr_b(mid_ptr),
         .data_in_b(),
         .en_b(1'b1),
         .we_b(~forward),
@@ -124,17 +166,18 @@ module fc1_layer(
                 // input
                 .clk(clk),
                 .rst(rst),
-                .activations_i(bram_activations[i]),
-                .weights(weights[i]),
-                .bias(bias),
+                .activation_i(bram_activations[i]),
+                .weight(weights[i]),
+                .bias(bias[i]),
+                .neuron_id_i(neuron_id[i]),
                 .has_bias(bram_has_bias),
                 .valid_i(bram_valid[i]),
-                .neuron_id(neuron_id)
                 // output
-                .activation_o(activation_o)
-                .neuron_id_o(neuron_id_o),
-                .valid_o(valid_act_o)
+                .activation_o(activation_o[i]),
+                .neuron_id_o(neuron_id_o[i]),
+                .valid_o(valid_act_o[i])
             );
         end
     endgenerate    
+
 endmodule

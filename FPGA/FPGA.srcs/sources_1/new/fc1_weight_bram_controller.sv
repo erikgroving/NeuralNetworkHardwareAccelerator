@@ -35,7 +35,7 @@ module fc1_weight_bram_controller (
                 end 
                 else begin 
                     neuron_id[i]    <= i + `FC1_BRAM;
-                    neuron_id[j]    <= j + `FC1_BRAM;
+                    neuron_id[j]    <= i + `FC1_HALF_NEURONS + `FC1_BRAM;
                 end
             end
         end

@@ -28,9 +28,19 @@ module neural_net_top(
 
 
     // FC1
+   
     fc1_layer fc1_layer_i (
+        // inputs
         .clk(clk),
-        .rst(reset)
+        .rst(reset),    
+        .forward(), 
+        .activations_i(),
+        .valid_i(),
+        
+        // outputs
+        .activation_o(),
+        .neuron_id_o(),
+        .valid_act_o()    
     );
 
     always_comb begin

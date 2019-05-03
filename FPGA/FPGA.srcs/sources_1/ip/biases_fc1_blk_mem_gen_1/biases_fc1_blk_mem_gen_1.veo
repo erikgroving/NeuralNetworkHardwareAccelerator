@@ -58,7 +58,7 @@ biases_fc1_blk_mem_gen_1 your_instance_name (
   .clka(clka),    // input wire clka
   .ena(ena),      // input wire ena
   .wea(wea),      // input wire [0 : 0] wea
-  .addra(addra),  // input wire [6 : 0] addra
+  .addra(addra),  // input wire [0 : 0] addra
   .dina(dina),    // input wire [255 : 0] dina
   .douta(douta)  // output wire [255 : 0] douta
 );

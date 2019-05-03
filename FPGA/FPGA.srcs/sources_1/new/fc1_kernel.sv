@@ -37,7 +37,7 @@ module fc1_kernel(
         end
         
         if (valid_i && cnt == `FC1_FAN_IN - 1'b1) begin
-            activation_o    <= dsp_o;
+            activation_o    <= dsp_o[15] ? 0 : dsp_o;       // ReLU
             neuron_id_o     <= neuron_id;
             valid_o         <= 1'b1;
         end
@@ -51,15 +51,31 @@ module fc1_kernel(
             neuron_id   <= neuron_id_i;
         end
     end
-
+    
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            dsp_o   <= 0;
+        end
+        else begin
+            dsp_o   <= weight * activation_i + kernel_in;
+        end
+    end
     // A*B + C
-    sixteen_bit_MAC_dsp dsp_i(
+    /*sixteen_bit_MAC_dsp dsp_i(
                 .CLK(clk), 
                 .A(weight),
                 .B(activation_i),
                 .C(kernel_in),
                 .P(dsp_o)
-    );
+    );*/
+    
+    `ifdef DEBUG
+    always_ff @(posedge clk) begin
+        $display("--- INTERNAL KERNEL ---");
+        $display("weight: %04h\t\tactivation_i: %04h\t\tkernel_in: %04h\t\tdsp_o:%04h", weight, activation_i, kernel_in, dsp_o);
+    end
+    `endif
 
 
     
