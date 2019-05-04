@@ -26,6 +26,7 @@ module neural_net_top(
     output  logic [7: 0]    led_o
     );
 
+    logic [`FC1_N_KERNELS - 1: 0][15: 0] activation_o;
 
     // FC1
    
@@ -33,18 +34,18 @@ module neural_net_top(
         // inputs
         .clk(clk),
         .rst(reset),    
-        .forward(), 
-        .activations_i(),
-        .valid_i(),
+        .forward(1'b1), 
+        .activations_i({`FC1_N_KERNELS{16'b1010101101}}),
+        .valid_i(`FC1_N_KERNELS'b1),
         
         // outputs
-        .activation_o(),
+        .activation_o(activation_o),
         .neuron_id_o(),
         .valid_act_o()    
     );
 
     always_comb begin
-        led_o[7:0] = 8'hA3;
+        led_o[7:0] = activation_o[0][7:0];
     end
     
     

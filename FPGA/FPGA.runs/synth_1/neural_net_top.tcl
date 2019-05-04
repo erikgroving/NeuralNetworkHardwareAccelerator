@@ -17,7 +17,6 @@ proc create_report { reportName command } {
     send_msg_id runtcl-5 warning "$msg"
   }
 }
-set_msg_config -id {Common 17-41} -limit 10000000
 create_project -in_memory -part xc7z020clg484-1
 
 set_param project.singleFileAddWarning.threshold 0
@@ -50,9 +49,6 @@ read_verilog -library xil_defaultlib -sv {
   C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/fc1_weight_bram_controller.sv
   C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/new/neural_net_top.sv
 }
-read_ip -quiet C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp.xci
-set_property used_in_implementation false [get_files -all c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/sixteen_bit_MAC_dsp/sixteen_bit_MAC_dsp_ooc.xdc]
-
 read_ip -quiet C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1.xci
 set_property used_in_implementation false [get_files -all c:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1_ooc.xdc]
 
