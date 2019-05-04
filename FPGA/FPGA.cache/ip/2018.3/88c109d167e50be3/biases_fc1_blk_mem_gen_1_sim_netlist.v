@@ -3,8 +3,8 @@
 // Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
 // Date        : Sat May  4 20:05:21 2019
 // Host        : erik running 64-bit major release  (build 9200)
-// Command     : write_verilog -force -mode funcsim
-//               C:/Users/Erik/Desktop/NeuralNetworkHardwareAccelerator/FPGA/FPGA.srcs/sources_1/ip/biases_fc1_blk_mem_gen_1/biases_fc1_blk_mem_gen_1_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim -rename_top decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix -prefix
+//               decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_ biases_fc1_blk_mem_gen_1_sim_netlist.v
 // Design      : biases_fc1_blk_mem_gen_1
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -14,7 +14,7 @@
 
 (* CHECK_LICENSE_TYPE = "biases_fc1_blk_mem_gen_1,blk_mem_gen_v8_4_2,{}" *) (* downgradeipidentifiedwarnings = "yes" *) (* x_core_info = "blk_mem_gen_v8_4_2,Vivado 2018.3" *) 
 (* NotValidForBitStream *)
-module biases_fc1_blk_mem_gen_1
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix
    (clka,
     ena,
     wea,
@@ -131,7 +131,7 @@ module biases_fc1_blk_mem_gen_1
   (* C_WRITE_WIDTH_B = "256" *) 
   (* C_XDEVICEFAMILY = "zynq" *) 
   (* downgradeipidentifiedwarnings = "yes" *) 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2 U0
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_v8_4_2 U0
        (.addra(addra),
         .addrb(1'b0),
         .clka(clka),
@@ -197,8 +197,7 @@ module biases_fc1_blk_mem_gen_1
         .web(1'b0));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_generic_cstr" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_generic_cstr
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_generic_cstr
    (douta,
     clka,
     ena,
@@ -219,28 +218,28 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_generic_cstr
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width \ramloop[0].ram.r 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width \ramloop[0].ram.r 
        (.addra(addra),
         .clka(clka),
         .dina(dina[71:0]),
         .douta(douta[71:0]),
         .ena(ena),
         .wea(wea));
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized0 \ramloop[1].ram.r 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width__parameterized0 \ramloop[1].ram.r 
        (.addra(addra),
         .clka(clka),
         .dina(dina[143:72]),
         .douta(douta[143:72]),
         .ena(ena),
         .wea(wea));
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized1 \ramloop[2].ram.r 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width__parameterized1 \ramloop[2].ram.r 
        (.addra(addra),
         .clka(clka),
         .dina(dina[215:144]),
         .douta(douta[215:144]),
         .ena(ena),
         .wea(wea));
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized2 \ramloop[3].ram.r 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width__parameterized2 \ramloop[3].ram.r 
        (.addra(addra),
         .clka(clka),
         .dina(dina[255:216]),
@@ -249,8 +248,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_generic_cstr
         .wea(wea));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_prim_width" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width
    (douta,
     clka,
     ena,
@@ -271,7 +269,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init \prim_init.ram 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init \prim_init.ram 
        (.addra(addra),
         .clka(clka),
         .dina(dina),
@@ -281,7 +279,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width
 endmodule
 
 (* ORIG_REF_NAME = "blk_mem_gen_prim_width" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized0
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width__parameterized0
    (douta,
     clka,
     ena,
@@ -302,7 +300,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized0
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized0 \prim_init.ram 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init__parameterized0 \prim_init.ram 
        (.addra(addra),
         .clka(clka),
         .dina(dina),
@@ -312,7 +310,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized0
 endmodule
 
 (* ORIG_REF_NAME = "blk_mem_gen_prim_width" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized1
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width__parameterized1
    (douta,
     clka,
     ena,
@@ -333,7 +331,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized1
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized1 \prim_init.ram 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init__parameterized1 \prim_init.ram 
        (.addra(addra),
         .clka(clka),
         .dina(dina),
@@ -343,7 +341,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized1
 endmodule
 
 (* ORIG_REF_NAME = "blk_mem_gen_prim_width" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized2
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_width__parameterized2
    (douta,
     clka,
     ena,
@@ -364,7 +362,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized2
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized2 \prim_init.ram 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init__parameterized2 \prim_init.ram 
        (.addra(addra),
         .clka(clka),
         .dina(dina),
@@ -373,8 +371,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_width__parameterized2
         .wea(wea));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_prim_wrapper_init" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init
    (douta,
     clka,
     ena,
@@ -614,7 +611,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init
 endmodule
 
 (* ORIG_REF_NAME = "blk_mem_gen_prim_wrapper_init" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized0
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init__parameterized0
    (douta,
     clka,
     ena,
@@ -854,7 +851,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized0
 endmodule
 
 (* ORIG_REF_NAME = "blk_mem_gen_prim_wrapper_init" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized1
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init__parameterized1
    (douta,
     clka,
     ena,
@@ -1094,7 +1091,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized1
 endmodule
 
 (* ORIG_REF_NAME = "blk_mem_gen_prim_wrapper_init" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized2
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_prim_wrapper_init__parameterized2
    (douta,
     clka,
     ena,
@@ -1365,8 +1362,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_prim_wrapper_init__parameterized2
         .WEBWE({1'b0,1'b0,1'b0,1'b0,wea,wea,wea,wea}));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_top" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_top
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_top
    (douta,
     clka,
     ena,
@@ -1387,7 +1383,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_top
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_generic_cstr \valid.cstr 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_generic_cstr \valid.cstr 
        (.addra(addra),
         .clka(clka),
         .dina(dina),
@@ -1421,8 +1417,8 @@ endmodule
 (* C_WEA_WIDTH = "1" *) (* C_WEB_WIDTH = "1" *) (* C_WRITE_DEPTH_A = "2" *) 
 (* C_WRITE_DEPTH_B = "2" *) (* C_WRITE_MODE_A = "WRITE_FIRST" *) (* C_WRITE_MODE_B = "WRITE_FIRST" *) 
 (* C_WRITE_WIDTH_A = "256" *) (* C_WRITE_WIDTH_B = "256" *) (* C_XDEVICEFAMILY = "zynq" *) 
-(* ORIG_REF_NAME = "blk_mem_gen_v8_4_2" *) (* downgradeipidentifiedwarnings = "yes" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2
+(* downgradeipidentifiedwarnings = "yes" *) 
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_v8_4_2
    (clka,
     rsta,
     ena,
@@ -2098,7 +2094,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2
   assign sbiterr = \<const0> ;
   GND GND
        (.G(\<const0> ));
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2_synth inst_blk_mem_gen
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_v8_4_2_synth inst_blk_mem_gen
        (.addra(addra),
         .clka(clka),
         .dina(dina),
@@ -2107,8 +2103,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2
         .wea(wea));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_v8_4_2_synth" *) 
-module biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2_synth
+module decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_v8_4_2_synth
    (douta,
     clka,
     ena,
@@ -2129,7 +2124,7 @@ module biases_fc1_blk_mem_gen_1_blk_mem_gen_v8_4_2_synth
   wire ena;
   wire [0:0]wea;
 
-  biases_fc1_blk_mem_gen_1_blk_mem_gen_top \gnbram.gnativebmg.native_blk_mem_gen 
+  decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_blk_mem_gen_top \gnbram.gnativebmg.native_blk_mem_gen 
        (.addra(addra),
         .clka(clka),
         .dina(dina),
