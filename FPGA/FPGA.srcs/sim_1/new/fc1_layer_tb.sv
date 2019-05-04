@@ -44,7 +44,7 @@ module fc1_layer_tb(
         @(negedge clock);
         reset = 1'b0;
 	    valid_i = {`FC1_N_KERNELS{1'b1}};
-	    activations_i = {`FC1_N_KERNELS{16'b1}};
+	    activations_i = {`FC1_N_KERNELS{16'h2000}};
         
         #100000;
         $finish;

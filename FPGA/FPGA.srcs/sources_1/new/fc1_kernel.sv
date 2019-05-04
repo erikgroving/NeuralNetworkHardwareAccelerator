@@ -56,8 +56,8 @@ module fc1_kernel(
     end
     
     assign kernel_in    = has_bias ? bias : dsp_o;
-    assign mult_res     = weight * activation_i;
-    assign mac_res      = mult_res[31:13] + kernel_in;
+    assign mult_res     = $signed(weight) * $signed(activation_i);
+    assign mac_res      = $signed(mult_res[31:13]) + $signed(kernel_in);
     
     always_ff @(posedge clk) begin
         if (rst) begin

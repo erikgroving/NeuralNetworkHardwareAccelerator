@@ -12,7 +12,7 @@ fc1_neurons = [[] for i in range(fc1_n_neurons)]
 n_offset = 0
 
 # Set activations in
-activations_i = [2 ** -13 for i in range(fc1_fan_in)]
+activations_i = [1 for i in range(fc1_fan_in)]
 
 path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights*.coe'
 for fname in glob.glob(path):
