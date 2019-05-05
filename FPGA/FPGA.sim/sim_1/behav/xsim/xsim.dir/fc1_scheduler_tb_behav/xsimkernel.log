@@ -1,7 +1,0 @@
-Running: xsim.dir/fc1_scheduler_tb_behav/xsimk.exe -simmode gui -wdb fc1_scheduler_tb_behav.wdb -simrunnum 0 -socket 58109
-Design successfully loaded
-Design Loading Memory Usage: 4920 KB (Peak: 4920 KB)
-Design Loading CPU Usage: 0 ms
-Simulation completed
-Simulation Memory Usage: 13532 KB (Peak: 13532 KB)
-Simulation CPU Usage: 171 ms

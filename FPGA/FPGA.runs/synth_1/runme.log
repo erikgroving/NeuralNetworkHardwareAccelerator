@@ -1,4 +1,0 @@
-
-*** Running vivado
-    with args -log neural_net_top.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source neural_net_top.tcl
-
