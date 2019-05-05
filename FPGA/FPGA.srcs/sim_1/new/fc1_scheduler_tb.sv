@@ -19,7 +19,7 @@ module fc1_scheduler_tb(
     
     
     
-    fc1_scheduler fc1_scheduler_i (
+    fc_scheduler #(.ADDR(`FC1_ADDR), .BIAS_ADDR(`FC1_BIAS_ADDR), .MID_PTR_OFFSET(`FC1_MID_PTR_OFFSET), .FAN_IN(`FC1_FAN_IN)) fc1_scheduler_i (
         .clk(clock),
         .rst(reset),
         .forward(forward),

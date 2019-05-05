@@ -2,18 +2,21 @@
 `include "sys_defs.vh"
 
 /* Addition kernel */
-module fc1_kernel(
-    input                       clk,
-    input                       rst,
-    input   [15: 0]             activation_i,
-    input   [15: 0]             weight,
-    input   [15: 0]             bias,
-    input   [4: 0]              neuron_id_i,
-    input                       has_bias,
-    input                       valid_i,
-    output logic    [15: 0]     activation_o,
-    output logic    [4: 0]      neuron_id_o,
-    output logic                valid_o
+module fc_kernel #(
+    parameter FAN_IN = 0,
+    parameter ID_WIDTH = 0
+)(
+    input                           clk,
+    input                           rst,
+    input   [15: 0]                 activation_i,
+    input   [15: 0]                 weight,
+    input   [15: 0]                 bias,
+    input   [ID_WIDTH - 1: 0]       neuron_id_i,
+    input                           has_bias,
+    input                           valid_i,
+    output logic [15: 0]            activation_o,
+    output logic [ID_WIDTH - 1: 0]  neuron_id_o,
+    output logic                    valid_o
 );
     
     logic [15: 0]   dsp_o;

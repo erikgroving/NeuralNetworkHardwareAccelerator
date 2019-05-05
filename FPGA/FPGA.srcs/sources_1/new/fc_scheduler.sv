@@ -1,6 +1,11 @@
 `timescale 1ns / 1ps
 
-module fc1_scheduler(
+module fc_scheduler #(
+    parameter ADDR              = 0,
+    parameter BIAS_ADDR         = 0,
+    parameter MID_PTR_OFFSET    = 0,
+    parameter FAN_IN            = 0    
+)(
     input                                                           clk,
     input                                                           rst,
     input                                                           forward,
@@ -11,7 +16,7 @@ module fc1_scheduler(
     output logic    [`FC1_BIAS_ADDR - 1: 0]                         bias_ptr,
     output logic                                                    has_bias
     
-    );    
+);    
     logic                               start;
     logic   [`FC1_ADDR - 1: 0]          h_thresh;
     logic   [`FC1_ADDR - 1: 0]          next_head_ptr;

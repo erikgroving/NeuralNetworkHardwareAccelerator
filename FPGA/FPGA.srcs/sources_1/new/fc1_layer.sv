@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "sys_defs.vh"
 
 module fc1_layer(
         input                                       clk,
@@ -93,7 +94,7 @@ module fc1_layer(
     end
 
     // Scheduler for the fully connected layer
-    fc1_scheduler fc1_scheduler_i (
+    fc_scheduler #(.ADDR(`FC1_ADDR), .BIAS_ADDR(`FC1_BIAS_ADDR), .MID_PTR_OFFSET(`FC1_MID_PTR_OFFSET), .FAN_IN(`FC1_FAN_IN)) fc1_scheduler_i (
         //inputs
         .clk(clk),
         .rst(rst),
@@ -162,7 +163,7 @@ module fc1_layer(
     genvar i;
     generate
         for (i = 0; i < `FC1_N_KERNELS; i=i+1) begin
-            fc1_kernel fc1_kernel_i (
+            fc_kernel #(.FAN_IN(`FC1_FAN_IN), .ID_WIDTH(5)) fc_kernel_i (
                 // input
                 .clk(clk),
                 .rst(rst),
