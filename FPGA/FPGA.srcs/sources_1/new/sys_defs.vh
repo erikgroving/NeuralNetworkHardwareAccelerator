@@ -17,7 +17,11 @@
 `define FC1_HALF_NEURONS        16
 
 // FC2 defines
+`define FC2_BRAM                1
 `define	FC2_NEURONS             10
 `define FC2_FAN_IN              32
 `define	FC2_N_KERNELS           1
+`define FC2_ADDR                9
+`define FC2_BIAS_ADDR           1
+`define FC2_MID_PTR_OFFSET      320         // serves as the end point
 `endif

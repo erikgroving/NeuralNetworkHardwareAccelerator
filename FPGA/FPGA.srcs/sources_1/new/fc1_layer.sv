@@ -81,6 +81,7 @@ module fc1_layer(
         end        
      end
     `endif
+
     
     always_ff @(posedge clk) begin
         if (rst) begin

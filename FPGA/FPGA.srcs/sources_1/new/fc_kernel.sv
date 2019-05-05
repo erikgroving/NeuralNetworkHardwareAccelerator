@@ -32,7 +32,7 @@ module fc_kernel #(
     logic [18: 0]   mac_res;
     
 
-    assign next_cnt     = (cnt == `FC1_FAN_IN - 1'b1) ? 0 : cnt + 1'b1;
+    assign next_cnt     = (cnt == FAN_IN - 1'b1) ? 0 : cnt + 1'b1;
     
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -42,7 +42,7 @@ module fc_kernel #(
             cnt <= next_cnt;
         end
         
-        if (valid_i && cnt == `FC1_FAN_IN - 1'b1) begin
+        if (valid_i && cnt == FAN_IN - 1'b1) begin
             activation_o    <= dsp_o[15] ? 0 : dsp_o;       // ReLU
             neuron_id_o     <= neuron_id;
             valid_o         <= 1'b1;

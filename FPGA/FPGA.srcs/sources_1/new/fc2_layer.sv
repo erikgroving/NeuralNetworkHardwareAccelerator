@@ -8,9 +8,126 @@ module fc2_layer(
         input  [`FC2_N_KERNELS - 1: 0]              valid_i,        
         
         output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
-        output logic [`FC2_N_KERNELS - 1: 0][4: 0]  neuron_id_o,
+        output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
         output logic [`FC2_N_KERNELS - 1: 0]        valid_act_o
     );
+    
+    logic   [`FC2_BRAM - 1: 0][15: 0]               data_in_a;
+    logic   [`FC2_BRAM - 1: 0][15: 0]               data_out_a;
+
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          weights;
+    logic   [`FC2_ADDR - 1: 0]                      head_ptr;
+    logic   [`FC2_ADDR - 1: 0]                      mid_ptr;
+    logic   [`FC2_BIAS_ADDR - 1: 0]                 bias_ptr;
+   
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          sch_activations;
+    logic   [`FC2_N_KERNELS - 1: 0]                 sch_valid;
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bram_activations;
+    logic   [`FC2_N_KERNELS - 1: 0]                 bram_valid;
+    
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bias;
+    logic                                           sch_has_bias;
+    logic                                           bram_has_bias;
+    logic   [`FC2_N_KERNELS - 1: 0][3: 0]           neuron_id;
+    logic   [`FC2_N_KERNELS - 1: 0]                 last_weight;
+
+    
+    assign weights = data_out_a;    
+    
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            sch_activations <= 0;
+            sch_valid       <= 0;
+        end
+        else begin
+            sch_activations <= activations_i;
+            sch_valid       <= valid_i;
+        end
+    end
+
+    // Scheduler for the fully connected layer
+    fc_scheduler #(.ADDR(`FC2_ADDR), .BIAS_ADDR(`FC2_BIAS_ADDR), .MID_PTR_OFFSET(`FC2_MID_PTR_OFFSET), .FAN_IN(`FC2_FAN_IN)) fc2_scheduler_i (
+        //inputs
+        .clk(clk),
+        .rst(rst),
+        .forward(forward),
+        .valid_i(&valid_i),
+        
+        //outputs
+        .head_ptr(head_ptr),
+        .mid_ptr(mid_ptr),      // not used in fc2
+        .bias_ptr(bias_ptr),
+        .has_bias(sch_has_bias)
+    );
+
+    
+
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            bram_activations    <= 0;
+            bram_valid          <= 0;
+            bram_has_bias       <= 0;
+        end
+        else begin
+            bram_activations    <= sch_activations;
+            bram_valid          <= sch_valid;
+            bram_has_bias       <= sch_has_bias;
+        end
+    end
+    
+    // BRAM for the weights of the fully connected layer
+    fc2_weight_bram_controller fc2_weight_bram_controller_i (
+        // inputs
+        .clk(clk),
+        .rst(rst),
+        
+        .addr_a(head_ptr),
+        .data_in_a(),
+        .en_a(1'b1),
+        .we_a(~forward),
+
+        
+        // outputs
+        .data_out_a(data_out_a),
+        .neuron_id(neuron_id)
+    ); 
+    
+    
+    biases_fc2_blk_mem biases_fc2_blk_mem_i (
+        .addra(bias_ptr),
+        .clka(clk),
+        .dina(),
+        .douta(bias),
+        .ena(1'b1),
+        .wea(1'b0)
+    );
+
+
+    
+    
+    // Computational kernel for the fully connected layer    
+    genvar i;
+    generate
+        for (i = 0; i < `FC2_N_KERNELS; i=i+1) begin
+            fc_kernel #(.FAN_IN(`FC2_FAN_IN), .ID_WIDTH(4)) fc_kernel_i (
+                // input
+                .clk(clk),
+                .rst(rst),
+                .activation_i(bram_activations[i]),
+                .weight(weights[i]),
+                .bias(bias[i]),
+                .neuron_id_i(neuron_id[i]),
+                .has_bias(bram_has_bias),
+                .valid_i(bram_valid[i]),
+                // output
+                .activation_o(activation_o[i]),
+                .neuron_id_o(neuron_id_o[i]),
+                .valid_o(valid_act_o[i])
+            );
+        end
+    endgenerate    
     
     
 endmodule
