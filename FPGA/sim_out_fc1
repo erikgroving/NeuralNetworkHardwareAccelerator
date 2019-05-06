@@ -460,30 +460,6 @@ fd98			fe6d
 fd8e			ff2c
 fd14			ff20
 
-Bias
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-
-neuron_id
-0	1	2	3
-4	5	6	7
-16	17	18	19
-20	21	22	23
-
 --- KERNELS---
 has_bias: 0
 ACT_I		WEIGHT		BIAS		BRAM_VALID
@@ -70596,7 +70572,7 @@ weight: 02fa		activation_i: 2000		kernel_in: 1836		dsp_o:1836
 weight: 0025		activation_i: 2000		kernel_in: 2275		dsp_o:2275
 
 
------- CYCLE 0734 ------
+------ CYCLE 0734 -----
 
 --- SCHEDULER ---
 head_ptr: 0733		mid_ptr: 1517		bias_ptr: 1
