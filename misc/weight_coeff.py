@@ -24,8 +24,8 @@ def intToBinaryString(x, l):
     return str
 
 
-n_neurons = 8
-params_per_neuron = 392
+n_neurons = 1
+params_per_neuron = 3136
 fan_in = 128
 params = []
 binary_params = []
@@ -45,8 +45,14 @@ print(params[0])
 print(binary_params[0])
 
 contents = "memory_initialization_radix=2;\nmemory_initialization_vector=\n"
+r_width = 1
+cnt = 0
 for b in binary_params:
-    contents += str(b) + ",\n" 
+    contents += str(b)
+    cnt += 1
+    if cnt == r_width:
+        contents += ",\n"
+        cnt = 0
 contents = contents[:-2] + ";"
 
 

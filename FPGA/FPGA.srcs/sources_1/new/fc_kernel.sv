@@ -85,12 +85,12 @@ module fc_kernel #(
                 .P(dsp_o)
     );*/
     
-    `ifdef DEBUG
+    /*`ifdef DEBUG
     always_ff @(posedge clk) begin
         $display("--- INTERNAL KERNEL ---");
         $display("weight: %04h\t\tactivation_i: %04h\t\tkernel_in: %04h\t\tdsp_o:%04h", weight, activation_i, kernel_in, dsp_o);
     end
-    `endif
+    `endif*/
 
 
     

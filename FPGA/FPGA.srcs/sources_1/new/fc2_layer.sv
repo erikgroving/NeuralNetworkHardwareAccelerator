@@ -5,11 +5,11 @@ module fc2_layer(
         input                                       rst,
         input                                       forward,
         input  [`FC2_N_KERNELS - 1: 0][15: 0]       activations_i,
-        input  [`FC2_N_KERNELS - 1: 0]              valid_i,        
+        input                                       valid_i,        
         
         output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
-        output logic [`FC2_N_KERNELS - 1: 0]        valid_act_o
+        output logic                                valid_act_o
     );
     
     logic   [`FC2_BRAM - 1: 0][15: 0]               data_in_a;
@@ -21,15 +21,18 @@ module fc2_layer(
     logic   [`FC2_BIAS_ADDR - 1: 0]                 bias_ptr;
    
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          sch_activations;
-    logic   [`FC2_N_KERNELS - 1: 0]                 sch_valid;
+    logic                                           sch_valid;
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bram_activations;
-    logic   [`FC2_N_KERNELS - 1: 0]                 bram_valid;
+    logic                                           bram_valid;
     
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bias;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
     logic   [`FC2_N_KERNELS - 1: 0][3: 0]           neuron_id;
     logic   [`FC2_N_KERNELS - 1: 0]                 last_weight;
+    
+    
+    logic   [`FC2_N_KERNELS - 1: 0]                 valid;
 
     
     assign weights = data_out_a;    
@@ -52,7 +55,7 @@ module fc2_layer(
         .clk(clk),
         .rst(rst),
         .forward(forward),
-        .valid_i(&valid_i),
+        .valid_i(valid_i),
         
         //outputs
         .head_ptr(head_ptr),
@@ -84,7 +87,7 @@ module fc2_layer(
         .rst(rst),
         
         .addr_a(head_ptr),
-        .data_in_a(),
+        .data_in_a(0),
         .en_a(1'b1),
         .we_a(~forward),
 
@@ -98,12 +101,46 @@ module fc2_layer(
     biases_fc2_blk_mem biases_fc2_blk_mem_i (
         .addra(bias_ptr),
         .clka(clk),
-        .dina(),
-        .douta(bias),
+        .dina(0),
+        .douta(bias[0]),
         .ena(1'b1),
         .wea(1'b0)
     );
 
+    `ifdef DEBUG
+    integer it;
+    always_ff @(posedge clk) begin
+        $display("\n--- SCHEDULER ---");
+        $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
+        $display("\n--- MEMORY CONTROLLER ---");
+        $display("data_out_a\t");
+        for (it = 0; it < `FC2_BRAM; it = it + 1) begin
+            $display("%04h", data_out_a[it]);       
+        end
+        $display("\nBias");
+        for (it = 0; it < `FC2_N_KERNELS; it = it + 1) begin
+            $display("%04h", bias[it]);
+        end
+        
+        $display("\nneuron_id");
+        for (it = 0; it < `FC2_N_KERNELS / 4; it = it + 1) begin
+            $display("%01d\t%01d\t%01d\t%01d", neuron_id[4*it], neuron_id[4*it + 1], neuron_id[4*it + 2], neuron_id[4*it + 3]);       
+        end
+        $display("\n--- KERNELS---");
+        $display("has_bias: %01b", bram_has_bias);
+        $display("ACT_I\t\tWEIGHT\t\tBIAS\t\tBRAM_VALID");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t%04h\t\t%04h\t\t\t%01b",
+            bram_activations[it], weights[it], bias[it], bram_valid);
+        end
+            
+        $display("\nACT_O\t\tNEURON_ID_O\t\tVALID_ACT_O");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t%02d\t\t\t\t%01b",
+            activation_o[it], neuron_id_o[it], valid_act_o);
+        end        
+     end
+    `endif
 
     
     
@@ -120,14 +157,16 @@ module fc2_layer(
                 .bias(bias[i]),
                 .neuron_id_i(neuron_id[i]),
                 .has_bias(bram_has_bias),
-                .valid_i(bram_valid[i]),
+                .valid_i(bram_valid),
                 // output
                 .activation_o(activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
-                .valid_o(valid_act_o[i])
+                .valid_o(valid)
             );
         end
     endgenerate    
-    
+     
+    assign valid_act_o = &valid;
+   
     
 endmodule

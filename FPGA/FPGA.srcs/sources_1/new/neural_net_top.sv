@@ -19,13 +19,16 @@ module neural_net_top(
     
     always_ff @(posedge clk) begin
         if (reset) begin
-            fc1_iter    <= 0;
+            fc1_iter        <= 0;
+            fc1_buf_valid_i <= 1'b0;
         end
         else if (fc1_iter == `FC1_FAN_IN - 1'b1) begin
-            fc1_iter    <= 0;
+            fc1_iter        <= 0;
+            fc1_buf_valid_i <= 1'b1;
         end
         else begin
-            fc1_iter    <= fc1_iter + 1'b1;
+            fc1_iter        <= fc1_iter + 1'b1;
+            fc1_buf_valid_i <= 1'b1;
         end
     end
     
@@ -40,30 +43,32 @@ module neural_net_top(
                                 
     assign fc1_buf_ptr      = fc1_iter + fc1_buf_offset;
     
-    // FC0 --> FC1 BRAM activation buffer
-    fc1_fc2_rand_activation_buff fc1_fc2_rand_activation_buff_i(
-        .addra(),
+    fc0_fc1_rand_activations fc0_fc1_rand_activations_i (
+        .addra(fc1_buf_ptr),
         .clka(clk),
-        .dina(),
-        .ena(1'b1),
-        .wea(),
-        
-        .addrb(fc1_buf_ptr),
-        .clkb(clk),
-        .doutb(fc1_buf_act_i),
-        .enb(1'b1)
+        .douta(fc1_buf_act_i),
+        .ena(1'b1)
     );
     
     // Logics for the fc1 layer
     logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_activation_i;
-    logic [`FC1_N_KERNELS - 1: 0]           fc1_valid_i;    
+    logic                                   fc1_valid_i;    
  
     logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_activation_o;
     logic [`FC1_N_KERNELS - 1: 0][4: 0]     fc1_neuron_id_o;
-    logic [`FC1_N_KERNELS - 1: 0]           fc1_valid_act_o;
+    logic                                   fc1_valid_act_o;
     
-    assign fc1_activation_i = {`FC1_N_KERNELS{fc1_buf_act_i}};
-    assign fc1_valid_i      = {`FC1_N_KERNELS{!reset}};
+    assign fc1_activation_i = {`FC1_N_KERNELS{16'h2000}};/*fc1_buf_act_i}};*/
+    
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            fc1_valid_i <= 0;
+        end
+        else begin
+            fc1_valid_i <= fc1_buf_valid_i;
+        end
+    end
+    
     // FC1   
     fc1_layer fc1_layer_i (
         // inputs
@@ -79,6 +84,8 @@ module neural_net_top(
         .valid_act_o(fc1_valid_act_o)    
     );
     
+
+    
     // FC1 --> FC2 buffer   
     // Stored in fabric since only 32 activations for the layer
     logic [`FC2_FAN_IN - 1: 0][15: 0]   fc1_fc2_buff;
@@ -93,7 +100,7 @@ module neural_net_top(
             fc1_fc2_buff        <= 0;
             fc1_fc2_rdy         <= 0;
         end
-        else if(&fc1_valid_act_o) begin
+        else if(fc1_valid_act_o) begin
             for (j = 0; j < `FC1_N_KERNELS; j=j+1) begin
                 fc1_fc2_buff[fc1_neuron_id_o[j]]    <= fc1_activation_o[j];
             end
@@ -128,22 +135,19 @@ module neural_net_top(
     
     // Logics for the fc2 layer (the last fc layer)
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_i;
-    logic [`FC2_N_KERNELS - 1: 0]           fc2_valid_i;
+    logic                                   fc2_valid_i;
     
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
-    logic [`FC2_N_KERNELS - 1: 0]           fc2_valid_o;    
-    bit [3: 0]  k;
+    logic                                   fc2_valid_o;    
     always_ff @(posedge clk) begin
         if (reset) begin
             fc2_activation_i    <= 0;
             fc2_valid_i         <= 0;
         end
         else begin
-            for (k = 0; k < `FC2_N_KERNELS; k=k+1) begin
-                fc2_activation_i[k] <= fc1_fc2_buff[fc1_fc2_buff_ptr];
-                fc2_valid_i[k]      <= fc2_start;
-            end
+            fc2_activation_i <= {`FC2_N_KERNELS{fc1_fc2_buff[fc1_fc2_buff_ptr]}};                         
+            fc2_valid_i         <= fc2_start;
         end
     end
     
@@ -170,14 +174,14 @@ module neural_net_top(
 
     logic [`FC2_NEURONS - 1: 0][15: 0]  fc2_act_o_buf;
     logic                               fc2_buf_valid;
-    bit [6: 0] m;
+    bit [`FC1_N_KERNELS - 1: 0] m;
     always_ff @(posedge clk) begin
         if (reset) begin
             fc2_act_o_buf   <= 0;
         end
         else begin
             for (m = 0; m < `FC1_N_KERNELS; m=m+1) begin
-                if (fc2_valid_o[m]) begin
+                if (fc2_valid_o) begin
                     fc2_act_o_buf[fc2_neuron_id_o[m]]  <= fc2_activation_o[m];
                 end 
             end
@@ -186,8 +190,8 @@ module neural_net_top(
         if (reset) begin
             fc2_buf_valid   <= 1'b0;
         end
-        else if (&fc2_valid_o) begin
-            fc2_buf_valid   <= fc2_neuron_id_o[`FC1_N_KERNELS - 1] == `FC2_FAN_IN - 1;
+        else if (fc2_valid_o) begin
+            fc2_buf_valid   <= fc2_neuron_id_o[`FC2_N_KERNELS - 1] == `FC2_NEURONS - 1;
         end
     end
 
@@ -208,6 +212,48 @@ module neural_net_top(
         end
     end
     
+    `ifdef DEBUG
+     integer clk_cycle;
+     integer it;
+
+     always_ff @(posedge clk) begin
+        if (reset) begin
+            clk_cycle   <= 0;
+        end
+        else begin
+            clk_cycle   <=  clk_cycle + 1'b1;
+        end
+        $display("\n\n------ CYCLE %04d ------", clk_cycle);
+        $display("FC1_iter: %04d\nFC1_buf_offset: %04d", fc1_iter, fc1_buf_offset);
+        $display("FC1_BUF_PTR: %04d\nFC1_ACT_I: %04h", fc1_buf_ptr, fc1_buf_act_i);  
+        $display("\n--- FC1 ---");
+        $display("FC1_act_i: %04h\t\tFC1_valid_i: %01b", fc1_activation_i[0], fc1_valid_i);
+        $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
+        for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t%04d\t\t%01b", fc1_activation_o[it], fc1_neuron_id_o[it], fc1_valid_act_o);
+        end
+        $display("\n--- FC2 ---");
+        $display("FC2_start: %01b\tFC1_FC2_BUFF_PTR: %04d", fc2_start, fc1_fc2_buff_ptr);
+        $display("FC2_act_i: %04h\t\tFC2_valid_i: %01b", fc2_activation_i[0], fc2_valid_i);
+        $display("fc1_fc2_buff_ptr: %02d\t\tfc1fc2_buff: %04h", fc1_fc2_buff_ptr, fc1_fc2_buff[fc1_fc2_buff_ptr]);
+        $display("fc2_act_i: %04h", fc2_activation_i);
+        $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t%04d\t\t%01b", fc2_activation_o[it], fc2_neuron_id_o[it], fc2_valid_o);
+        end            
+        
+        $display("--- FC2 OUT ---");        
+        $display("fc2_buf_valid: %01b" , fc2_buf_valid);
+        for (it= 0; it < `FC2_NEURONS; it=it+1) begin
+            $display("%02d: %04h", it, fc2_act_o_buf[it]); 
+        end
+        $display("\n---FC1 FC2 Buff---");
+        for (it = 0; it < `FC2_FAN_IN; it=it+1) begin
+            $display("[%02d]: %04h", it, fc1_fc2_buff[it]);
+        end
+     end 
+    `endif    
+        
     
     logic [7: 0]    led;
     // Gets the max idx and sets the LED accordingly
@@ -238,7 +284,7 @@ module neural_net_top(
         endcase
         
         if (reset) begin
-            led_o   <= 8'b00;
+            led_o   <= 8'hAA;
         end
         else if (fc2_buf_valid) begin
             led_o   <= led;

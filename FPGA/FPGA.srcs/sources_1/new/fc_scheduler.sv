@@ -11,25 +11,25 @@ module fc_scheduler #(
     input                                                           forward,
     input                                                           valid_i,
     
-    output logic    [`FC1_ADDR - 1: 0]                              head_ptr,
-    output logic    [`FC1_ADDR - 1: 0]                              mid_ptr,
-    output logic    [`FC1_BIAS_ADDR - 1: 0]                         bias_ptr,
+    output logic    [ADDR - 1: 0]                                   head_ptr,
+    output logic    [ADDR - 1: 0]                                   mid_ptr,
+    output logic    [BIAS_ADDR - 1: 0]                              bias_ptr,
     output logic                                                    has_bias
     
 );    
-    logic                               start;
-    logic   [`FC1_ADDR - 1: 0]          h_thresh;
-    logic   [`FC1_ADDR - 1: 0]          next_head_ptr;
-    logic   [`FC1_ADDR - 1: 0]          next_mid_ptr;
-    logic   [`FC1_BIAS_ADDR - 1: 0]     next_bias_ptr;
+    logic                          start;
+    logic   [ADDR - 1: 0]          h_thresh;
+    logic   [ADDR - 1: 0]          next_head_ptr;
+    logic   [ADDR - 1: 0]          next_mid_ptr;
+    logic   [BIAS_ADDR - 1: 0]     next_bias_ptr;
     
-    assign h_thresh         = `FC1_MID_PTR_OFFSET - `FC1_ADDR'd2;
+    assign h_thresh         = MID_PTR_OFFSET - 2;
     
     assign next_head_ptr    = (!valid_i) ? head_ptr     :
                                 (!start) ? 0            : head_ptr + 1'b1;
                                         
     assign next_mid_ptr     = (!valid_i) ? mid_ptr      :
-                                (!start) ? `FC1_MID_PTR_OFFSET : mid_ptr + 1'b1;
+                                (!start) ? MID_PTR_OFFSET : mid_ptr + 1'b1;
                                 
     assign next_bias_ptr    = (!valid_i) ? bias_ptr     :
                                 (!start) ? 0            : bias_ptr + 1'b1;
@@ -38,7 +38,7 @@ module fc_scheduler #(
     always_ff @(posedge clk) begin
         if (rst) begin
             head_ptr    <= 0;
-            mid_ptr     <= `FC1_MID_PTR_OFFSET;
+            mid_ptr     <= MID_PTR_OFFSET;
         end
         else begin
             head_ptr    <= next_head_ptr;
@@ -51,7 +51,7 @@ module fc_scheduler #(
             has_bias    <= 0;
             bias_ptr    <= 0;
         end
-        else if (valid_i && (next_head_ptr == 0 || next_head_ptr == `FC1_FAN_IN)) begin 
+        else if (valid_i && (next_head_ptr == 0 || next_head_ptr == FAN_IN)) begin 
             has_bias    <= 1'b1;
             bias_ptr    <= next_bias_ptr;
         end

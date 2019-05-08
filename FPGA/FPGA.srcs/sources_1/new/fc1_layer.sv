@@ -6,11 +6,11 @@ module fc1_layer(
         input                                       rst,
         input                                       forward,
         input  [`FC1_N_KERNELS - 1: 0][15: 0]       activations_i,
-        input  [`FC1_N_KERNELS - 1: 0]              valid_i,        
+        input                                       valid_i,        
         
         output logic [`FC1_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC1_N_KERNELS - 1: 0][4: 0]  neuron_id_o,
-        output logic [`FC1_N_KERNELS - 1: 0]        valid_act_o
+        output logic                                valid_act_o
     );
     
     logic   [`FC1_BRAM - 1: 0][15: 0]               data_in_a;
@@ -24,9 +24,9 @@ module fc1_layer(
     logic   [`FC1_BIAS_ADDR - 1: 0]                 bias_ptr;
    
     logic   [`FC1_N_KERNELS - 1: 0][15: 0]          sch_activations;
-    logic   [`FC1_N_KERNELS - 1: 0]                 sch_valid;
+    logic                                           sch_valid;
     logic   [`FC1_N_KERNELS - 1: 0][15: 0]          bram_activations;
-    logic   [`FC1_N_KERNELS - 1: 0]                 bram_valid;
+    logic                                           bram_valid;
     
     logic   [`FC1_N_KERNELS - 1: 0][15: 0]          bias;
     logic   [255: 0]                                bias_container;
@@ -35,21 +35,13 @@ module fc1_layer(
     logic   [`FC1_N_KERNELS - 1: 0][4: 0]           neuron_id;
     logic   [`FC1_N_KERNELS - 1: 0]                 last_weight;
 
+    logic   [`FC1_N_KERNELS - 1: 0]                 valid;
     
     assign weights = {data_out_b, data_out_a};    
     
     `ifdef DEBUG
-     integer clk_cycle;
-     integer it;
-
-     always_ff @(posedge clk) begin
-        if (rst) begin
-            clk_cycle   <= 0;
-        end
-        else begin
-            clk_cycle   <=  clk_cycle + 1'b1;
-        end
-        $display("\n\n------ CYCLE %04d ------", clk_cycle);
+    integer it;
+    /*always_ff @(posedge clk) begin
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
         $display("\n--- MEMORY CONTROLLER ---");
@@ -79,7 +71,7 @@ module fc1_layer(
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o[it]);
         end        
-     end
+     end*/
     `endif
 
     
@@ -100,7 +92,7 @@ module fc1_layer(
         .clk(clk),
         .rst(rst),
         .forward(forward),
-        .valid_i(&valid_i),
+        .valid_i(valid_i),
         
         //outputs
         .head_ptr(head_ptr),
@@ -132,12 +124,12 @@ module fc1_layer(
         .rst(rst),
         
         .addr_a(head_ptr),
-        .data_in_a(),
+        .data_in_a(0),
         .en_a(1'b1),
         .we_a(~forward),
         
         .addr_b(mid_ptr),
-        .data_in_b(),
+        .data_in_b(0),
         .en_b(1'b1),
         .we_b(~forward),
         
@@ -151,7 +143,7 @@ module fc1_layer(
     biases_fc1_blk_mem_gen_1 biases_fc1_blk_mem_gen_1_i (
         .addra(bias_ptr),
         .clka(clk),
-        .dina(),
+        .dina(0),
         .douta(bias),
         .ena(1'b1),
         .wea(1'b0)
@@ -173,13 +165,14 @@ module fc1_layer(
                 .bias(bias[i]),
                 .neuron_id_i(neuron_id[i]),
                 .has_bias(bram_has_bias),
-                .valid_i(bram_valid[i]),
+                .valid_i(bram_valid),
                 // output
                 .activation_o(activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
-                .valid_o(valid_act_o[i])
+                .valid_o(valid[i])
             );
         end
     endgenerate    
 
+    assign valid_act_o = &valid;
 endmodule
