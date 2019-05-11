@@ -94,29 +94,7 @@ module neural_net_top(
     // FC1 --> FC2 buffer   
     // Stored in fabric since only 32 activations for the layer
     logic [`FC2_FAN_IN - 1: 0][15: 0]   fc1_fc2_buff;
-    logic                               fc1_fc2_rdy;
-    logic [8: 0]                        fc1_fc2_buff_ptr;
-    logic                               fc2_start;
-    
-    
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            fc2_start   <= 1'b0;
-        end
-        else if (fc1_valid_act_o && fc1_neuron_id_o[`FC1_N_KERNELS - 1] == `FC1_NEURONS - 1) begin
-            fc2_start   <= 1'b1;
-        end
-       
-        
-        if (reset) begin
-            fc1_fc2_buff_ptr    <= 0;
-        end
-        else if (fc2_start) begin
-            fc1_fc2_buff_ptr    <= (fc1_fc2_buff_ptr == `FC1_NEURONS - 1) ? 0 : fc1_fc2_buff_ptr + 1'b1;
-        end
 
-    end
-    
     bit[5: 0] j;
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -138,20 +116,6 @@ module neural_net_top(
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
     logic                                   fc2_valid_o;    
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            fc2_activation_i    <= 0;
-            fc2_valid_i         <= 0;
-        end
-        else begin
-            fc2_activation_i <= {`FC2_N_KERNELS{fc1_fc2_buff[fc1_fc2_buff_ptr]}};                         
-            fc2_valid_i         <= fc2_start;
-        end
-    end
-    
-    
-    
-
     
     // FC2, fed directly from FC1 due to the small size
     fc2_layer fc2_layer_i (
