@@ -23,7 +23,6 @@ for line in f:
     activations_i.append(act)
 
 
-activations_i = [1 for i in range(fc1_fan_in)]
 
 # FC1 layer
 fc1_n_neurons = 32

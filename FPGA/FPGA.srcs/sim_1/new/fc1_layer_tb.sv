@@ -15,6 +15,8 @@ module fc1_layer_tb(
     logic  [`FC1_N_KERNELS - 1: 0]               valid_act_o;
     
    
+   
+   
     fc1_layer fc1_layer_i (
         // inputs
         .clk(clock),

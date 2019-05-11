@@ -14,37 +14,49 @@ module fc_kernel #(
     input   [ID_WIDTH - 1: 0]       neuron_id_i,
     input                           has_bias,
     input                           valid_i,
+    
     output logic [15: 0]            activation_o,
     output logic [ID_WIDTH - 1: 0]  neuron_id_o,
     output logic                    valid_o
 );
     
-    logic [15: 0]   dsp_o;
+    logic [23: 0]               dsp_o;
     
-    logic [4: 0]    neuron_id;
-    logic           valids;
-    logic [15: 0]   kernel_in;
+    logic [ID_WIDTH - 1: 0]     neuron_id;
+    logic [ID_WIDTH - 1: 0]     prev_neuron_id_i;
+    logic                       valids;
+    logic [23: 0]               kernel_in;
     
-    logic [8: 0]    cnt;
-    logic [8: 0]    next_cnt;
     
-    logic [31: 0]   mult_res;
-    logic [18: 0]   mac_res;
+    logic [31: 0]               mult_res;
+    logic [26: 0]               mac_res;
     
-
-    assign next_cnt     = (cnt == FAN_IN - 1'b1) ? 0 : cnt + 1'b1;
+    logic                       last;
+    logic                       prev_valid_i;
+    
+    assign last = (neuron_id_i != prev_neuron_id_i) && prev_valid_i && valid_i;
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            cnt <= 0;
+            prev_neuron_id_i    <= 0;
+            prev_valid_i        <= 0;
         end
-        if (valid_i) begin
-            cnt <= next_cnt;
+        else begin
+            prev_neuron_id_i    <= neuron_id_i;
+            prev_valid_i        <= valid_i;
         end
-        
-        if (valid_i && cnt == FAN_IN - 1'b1) begin
-            activation_o    <= dsp_o[15] ? 0 : dsp_o;       // ReLU
-            neuron_id_o     <= neuron_id;
+    end
+    
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            activation_o    <= 0;
+            neuron_id_o     <= 0;
+            valid_o         <= 0;
+        end
+        else if (last) begin
+            activation_o    <= dsp_o[23] ? 0 : dsp_o[23: 8];       // ReLU
+            neuron_id_o     <= prev_neuron_id_i;
             valid_o         <= 1'b1;
         end
         else begin
@@ -52,45 +64,33 @@ module fc_kernel #(
             neuron_id_o     <= neuron_id_o;
             valid_o         <= 1'b0;
         end
-        
-        if (valid_i && cnt == 0) begin
-            neuron_id   <= neuron_id_i;
-        end
     end
     
-    assign kernel_in    = has_bias ? bias : dsp_o;
+    assign kernel_in    = has_bias ? {bias, 8'b0} : dsp_o;
     assign mult_res     = $signed(weight) * $signed(activation_i);
-    assign mac_res      = $signed(mult_res[31:13]) + $signed(kernel_in);
+    assign mac_res      = $signed(mult_res[31:5]) + $signed(kernel_in);
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            dsp_o   <= 0;
+            dsp_o   <= 24'h0;
         end
-        else if ({mac_res[18], &mac_res[17:15]} == 2'b10) begin // negative saturation
-            dsp_o   <= 16'h8000;
+        else if ({mac_res[26], &mac_res[25:23]} == 2'b10) begin // negative saturation
+            dsp_o   <= 24'h80_0000;
         end
-        else if ({mac_res[18], |mac_res[17:15]} == 2'b01) begin // positive saturation
-            dsp_o   <= 16'h7FFF;
+        else if ({mac_res[26], |mac_res[25:23]} == 2'b01) begin // positive saturation
+            dsp_o   <= 24'h7F_FFFF;
         end
         else begin
-            dsp_o   <= mac_res; 
+            dsp_o   <= mac_res[23: 0]; 
         end
     end
-    // A*B + C
-    /*sixteen_bit_MAC_dsp dsp_i(
-                .CLK(clk), 
-                .A(weight),
-                .B(activation_i),
-                .C(kernel_in),
-                .P(dsp_o)
-    );*/
     
-    /*`ifdef DEBUG
+    `ifdef DEBUG
     always_ff @(posedge clk) begin
         $display("--- INTERNAL KERNEL ---");
-        $display("weight: %04h\t\tactivation_i: %04h\t\tkernel_in: %04h\t\tdsp_o:%04h", weight, activation_i, kernel_in, dsp_o);
+        $display("neuron_id: %02d\t\tweight: %04h\t\tactivation_i: %04h\t\tkernel_in: %06h\t\tdsp_o:%06h\t\tvalid_i: %01b", neuron_id_i, weight, activation_i, kernel_in, dsp_o, valid_i);
     end
-    `endif*/
+    `endif
 
 
     

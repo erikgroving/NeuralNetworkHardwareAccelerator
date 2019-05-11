@@ -40,8 +40,8 @@ module fc1_layer(
     assign weights = {data_out_b, data_out_a};    
     
     `ifdef DEBUG
-    integer it;
-    /*always_ff @(posedge clk) begin
+    /*integer it;
+    always_ff @(posedge clk) begin
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
         $display("\n--- MEMORY CONTROLLER ---");
@@ -63,13 +63,13 @@ module fc1_layer(
         $display("ACT_I\t\tWEIGHT\t\tBIAS\t\tBRAM_VALID");
         for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%04h\t\t%04h\t\t\t%01b",
-            bram_activations[it], weights[it], bias[it], bram_valid[it]);
+            bram_activations[it], weights[it], bias[it], bram_valid);
         end
             
         $display("\nACT_O\t\tNEURON_ID_O\t\tVALID_ACT_O");
         for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%02d\t\t\t\t%01b",
-            activation_o[it], neuron_id_o[it], valid_act_o[it]);
+            activation_o[it], neuron_id_o[it], valid_act_o);
         end        
      end*/
     `endif

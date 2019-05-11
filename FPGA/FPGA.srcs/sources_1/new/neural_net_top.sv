@@ -16,13 +16,18 @@ module neural_net_top(
     logic   [11: 0] fc1_buf_ptr;
     logic   [15: 0] fc1_buf_act_i;
     logic           fc1_buf_valid_i;
+    logic           prev_reset;
+    
+    always_ff @(posedge clk) begin
+        prev_reset  <= reset;
+    end
     
     always_ff @(posedge clk) begin
         if (reset) begin
             fc1_iter        <= 0;
             fc1_buf_valid_i <= 1'b0;
         end
-        else if (fc1_iter == `FC1_FAN_IN - 1'b1) begin
+        else if (fc1_iter == `FC1_FAN_IN - 1'b1 || prev_reset) begin
             fc1_iter        <= 0;
             fc1_buf_valid_i <= 1'b1;
         end
@@ -58,7 +63,7 @@ module neural_net_top(
     logic [`FC1_N_KERNELS - 1: 0][4: 0]     fc1_neuron_id_o;
     logic                                   fc1_valid_act_o;
     
-    assign fc1_activation_i = {`FC1_N_KERNELS{16'h2000}};/*fc1_buf_act_i}};*/
+    assign fc1_activation_i = {`FC1_N_KERNELS{fc1_buf_act_i}};
     
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -92,46 +97,39 @@ module neural_net_top(
     logic                               fc1_fc2_rdy;
     logic [8: 0]                        fc1_fc2_buff_ptr;
     logic                               fc2_start;
-
+    
+    
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            fc2_start   <= 1'b0;
+        end
+        else if (fc1_valid_act_o && fc1_neuron_id_o[`FC1_N_KERNELS - 1] == `FC1_NEURONS - 1) begin
+            fc2_start   <= 1'b1;
+        end
+       
         
-    bit [6: 0]  j;
+        if (reset) begin
+            fc1_fc2_buff_ptr    <= 0;
+        end
+        else if (fc2_start) begin
+            fc1_fc2_buff_ptr    <= (fc1_fc2_buff_ptr == `FC1_NEURONS - 1) ? 0 : fc1_fc2_buff_ptr + 1'b1;
+        end
+
+    end
+    
+    bit[5: 0] j;
     always_ff @(posedge clk) begin
         if (reset) begin
             fc1_fc2_buff        <= 0;
-            fc1_fc2_rdy         <= 0;
         end
         else if(fc1_valid_act_o) begin
             for (j = 0; j < `FC1_N_KERNELS; j=j+1) begin
                 fc1_fc2_buff[fc1_neuron_id_o[j]]    <= fc1_activation_o[j];
             end
-            
-            if (fc1_neuron_id_o[`FC1_N_KERNELS - 1] == 5'd31 && !fc2_start) begin
-                fc1_fc2_rdy <= 1'b1;
-            end
-            else begin
-                fc1_fc2_rdy <= 1'b0;
-            end
         end
     end
-     
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            fc1_fc2_buff_ptr    <= 0;
-            fc2_start           <= 0;
-        end
-        else if (fc1_fc2_rdy && !fc2_start) begin
-            fc1_fc2_buff_ptr    <= 0;
-            fc2_start           <= 1'b1;            
-        end
-        else if (fc1_fc2_buff_ptr == 8'd`FC2_FAN_IN - 1) begin
-            fc1_fc2_buff_ptr    <= 1'b0;
-            fc2_start           <= 1'b0;
-        end
-        else if (fc2_start) begin
-            fc1_fc2_buff_ptr    <= fc1_fc2_buff_ptr + 1'b1;
-            fc2_start           <= fc2_start;
-        end    
-    end
+    
+
     
     // Logics for the fc2 layer (the last fc layer)
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_i;

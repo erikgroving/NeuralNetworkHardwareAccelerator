@@ -123,8 +123,8 @@ module fc2_layer(
         end
         
         $display("\nneuron_id");
-        for (it = 0; it < `FC2_N_KERNELS / 4; it = it + 1) begin
-            $display("%01d\t%01d\t%01d\t%01d", neuron_id[4*it], neuron_id[4*it + 1], neuron_id[4*it + 2], neuron_id[4*it + 3]);       
+        for (it = 0; it < `FC2_N_KERNELS; it = it + 1) begin
+            $display("%01d", neuron_id[it]);       
         end
         $display("\n--- KERNELS---");
         $display("has_bias: %01b", bram_has_bias);
