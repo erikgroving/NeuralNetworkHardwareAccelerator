@@ -14,21 +14,26 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 3, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(3, 6, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(6 , 8, kernel_size=3, padding=1)
+        #self.conv1 = nn.Conv2d(1, 3, kernel_size=3, padding=1)
+        #self.conv2 = nn.Conv2d(3, 6, kernel_size=3, padding=1)
+        #self.conv3 = nn.Conv2d(6 , 8, kernel_size=3, padding=1)
         self.mp = nn.MaxPool2d(2)
-        self.fc = nn.Linear(8*7*7, 32)
-        self.fc2 = nn.Linear(32, 10)
+        self.fc0 = nn.Linear(28*28, 2*7*7)
+        self.fc1 = nn.Linear(2*7*7, 64)
+        self.fc2 = nn.Linear(64, 10)
 
     def forward(self, x):
         in_size = x.size(0)
-        x = self.mp(F.relu(self.conv1(x)))
-        x = self.mp(F.relu(self.conv2(x)))
-        x = F.relu(self.conv3(x))
-        x = x.view(in_size, -1)  # flatten the tensor
-        x = F.relu(self.fc(x))
+        #x = self.mp(x)
+        x = x.view(in_size, -1)
+        x = F.relu(self.fc0(x))
+        x = F.relu(self.fc1(x))
         x = self.fc2(x)
+        #x = self.mp(F.relu(self.conv1(x)))
+        #x = self.mp(F.relu(self.conv2(x)))
+        #x = F.relu(self.conv3(x))
+        #x = x.view(in_size, -1)  # flatten the tensor
+        #x = F.relu(self.fc(x))
         #return x
         return F.log_softmax(x, dim=0)
 
@@ -59,8 +64,8 @@ def finalTrainAndTest():
         running_loss = 0.0
 
         lb = 0
-        ub = 100
-        batch_s = 100
+        ub = 1
+        batch_s = 1
         
         if i == 15:
             lrate = 1e-3

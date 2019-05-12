@@ -34,7 +34,7 @@ module fc_kernel #(
     logic                       last;
     logic                       prev_valid_i;
     
-    assign last = (neuron_id_i != prev_neuron_id_i) && prev_valid_i && valid_i;
+    assign last = ((neuron_id_i != prev_neuron_id_i) && prev_valid_i) || (prev_valid_i && !valid_i);
     
     always_ff @(posedge clk) begin
         if (rst) begin

@@ -3,11 +3,17 @@
 
 `define DEBUG
 
+// FC0 defines
+`define FC0_N_KERNELS           196
+`define FC0_NEURONS             98
+`define FC0_FAN_IN              784
+
+
 // FC1 defines
 `define FC1_N_KERNELS           16
 `define FC1_ADDR                11
 `define FC1_SCH_ADDRS           (`FC1_KERNEL_SIZE * `FC1_N_KERNELS)
-`define FC1_WEIGHT_BRAM         4			// Per kernel
+`define FC1_WEIGHT_BRAM         4			
 `define FC1_BRAM                8			// total     
 `define FC1_NEURONS             32
 `define FC1_BIAS_ADDR           1

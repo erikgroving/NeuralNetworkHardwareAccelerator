@@ -9,7 +9,8 @@ module fc2_layer(
         
         output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
-        output logic                                valid_act_o
+        output logic                                valid_act_o,
+        output logic                                fc2_busy
     );
     
     logic   [`FC2_BRAM - 1: 0][15: 0]               data_in_a;
@@ -72,11 +73,13 @@ module fc2_layer(
             bram_activations    <= 0;
             bram_valid          <= 0;
             bram_has_bias       <= 0;
+            fc2_busy            <= 0;
         end
         else begin
             bram_activations    <= sch_activations;
             bram_valid          <= sch_valid;
             bram_has_bias       <= sch_has_bias;
+            fc2_busy            <= valid_i;
         end
     end
     
@@ -87,7 +90,7 @@ module fc2_layer(
         .rst(rst),
         
         .addr_a(head_ptr),
-        .data_in_a(0),
+        .data_in_a(16'b0),
         .en_a(1'b1),
         .we_a(~forward),
 
@@ -101,7 +104,7 @@ module fc2_layer(
     biases_fc2_blk_mem biases_fc2_blk_mem_i (
         .addra(bias_ptr),
         .clka(clk),
-        .dina(0),
+        .dina(16'b0),
         .douta(bias[0]),
         .ena(1'b1),
         .wea(1'b0)
@@ -109,7 +112,7 @@ module fc2_layer(
 
     `ifdef DEBUG
     integer it;
-    always_ff @(posedge clk) begin
+    /*always_ff @(posedge clk) begin
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
         $display("\n--- MEMORY CONTROLLER ---");
@@ -139,7 +142,7 @@ module fc2_layer(
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
         end        
-     end
+     end*/
     `endif
 
     

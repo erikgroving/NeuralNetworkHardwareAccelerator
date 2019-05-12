@@ -40,7 +40,7 @@ module fc1_layer(
     assign weights = {data_out_b, data_out_a};    
     
     `ifdef DEBUG
-    /*integer it;
+    integer it;
     always_ff @(posedge clk) begin
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
@@ -71,7 +71,7 @@ module fc1_layer(
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
         end        
-     end*/
+     end
     `endif
 
     
@@ -124,12 +124,12 @@ module fc1_layer(
         .rst(rst),
         
         .addr_a(head_ptr),
-        .data_in_a(0),
+        .data_in_a(128'b0),
         .en_a(1'b1),
         .we_a(~forward),
         
         .addr_b(mid_ptr),
-        .data_in_b(0),
+        .data_in_b(128'b0),
         .en_b(1'b1),
         .we_b(~forward),
         
@@ -143,7 +143,7 @@ module fc1_layer(
     biases_fc1_blk_mem_gen_1 biases_fc1_blk_mem_gen_1_i (
         .addra(bias_ptr),
         .clka(clk),
-        .dina(0),
+        .dina(256'b0),
         .douta(bias),
         .ena(1'b1),
         .wea(1'b0)

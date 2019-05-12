@@ -89,34 +89,52 @@ module neural_net_top(
         .valid_act_o(fc1_valid_act_o)    
     );
     
-
-    
-    // FC1 --> FC2 buffer   
-    // Stored in fabric since only 32 activations for the layer
-    logic [`FC2_FAN_IN - 1: 0][15: 0]   fc1_fc2_buff;
-
-    bit[5: 0] j;
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            fc1_fc2_buff        <= 0;
-        end
-        else if(fc1_valid_act_o) begin
-            for (j = 0; j < `FC1_N_KERNELS; j=j+1) begin
-                fc1_fc2_buff[fc1_neuron_id_o[j]]    <= fc1_activation_o[j];
-            end
-        end
-    end
-    
-
-    
     // Logics for the fc2 layer (the last fc layer)
+    logic                                   fc2_start;
+    logic                                   fc2_buff_rdy;
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_i;
+    logic [`FC2_N_KERNELS - 1: 0][4: 0]     fc2_neuron_id_i;
     logic                                   fc2_valid_i;
+    logic                                   fc2_busy;
     
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
     logic                                   fc2_valid_o;    
+         
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            fc2_start   <= 1'b0;
+        end
+        else begin
+            $display("fc2_buff_rdy: %01b\tfc2_busy: %01b", fc2_buff_rdy, fc2_busy);
+            fc2_start   <= fc2_buff_rdy & ~fc2_busy;
+        end
+    end 
     
+    interlayer_activation_buffer
+    #(.N_KERNELS_I(`FC1_N_KERNELS), 
+        .N_KERNELS_O(`FC2_N_KERNELS), 
+        .ID_WIDTH(5), 
+        .BUFF_SIZE(`FC1_NEURONS),
+        .LOOPS(`FC2_NEURONS)) 
+    interlayer_activations_fc1_fc2 (
+        // inputs
+        .clk(clk),
+        .rst(reset),
+        
+        .start(fc2_start),
+        .activation_i(fc1_activation_o),
+        .neuron_id_i(fc1_neuron_id_o),
+        .valid_act_i(fc1_valid_act_o),
+        // outputs
+        .activation_o(fc2_activation_i),
+        .neuron_id_o(fc2_neuron_id_i),
+        .valid_o(fc2_valid_i),
+        
+        .buff_rdy(fc2_buff_rdy)
+    );
+
+
     // FC2, fed directly from FC1 due to the small size
     fc2_layer fc2_layer_i (
         // inputs
@@ -129,8 +147,10 @@ module neural_net_top(
         // outputs
         .activation_o(fc2_activation_o),
         .neuron_id_o(fc2_neuron_id_o),
-        .valid_act_o(fc2_valid_o)  
+        .valid_act_o(fc2_valid_o),
+        .fc2_busy(fc2_busy)
     );
+
 
 
 
@@ -195,23 +215,16 @@ module neural_net_top(
             $display("%04h\t\t%04d\t\t%01b", fc1_activation_o[it], fc1_neuron_id_o[it], fc1_valid_act_o);
         end
         $display("\n--- FC2 ---");
-        $display("FC2_start: %01b\tFC1_FC2_BUFF_PTR: %04d", fc2_start, fc1_fc2_buff_ptr);
-        $display("FC2_act_i: %04h\t\tFC2_valid_i: %01b", fc2_activation_i[0], fc2_valid_i);
-        $display("fc1_fc2_buff_ptr: %02d\t\tfc1fc2_buff: %04h", fc1_fc2_buff_ptr, fc1_fc2_buff[fc1_fc2_buff_ptr]);
-        $display("fc2_act_i: %04h", fc2_activation_i);
+        $display("fc2_act_i: %04h\t\tfc2_valid_i: %01b", fc2_activation_i[0], fc2_valid_i);
         $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%04d\t\t%01b", fc2_activation_o[it], fc2_neuron_id_o[it], fc2_valid_o);
-        end            
+        end
         
         $display("--- FC2 OUT ---");        
         $display("fc2_buf_valid: %01b" , fc2_buf_valid);
         for (it= 0; it < `FC2_NEURONS; it=it+1) begin
             $display("%02d: %04h", it, fc2_act_o_buf[it]); 
-        end
-        $display("\n---FC1 FC2 Buff---");
-        for (it = 0; it < `FC2_FAN_IN; it=it+1) begin
-            $display("[%02d]: %04h", it, fc1_fc2_buff[it]);
         end
      end 
     `endif    

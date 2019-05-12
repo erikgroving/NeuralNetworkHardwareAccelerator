@@ -46,12 +46,26 @@ module fc_scheduler #(
         end
     end
 
+    logic [ADDR - 1: 0] bias_cntr;
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            bias_cntr   <= 0;
+        end
+        else if (valid_i) begin
+            bias_cntr   <= (bias_cntr == FAN_IN - 1) ? 0 : bias_cntr + 1'b1;
+        end
+        else begin
+            bias_cntr   <= 0;
+        end
+    end
+    
+
     always_ff @(posedge clk) begin
         if (rst) begin
             has_bias    <= 0;
             bias_ptr    <= 0;
         end
-        else if (valid_i && (next_head_ptr == 0 || next_head_ptr == FAN_IN)) begin 
+        else if (valid_i && bias_cntr == 0) begin 
             has_bias    <= 1'b1;
             bias_ptr    <= next_bias_ptr;
         end

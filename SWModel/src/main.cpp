@@ -29,22 +29,25 @@ int main () {
     Net net(input_size, output_size, batch_size, lr, momentum);
 
     /* use a smaller dataset for testing, 1000 samples */
-    trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 1000);
-    trainY = std::vector<int> (trainY.begin(), trainY.begin() + 1000);
+    trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 60000);
+    trainY = std::vector<int> (trainY.begin(), trainY.begin() + 60000);
 
-    Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
+    //Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
     Layer* pool1 = new PoolingLayer(28, 14, 1);
-    Layer* conv2 = new ConvLayer(14, 3, 1, 1, 3, 5);
-    Layer* pool2 = new PoolingLayer(14, 7, 1);
-    Layer* fc1 = new FullyConnected(7*7, 64);
-    Layer* fc2 = new FullyConnected(64, 10);
+    //Layer* conv2 = new ConvLayer(14, 3, 1, 1, 3, 5);
+    //Layer* pool2 = new PoolingLayer(14, 7, 1);
+    Layer* fc1 = new FullyConnected(14*14, 8*7*7);
+    Layer* fc2 = new FullyConnected(8*7*7, 32);
+    Layer* fc3 = new FullyConnected(32, 10);
+
 
     //net.addLayer(conv1);
     net.addLayer(pool1);
     //net.addLayer(conv2);
-    net.addLayer(pool2);
+    //net.addLayer(pool2);
     net.addLayer(fc1);
     net.addLayer(fc2);
+    net.addLayer(fc3);
     
     trainNet(net, trainX, trainY, n_epochs);
 
