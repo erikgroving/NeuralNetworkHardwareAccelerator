@@ -25,18 +25,20 @@ module fc2_layer(
     logic                                           sch_valid;
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bram_activations;
     logic                                           bram_valid;
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          kern_activations;
+    logic                                           kern_valid;
     
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bias;
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          kern_bias;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
+    logic                                           kern_has_bias;
     logic   [`FC2_N_KERNELS - 1: 0][3: 0]           neuron_id;
+    logic   [`FC2_N_KERNELS - 1: 0][3: 0]           kern_neuron_id;
     logic   [`FC2_N_KERNELS - 1: 0]                 last_weight;
     
     
     logic   [`FC2_N_KERNELS - 1: 0]                 valid;
-
-    
-    assign weights = data_out_a;    
     
     
     always_ff @(posedge clk) begin
@@ -145,6 +147,24 @@ module fc2_layer(
      end*/
     `endif
 
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            kern_activations    <= 0;
+            kern_valid          <= 0;
+            kern_has_bias       <= 0;
+            kern_bias           <= 0;
+            kern_neuron_id      <= 0;
+            weights             <= 0;
+        end
+        else begin
+            kern_activations    <= bram_activations;
+            kern_valid          <= bram_valid;
+            kern_has_bias       <= bram_has_bias;
+            kern_bias           <= bias;
+            kern_neuron_id      <= neuron_id;
+            weights             <= data_out_a;
+        end
+    end
     
     
     // Computational kernel for the fully connected layer    
@@ -155,12 +175,12 @@ module fc2_layer(
                 // input
                 .clk(clk),
                 .rst(rst),
-                .activation_i(bram_activations[i]),
+                .activation_i(kern_activations[i]),
                 .weight(weights[i]),
-                .bias(bias[i]),
-                .neuron_id_i(neuron_id[i]),
-                .has_bias(bram_has_bias),
-                .valid_i(bram_valid),
+                .bias(kern_bias[i]),
+                .neuron_id_i(kern_neuron_id[i]),
+                .has_bias(kern_has_bias),
+                .valid_i(kern_valid),
                 // output
                 .activation_o(activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),

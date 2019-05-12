@@ -177,22 +177,64 @@ module neural_net_top(
         end
     end
 
+    logic [`FC2_NEURONS - 1: 0][15: 0]  fc2_act_o_buf_r;
 
-
-    // Logic to display max on LED
-    logic   [3: 0]      max_idx;
-    logic   [15: 0]     max_val;
-    bit     [3: 0]      i;
-    always_comb begin
-        max_idx = 4'b0;
-        max_val = fc2_act_o_buf[0];
-        for (i = 4'b1; i < `FC2_NEURONS; i=i+1) begin
-            if (fc2_act_o_buf[i] > max_val) begin // note: since relu, do not need to worry about negative numbers in the comparions
-                max_idx = i;
-                max_val = fc2_act_o_buf[i];
+    logic prev_fc2_buf_valid;
+    logic check;
+    logic once;
+    logic [4: 0] iter;
+    logic [15: 0] max_val;
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            prev_fc2_buf_valid  <= 0;
+            fc2_act_o_buf_r     <= 0;
+        end
+        else begin
+            prev_fc2_buf_valid  <= fc2_buf_valid;
+            fc2_act_o_buf_r     <= fc2_act_o_buf;
+        end
+        
+        if (reset) begin
+            check   <= 1'b0;
+            iter    <= 0;
+            max_val <= 16'h0000;
+            once    <= 1'b0;
+        end
+        else if ({prev_fc2_buf_valid, fc2_buf_valid} == 2'b01 && ~once) begin
+            check   <= 1'b1;
+            once    <= 1'b1;
+            iter    <= 0;
+            max_val <= 16'h0000;
+        end
+        else if (check) begin
+            max_val <= (max_val > fc2_act_o_buf_r[iter]) ? max_val : fc2_act_o_buf_r[iter];
+            iter    <= iter + 1'b1;
+            if (iter == 5'd9) begin
+                check   <= 1'b0;
             end
         end
     end
+    logic [9: 0] one_hot;
+    assign one_hot[0] = (fc2_act_o_buf_r[0] == max_val);
+    assign one_hot[1] = (fc2_act_o_buf_r[1] == max_val);
+    assign one_hot[2] = (fc2_act_o_buf_r[2] == max_val);
+    assign one_hot[3] = (fc2_act_o_buf_r[3] == max_val);
+    assign one_hot[4] = (fc2_act_o_buf_r[4] == max_val);
+    assign one_hot[5] = (fc2_act_o_buf_r[5] == max_val);
+    assign one_hot[6] = (fc2_act_o_buf_r[6] == max_val);
+    assign one_hot[7] = (fc2_act_o_buf_r[7] == max_val);    
+    assign one_hot[8] = (fc2_act_o_buf_r[6] == max_val);
+    assign one_hot[9] = (fc2_act_o_buf_r[7] == max_val);
+    
+    assign led_o[0] = one_hot[0] || one_hot[8] || one_hot[9];
+    assign led_o[1] = one_hot[1] || one_hot[8];
+    assign led_o[2] = one_hot[2] || one_hot[9];
+    assign led_o[3] = one_hot[3];
+    assign led_o[4] = one_hot[4];
+    assign led_o[5] = one_hot[5];
+    assign led_o[6] = one_hot[6];
+    assign led_o[7] = one_hot[7];
+    
     
     `ifdef DEBUG
      integer clk_cycle;
@@ -226,45 +268,9 @@ module neural_net_top(
         for (it= 0; it < `FC2_NEURONS; it=it+1) begin
             $display("%02d: %04h", it, fc2_act_o_buf[it]); 
         end
+        $display("LEDS: %08b", led_o);
      end 
     `endif    
-        
-    
-    logic [7: 0]    led;
-    // Gets the max idx and sets the LED accordingly
-    always_ff @(posedge clk) begin
-        case(max_idx)
-            4'd0:
-                led     <= 8'h01;
-            4'd1:
-                led     <= 8'h02;
-            4'd2:
-                led     <= 8'h04;
-            4'd3:
-                led     <= 8'h08;
-            4'd4:
-                led     <= 8'h10;
-            4'd5:
-                led     <= 8'h20;
-            4'd6:
-                led     <= 8'h40;
-            4'd7:
-                led     <= 8'h80;
-            4'd8:
-                led     <= 8'h03;
-            4'd9:
-                led     <= 8'h05;
-            default:
-                led     <= 8'hF0;
-        endcase
-        
-        if (reset) begin
-            led_o   <= 8'hAA;
-        end
-        else if (fc2_buf_valid) begin
-            led_o   <= led;
-        end
-    end
-    
+
     
 endmodule

@@ -98,7 +98,7 @@ fc1_output = []
 for neuron in fc1_neurons:
     n_out = 0
     for j in range(len(activations_i[0: fc1_fan_in])):
-        n_out += activations_i[j] * neuron[j]
+        n_out += activations_i[j + 0*fc1_fan_in] * neuron[j]
     fc1_output.append(max(n_out, 0))
 
 fc2_output = []
