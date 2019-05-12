@@ -177,64 +177,6 @@ module neural_net_top(
         end
     end
 
-    logic [`FC2_NEURONS - 1: 0][15: 0]  fc2_act_o_buf_r;
-
-    logic prev_fc2_buf_valid;
-    logic check;
-    logic once;
-    logic [4: 0] iter;
-    logic [15: 0] max_val;
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            prev_fc2_buf_valid  <= 0;
-            fc2_act_o_buf_r     <= 0;
-        end
-        else begin
-            prev_fc2_buf_valid  <= fc2_buf_valid;
-            fc2_act_o_buf_r     <= fc2_act_o_buf;
-        end
-        
-        if (reset) begin
-            check   <= 1'b0;
-            iter    <= 0;
-            max_val <= 16'h0000;
-            once    <= 1'b0;
-        end
-        else if ({prev_fc2_buf_valid, fc2_buf_valid} == 2'b01 && ~once) begin
-            check   <= 1'b1;
-            once    <= 1'b1;
-            iter    <= 0;
-            max_val <= 16'h0000;
-        end
-        else if (check) begin
-            max_val <= (max_val > fc2_act_o_buf_r[iter]) ? max_val : fc2_act_o_buf_r[iter];
-            iter    <= iter + 1'b1;
-            if (iter == 5'd9) begin
-                check   <= 1'b0;
-            end
-        end
-    end
-    logic [9: 0] one_hot;
-    assign one_hot[0] = (fc2_act_o_buf_r[0] == max_val);
-    assign one_hot[1] = (fc2_act_o_buf_r[1] == max_val);
-    assign one_hot[2] = (fc2_act_o_buf_r[2] == max_val);
-    assign one_hot[3] = (fc2_act_o_buf_r[3] == max_val);
-    assign one_hot[4] = (fc2_act_o_buf_r[4] == max_val);
-    assign one_hot[5] = (fc2_act_o_buf_r[5] == max_val);
-    assign one_hot[6] = (fc2_act_o_buf_r[6] == max_val);
-    assign one_hot[7] = (fc2_act_o_buf_r[7] == max_val);    
-    assign one_hot[8] = (fc2_act_o_buf_r[6] == max_val);
-    assign one_hot[9] = (fc2_act_o_buf_r[7] == max_val);
-    
-    assign led_o[0] = one_hot[0] || one_hot[8] || one_hot[9];
-    assign led_o[1] = one_hot[1] || one_hot[8];
-    assign led_o[2] = one_hot[2] || one_hot[9];
-    assign led_o[3] = one_hot[3];
-    assign led_o[4] = one_hot[4];
-    assign led_o[5] = one_hot[5];
-    assign led_o[6] = one_hot[6];
-    assign led_o[7] = one_hot[7];
-    
     
     `ifdef DEBUG
      integer clk_cycle;
