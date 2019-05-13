@@ -72,8 +72,9 @@ double Neuron::computeActivation() {
     return activation;
 }
 
-void Neuron::calculateGradient(double grad, std::vector<double> act_in, double act_out) {
-    double dact_dnet = (act_out > 0) ? 1 : 0;
+void Neuron::calculateGradient(double grad, std::vector<double> act_in, double act_out, bool last_layer) {
+    double dact_dnet = (!last_layer) ? (act_out > 0) : 1;
+    //double dact_dnet = 1;//(act_out > 0) ? 1 : 0;
     /*grad = std::min(grad, 0.5);
     grad = std::max(grad, -0.5);*/
     de_dnet = grad * dact_dnet;
@@ -88,10 +89,10 @@ void Neuron::calculateGradient(double grad, std::vector<double> act_in, double a
 void Neuron::updateWeights(double lr, double momentum) {
     // update weights
     for (size_t i = 0; i < fan_in; i++) {
-        momentum_per_weight[i] = momentum * momentum_per_weight[i] + (lr * gradient_per_weight[i]);
+        momentum_per_weight[i] = momentum * momentum_per_weight[i] + (lr * -gradient_per_weight[i]);
         weights[i] += momentum_per_weight[i];
     }
-    offset_momentum = offset_momentum * momentum + (lr * offset_gradient);
+    offset_momentum = offset_momentum * momentum + (lr * -offset_gradient);
     offset += offset_momentum;
     clearBackwardData();
 }

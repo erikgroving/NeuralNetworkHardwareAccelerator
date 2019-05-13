@@ -7,7 +7,11 @@
 #include "fullyconnected.h"
 
 void Net::addLayer(Layer* layer) {
+    if (layers.size()) {
+        layers[layers.size() - 1]->last_layer = false;
+    }
     layers.push_back(layer);
+    layers[layers.size() - 1]->last_layer = true;
 }
 
 std::vector< std::vector<double> > Net::operator() (std::vector < std::vector<double> > input) {
@@ -71,16 +75,18 @@ double Net::computeLossAndGradients(std::vector<int> labeled) {
     // Compute cross entropy loss for each output
     // CrossEntropy loss -q(x) * log(p(x))
     // q(x) is true distribution, so it is 1 for our labeled data on the correct sample
-    for (size_t i = 0; i < labeled.size(); i++) { 
+    for (size_t i = 0; i < labeled.size(); i++) {
         std::vector<double> gradient(output_size, 0);
         unsigned short label = labeled[i];
 
         for (size_t j = 0; j < output_size; j++) {
             if (j == label) {
-                gradient[j] = batch_output[i][j] * (1 - batch_output[i][j]);
+                //gradient[j] = batch_output[i][j] * (1 - batch_output[i][j]);
+                gradient[j] = batch_output[i][j]  - 1;
             }
             else {
-                gradient[j] = -batch_output[i][j] * batch_output[i][label];
+                //gradient[j] = -batch_output[i][j] * batch_output[i][label];
+                gradient[j] = batch_output[i][j];
             }
         }
         loss += -log(batch_output[i][label]);
@@ -236,6 +242,12 @@ void Net::clearSavedData() {
     activations = std::vector< std::vector< std::vector<double> > >();
     batch_output = std::vector< std::vector<double> >();
     ol_gradient = std::vector< std::vector<double> >();
+    /*for (int i = layers.size() - 1; i >= 0; i--) {
+        layers[i]->clearData();
+    }*/
+    for (Layer* l : layers) {
+        l->clearData();
+    }
 }
 
 Net::Net(uint32_t in, uint32_t out, uint32_t bs, double lr, double moment) {

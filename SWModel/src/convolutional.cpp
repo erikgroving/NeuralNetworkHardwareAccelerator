@@ -75,7 +75,7 @@ std::vector< std::vector<double> > ConvLayer::backward (std::vector< std::vector
                     int row = k * stride + start;
                     int col = l * stride + start;
                     std::vector<double> in_act = getWindowPixels(in_activations[i], row, col);
-                    neurons[idx].calculateGradient(gradients[i][idx], in_act, out_activations[i][idx]);
+                    neurons[idx].calculateGradient(gradients[i][idx], in_act, out_activations[i][idx], last_layer);
                     single_sens.push_back(neurons[idx].getSensitivity());
                 }
             }            
@@ -95,6 +95,7 @@ void ConvLayer::updateWeights(double lr, double momentum) {
 
 
 ConvLayer::ConvLayer(uint32_t d, uint32_t fsize, uint32_t str, uint32_t pad, uint32_t in_ch, uint32_t out_ch) {
+    last_layer = false;
     dim = d;
     in_channels = in_ch;
     out_channels = out_ch;

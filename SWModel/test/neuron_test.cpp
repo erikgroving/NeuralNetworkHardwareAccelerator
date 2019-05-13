@@ -40,5 +40,5 @@ TEST(NeuronTest, CalculateGradient) {
         out += act_in[i] * weights[i];
     }
     double grad = 0.2;
-    n.calculateGradient(grad, act_in, out);
+    n.calculateGradient(grad, act_in, out, true);
 }

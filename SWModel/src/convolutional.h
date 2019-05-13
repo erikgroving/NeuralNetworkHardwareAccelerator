@@ -30,7 +30,8 @@ public:
                                                  std::vector< std::vector<double> >,
                                                  std::vector< std::vector<double> >) ;
     void updateWeights(double lr, double momentum);
-    const std::vector<Neuron>& getNeurons() { return neurons; };
+    void clearData() {}
+    std::vector<Neuron>& getNeurons() { return neurons; };
     const std::vector<double>& getOutput() { return output; };
     void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
     const uint32_t getDim() const { return dim; }

@@ -25,7 +25,7 @@ public:
     void initWeights(); // He initialization
     double computeNet(std::vector<double> input);   
     double computeActivation();
-    void calculateGradient(double grad, std::vector<double> act_in, double act_out);
+    void calculateGradient(double grad, std::vector<double> act_in, double act_out, bool last_layer);
     void updateWeights(double lr, double momentum);
     void clearBackwardData();
 

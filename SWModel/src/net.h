@@ -30,6 +30,7 @@ public:
     std::vector<double> getPredictions();
 
     const uint32_t getBatchSize() const { return batch_size; }
+    std::vector< std::vector<double> > getOlGradient() const { return ol_gradient; }
     std::vector<Layer*> getLayers() { return layers; }
 
     Net(uint32_t in, uint32_t out, uint32_t bs, double lr, double momentum);

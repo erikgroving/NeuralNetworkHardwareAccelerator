@@ -10,14 +10,16 @@
 
 class Layer {
 public:
+    bool last_layer;
     virtual void forward(std::vector<double>) = 0;
     virtual void forward(std::vector<double>, bool) = 0;
     virtual std::vector< std::vector<double> > backward(std::vector< std::vector<double> >,
                                                         std::vector< std::vector<double> >,
                                                         std::vector< std::vector<double> >) = 0;
     virtual void updateWeights(double lr, double momentum) = 0;
+    virtual void clearData() = 0;
     virtual const std::vector<double>& getOutput() = 0;
-    virtual const std::vector<Neuron>& getNeurons() = 0;
+    virtual std::vector<Neuron>& getNeurons() = 0;
     virtual int getType() = 0;
     virtual ~Layer() {};
 };

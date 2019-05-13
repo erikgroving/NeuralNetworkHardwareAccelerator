@@ -10,7 +10,8 @@
 #include "net.h"
 
 void printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out);
-void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out, int n_epochs);
+void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out,
+            std::vector< std::vector<double> >& in_test, std::vector<int>& out_test, int n_epochs);
 int main () {
 
     std::cout << "Running software model...\n";
@@ -19,44 +20,48 @@ int main () {
     int output_size = 10;
     int batch_size = 100;
     double momentum = 0.9;
-    double lr = 0.001; 
-    int n_epochs = 1000;
+    double lr = 0.0001; 
+    int n_epochs = 50;
 
     std::vector< std::vector<double> > trainX;
     std::vector<int> trainY;
+    std::vector< std::vector<double> > testX;
+    std::vector<int> testY;
     trainX = readImages("data/train-images.idx3-ubyte");
     trainY = readLabels("data/train-labels.idx1-ubyte");
+    testX = readImages("data/t10k-images.idx3-ubyte");
+    testY = readLabels("data/t10k-labels.idx1-ubyte");
     Net net(input_size, output_size, batch_size, lr, momentum);
 
-    /* use a smaller dataset for testing, 1000 samples */
     trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 60000);
     trainY = std::vector<int> (trainY.begin(), trainY.begin() + 60000);
 
-    //Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
-    Layer* pool1 = new PoolingLayer(28, 14, 1);
-    //Layer* conv2 = new ConvLayer(14, 3, 1, 1, 3, 5);
-    //Layer* pool2 = new PoolingLayer(14, 7, 1);
-    Layer* fc1 = new FullyConnected(14*14, 8*7*7);
-    Layer* fc2 = new FullyConnected(8*7*7, 32);
-    Layer* fc3 = new FullyConnected(32, 10);
+    /*Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
+    Layer* pool1 = new PoolingLayer(28, 14, 3);
+    Layer* conv2 = new ConvLayer(14, 3, 1, 1, 3, 5);
+    Layer* pool2 = new PoolingLayer(14, 7, 5);*/
+    Layer* fc1 = new FullyConnected(28*28, 98);
+    Layer* fc2 = new FullyConnected(98, 64);
+    Layer* fc3 = new FullyConnected(64, 10);
 
 
-    //net.addLayer(conv1);
+   /* net.addLayer(conv1);
     net.addLayer(pool1);
-    //net.addLayer(conv2);
-    //net.addLayer(pool2);
+    net.addLayer(conv2);
+    net.addLayer(pool2);*/
     net.addLayer(fc1);
     net.addLayer(fc2);
     net.addLayer(fc3);
     
-    trainNet(net, trainX, trainY, n_epochs);
+    trainNet(net, trainX, trainY, testX, testY, n_epochs);
 
-    printAccuracy(net, trainX, trainY);   
+    printAccuracy(net, testX, testY);   
 }
 
-void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out, int n_epochs) {
+void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out,
+            std::vector< std::vector<double> >& in_test, std::vector<int>& out_test, int n_epochs) {
     std::cout << "Starting Accuracy" << std::endl;
-    printAccuracy(net, in, out);
+    printAccuracy(net, in_test, out_test);
     std::cout <<std::endl;
     for (int i = 0; i <= n_epochs; i++) {
         double loss = 0.0;
@@ -86,7 +91,7 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             ub += batch_size;
         }
         std::cout << "Epoch: " << i << std::endl;
-        printAccuracy(net, in, out);
+        printAccuracy(net, in_test, out_test);
         std::cout << "Loss: " << loss / (double)in.size() << std::endl << std::endl;
         
     }
