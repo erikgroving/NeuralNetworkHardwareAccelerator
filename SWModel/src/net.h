@@ -22,13 +22,15 @@ public:
     void addLayer(Layer*);
     std::vector< std::vector<double> > inference(std::vector< std::vector<double> > input);
     double computeLossAndGradients(std::vector<int> labeled);
-    void backpropLossAndUpdate();
+    void backpropLoss();
+    void update();
     void clearSavedData();
 
     std::vector<double> convLogitToProb(std::vector<double> logits);
     std::vector<double> getPredictions();
 
     const uint32_t getBatchSize() const { return batch_size; }
+    std::vector<Layer*> getLayers() { return layers; }
 
     Net(uint32_t in, uint32_t out, uint32_t bs, double lr, double momentum);
     Net(const Net& net);

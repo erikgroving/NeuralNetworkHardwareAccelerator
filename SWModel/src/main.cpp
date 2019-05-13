@@ -78,7 +78,8 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             auto result = net(in_batch);
             loss += net.computeLossAndGradients(out_batch);
 
-            net.backpropLossAndUpdate();
+            net.backpropLoss();
+            net.update();
             net.clearSavedData();
 
             lb += batch_size;

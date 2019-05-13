@@ -35,6 +35,7 @@ public:
     const double& getOffset() { return offset; }
     void setWeights(std::vector<double> weights) { this->weights = weights; }
     const std::vector<double>& getWeights() { return weights; }
+    const std::vector<double>& getGradients() { return gradient_per_weight; }
 };
 
 #endif

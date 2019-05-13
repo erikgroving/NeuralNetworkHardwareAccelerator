@@ -112,7 +112,7 @@ double Net::computeLossAndGradients(std::vector<int> labeled) {
 }
 
 // Backpropagate the gradients of the error
-void Net::backpropLossAndUpdate() {
+void Net::backpropLoss() {
     std::vector< std::vector<double> > gradients = ol_gradient;
     std::vector< std::vector<double> > sens;
     // Outer layer gradients is just the loss
@@ -195,7 +195,8 @@ void Net::backpropLossAndUpdate() {
 
         
     }
-    
+}    
+void Net::update() {
     for (int i = layers.size() - 1; i >= 0; i--) {
         layers[i]->updateWeights(learning_rate, momentum);
     }
