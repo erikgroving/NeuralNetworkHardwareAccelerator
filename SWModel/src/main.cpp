@@ -9,9 +9,10 @@
 #include "layer.h" 
 #include "net.h"
 
-void printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out);
+double printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out);
 void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out,
-            std::vector< std::vector<double> >& in_test, std::vector<int>& out_test, int n_epochs);
+            std::vector< std::vector<double> >& in_test, std::vector<int>& out_test, int n_epochs,
+            int epochs_per_change, double geometric_rate);
 int main () {
 
     std::cout << "Running software model...\n";
@@ -20,7 +21,7 @@ int main () {
     int output_size = 10;
     int batch_size = 100;
     double momentum = 0.9;
-    double lr = 0.0001; 
+    double lr = 0.01; 
     int n_epochs = 50;
 
     std::vector< std::vector<double> > trainX;
@@ -35,6 +36,10 @@ int main () {
 
     trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 60000);
     trainY = std::vector<int> (trainY.begin(), trainY.begin() + 60000);
+
+
+    testX = std::vector< std::vector<double> > (testX.begin(), testX.begin() + 10000);
+    testY = std::vector<int> (testY.begin(), testY.begin() + 10000);
 
     /*Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
     Layer* pool1 = new PoolingLayer(28, 14, 3);
@@ -53,18 +58,19 @@ int main () {
     net.addLayer(fc2);
     net.addLayer(fc3);
     
-    trainNet(net, trainX, trainY, testX, testY, n_epochs);
+    trainNet(net, trainX, trainY, testX, testY, n_epochs, 5, 1/(sqrt(10.)));
 
     printAccuracy(net, testX, testY);   
 }
 
 void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out,
-            std::vector< std::vector<double> >& in_test, std::vector<int>& out_test, int n_epochs) {
+            std::vector< std::vector<double> >& in_test, std::vector<int>& out_test, int n_epochs,
+            int epochs_per_change, double geometric_rate) {
     std::cout << "Starting Accuracy" << std::endl;
     printAccuracy(net, in_test, out_test);
     std::cout <<std::endl;
     for (int i = 0; i <= n_epochs; i++) {
-        double loss = 0.0;
+        double train_loss = 0.0;
         int batch_size = net.getBatchSize();
         int lb = 0;
         int ub = batch_size;
@@ -81,7 +87,7 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             std::vector<int> out_batch(startY, endY);
             /* Train by batch size! */
             auto result = net(in_batch);
-            loss += net.computeLossAndGradients(out_batch);
+            train_loss += net.computeLossAndGradients(out_batch);
 
             net.backpropLoss();
             net.update();
@@ -91,9 +97,14 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             ub += batch_size;
         }
         std::cout << "Epoch: " << i << std::endl;
-        printAccuracy(net, in_test, out_test);
-        std::cout << "Loss: " << loss / (double)in.size() << std::endl << std::endl;
-        
+        double test_loss = printAccuracy(net, in_test, out_test);
+        std::cout << "Training Loss: " << train_loss / (double)in.size() << std::endl;
+        std::cout << "Test Loss: " << test_loss / (double)in_test.size() << std::endl << std::endl;
+        if ( (i + 1) % epochs_per_change == 0) {
+            std::cout << "Learning rate changed from " << net.getLearningRate();
+            net.setLearningRate(net.getLearningRate() * geometric_rate);
+            std::cout << " to " << net.getLearningRate() << std::endl << std::endl;
+        }
     }
 }
 
@@ -147,7 +158,7 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
 }*/
 
 
-void printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out) {
+double printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out) {
     auto result = net(in);
     int corr = 0;
     for (size_t i = 0; i < result.size(); i++) {
@@ -163,8 +174,9 @@ void printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector
             corr++;
         }
     }
+    double loss = net.computeLossAndGradients(out);
     net.clearSavedData();
     std::cout << "Total correct: " << corr << " / " << result.size() << std::endl;
     std::cout << "Accuracy: " << (double)corr / result.size() << std::endl;
-
+    return loss;
 }

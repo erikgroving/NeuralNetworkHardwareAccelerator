@@ -203,8 +203,9 @@ void Net::backpropLoss() {
     }
 }    
 void Net::update() {
+    double effective_lr = learning_rate / batch_size;
     for (int i = layers.size() - 1; i >= 0; i--) {
-        layers[i]->updateWeights(learning_rate, momentum);
+        layers[i]->updateWeights(effective_lr, momentum);
     }
 }
 
