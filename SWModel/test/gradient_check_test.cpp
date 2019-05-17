@@ -105,21 +105,22 @@ TEST(GradientTest, FCGradientCheck) {
 
 TEST(GradientTest, ConvGradientCheck) {
     
-    int input_size = 100;
+    int input_size = 8*8;
     int output_size = 2;
     int batch_size = 1;
     double momentum = 0.9;
     double lr = 0.001; 
     Net net(input_size, output_size, batch_size, lr, momentum);
     
+    Layer* conv1 = new ConvLayer(8, 3, 1, 1, 1, 3);
+    Layer* pool1 = new PoolingLayer(8, 4, 3);
+    Layer* conv2 = new ConvLayer(4, 3, 1, 1, 3, 6);
+    Layer* fc1 = new FullyConnected(4*4*6, output_size);
 
-    Layer* fc1 = new FullyConnected(input_size, 98);
-    Layer* fc2 = new FullyConnected(98, 64);
-    Layer* fc3 = new FullyConnected(64, output_size);
-
+    net.addLayer(conv1);
+    net.addLayer(pool1);
+    net.addLayer(conv2);
     net.addLayer(fc1);
-    net.addLayer(fc2);
-    net.addLayer(fc3);
 
     // Generate random input and output labels 
     std::vector< std::vector<double> > in; 
@@ -146,16 +147,13 @@ TEST(GradientTest, ConvGradientCheck) {
         double sigma = pow(10, -4);
         auto out_ = net(in);
         net.computeLossAndGradients(out);
-
-        /*for (size_t j = 0; j < out_[0].size(); j++) {
-            std::cout << out[0] << "\t\t" << out_[0][j] << "\t\t" << net.getOlGradient()[0][j] << "\n";
-        }*/
-
         net.backpropLoss();
-
         int l_idx = (rand() % num_layers);
-        FullyConnected* fc = (FullyConnected* )net.getLayers()[l_idx];
-        std::vector<Neuron>& neurons = fc->getNeurons();
+        while (l_idx == 1) {
+            l_idx = (rand() % num_layers);
+        }
+        Layer* l = (FullyConnected* )net.getLayers()[l_idx];
+        std::vector<Neuron>& neurons = l->getNeurons();
         int n_idx = (rand() % neurons.size());
         auto neuron = neurons[n_idx];
         auto weights = neuron.getWeights();
@@ -163,11 +161,12 @@ TEST(GradientTest, ConvGradientCheck) {
         double grad = neuron.getGradients()[w_idx];
         net.clearSavedData();
         
+        //std::cout << "Testing weight " << w_idx << " of neuron " << n_idx <<  " in layer " << l_idx << std::endl;
 
         // + sigma loss
         weights[w_idx] += sigma;
         neurons[n_idx].setWeights(weights);
-        fc->setNeurons(neurons);
+        l->setNeurons(neurons);
         net(in);
         double loss_plus = net.computeLossAndGradients(out);
         net.clearSavedData();
@@ -175,18 +174,18 @@ TEST(GradientTest, ConvGradientCheck) {
         // - sigma loss
         weights[w_idx] -= (sigma + sigma);
         neurons[n_idx].setWeights(weights);
-        fc->setNeurons(neurons);
+        l->setNeurons(neurons);
         net(in);
         double loss_minus = net.computeLossAndGradients(out);
         net.clearSavedData(); 
         
         weights[w_idx] += sigma;
         neurons[n_idx].setWeights(weights);
-        fc->setNeurons(neurons);
+        l->setNeurons(neurons);
 
         double num_grad = (loss_plus - loss_minus) / (2 * sigma);
         /*std::cout << "Original Loss: " << orig_loss;
-        std::cout << "\tCalculated Gradient: " << grad;
+        std::cout << "Calculated Gradient: " << grad;
         std::cout << "\tNumerical Gradient: " << num_grad << std::endl;*/
 
         double diff = num_grad - grad;

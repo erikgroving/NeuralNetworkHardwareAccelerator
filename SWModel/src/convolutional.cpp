@@ -94,6 +94,13 @@ void ConvLayer::updateWeights(double lr, double momentum) {
 
 
 
+void ConvLayer::clearData() {
+    for (Neuron& n : neurons) {
+        n.clearBackwardData();
+    }
+}
+
+
 ConvLayer::ConvLayer(uint32_t d, uint32_t fsize, uint32_t str, uint32_t pad, uint32_t in_ch, uint32_t out_ch) {
     last_layer = false;
     dim = d;

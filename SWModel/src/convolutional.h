@@ -30,16 +30,17 @@ public:
                                                  std::vector< std::vector<double> >,
                                                  std::vector< std::vector<double> >) ;
     void updateWeights(double lr, double momentum);
-    void clearData() {}
+    void clearData();
     std::vector<Neuron>& getNeurons() { return neurons; };
     const std::vector<double>& getOutput() { return output; };
-    void setNeurons (const std::vector<Neuron>& n) {neurons = n;}
     const uint32_t getDim() const { return dim; }
     const uint32_t getInChannels() const { return in_channels; }
     const uint32_t getOutChannels() const { return out_channels; }
     const uint32_t getFiltSize() const { return filt_size; }
     std::vector<double> getWindowPixels(const std::vector<double>& input, int row, int col);
     int getType() { return CONV; }
+    
+    void setNeurons (const std::vector<Neuron>& n) {neurons = n;} 
 
 
 };

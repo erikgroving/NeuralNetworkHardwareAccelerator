@@ -20,6 +20,7 @@ public:
     virtual void clearData() = 0;
     virtual const std::vector<double>& getOutput() = 0;
     virtual std::vector<Neuron>& getNeurons() = 0;
+    virtual void setNeurons (const std::vector<Neuron>& n) = 0;
     virtual int getType() = 0;
     virtual ~Layer() {};
 };

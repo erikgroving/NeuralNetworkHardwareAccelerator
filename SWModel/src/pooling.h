@@ -38,6 +38,7 @@ public:
     void clearData() {}
     const std::vector<double>& getOutput() { return output; }
     std::vector<Neuron>& getNeurons() { return placeholder; }
+    void setNeurons (const std::vector<Neuron>& n) {};
     int getType() { return POOL; };
 };
 

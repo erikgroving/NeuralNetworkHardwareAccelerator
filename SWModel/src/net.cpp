@@ -136,7 +136,6 @@ void Net::backpropLoss() {
         }
         else {
             for (size_t j = 0; j < sens.size(); j++) {
-
                 if (l->getType() == FULLY) {
                     // The gradient of neuron i in prev layer is the sum of the weights[i] * de_dnet of all 
                     // neurons in layer j
@@ -175,13 +174,17 @@ void Net::backpropLoss() {
                         int start_col = col - (filt_size / 2);
                         int end_col = col + (filt_size / 2);
 
-                        //std::cout << "\n--------------------------------\n";
-                        //std::cout << "Channel: " << chan << "\t\tRow: " << row << "\t\tCol: " << col << std::endl;
+                        /*std::cout << "Row: " << row << " Col: " << col << " Start row: " << start_row <<
+                        " End row: " << end_row << " Start col: " 
+                        << start_col << " End col: " << end_col << " j: " << j 
+                        << " Sens size: " << sens.size() << std::endl;*/
+
                         for (int o = 0; o < out_chan; o++) {
                             int count = 0;
                             for (int m = start_row; m <= end_row; m++) {
                                 for (int n = start_col; n <= end_col; n++) {
                                     if (m < 0 || m >= dim || n < 0 || n >= dim) {
+                                        count++;
                                         continue;
                                     }
                                     int o_neur_idx = o * dim_sq + m * dim + n;
@@ -189,8 +192,8 @@ void Net::backpropLoss() {
                                     int weight_idx = (chan * filt_sq) + filt_offset;
 
                                     grad[k] += sens[j][o_neur_idx] * neurons[o_neur_idx].getWeights()[weight_idx];
+                                    count++;
                                 }
-                                count++;
                             }
                         }
                     }
@@ -198,8 +201,6 @@ void Net::backpropLoss() {
                 }
             }
         }
-
-        
     }
 }    
 void Net::update() {
