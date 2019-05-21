@@ -2,6 +2,13 @@ from random import seed
 from random import gauss
 import math
 
+n_neurons = 98
+params_per_neuron = 1
+r_width = 98
+fan_in = 28*28
+int_bits = 3
+dec_bits = 13
+
 def intToBinaryString(x, l):
     str = ""
     neg = False
@@ -23,15 +30,8 @@ def intToBinaryString(x, l):
         str = "0" + str
     return str
 
-
-n_neurons = 1
-params_per_neuron = 3136
-fan_in = 128
 params = []
 binary_params = []
-
-int_bits = 3
-dec_bits = 13
 
 for i in range(n_neurons):
     for j in range(params_per_neuron):
@@ -45,7 +45,6 @@ print(params[0])
 print(binary_params[0])
 
 contents = "memory_initialization_radix=2;\nmemory_initialization_vector=\n"
-r_width = 1
 cnt = 0
 for b in binary_params:
     contents += str(b)

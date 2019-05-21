@@ -25,8 +25,8 @@ module interlayer_activation_buffer #(
     logic   [ID_WIDTH - 1: 0]           buff_ptr;
     logic   [BUFF_SIZE - 1: 0][15: 0]   buffer;
     logic                               read_o;
-    logic   [LOOPS - 1: 0]              loop_cnt;
-    bit     [ID_WIDTH - 1: 0]           i;
+    logic   [LOOPS: 0]                  loop_cnt;
+    bit     [ID_WIDTH: 0]               i;
     
     always_ff @(posedge clk) begin
         if (rst) begin

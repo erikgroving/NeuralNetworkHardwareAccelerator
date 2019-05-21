@@ -13,8 +13,8 @@ module fc2_layer(
         output logic                                fc2_busy
     );
     
-    logic   [`FC2_BRAM - 1: 0][15: 0]               data_in_a;
-    logic   [`FC2_BRAM - 1: 0][15: 0]               data_out_a;
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          data_in;
+    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          data_out;
 
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          weights;
     logic   [`FC2_ADDR - 1: 0]                      head_ptr;
@@ -62,7 +62,7 @@ module fc2_layer(
         
         //outputs
         .head_ptr(head_ptr),
-        .mid_ptr(mid_ptr),      // not used in fc2
+        .mid_ptr(mid_ptr),      
         .bias_ptr(bias_ptr),
         .has_bias(sch_has_bias)
     );
@@ -95,19 +95,24 @@ module fc2_layer(
         .data_in_a(16'b0),
         .en_a(1'b1),
         .we_a(~forward),
-
+        
+        .addr_b(mid_ptr),
+        .data_in_b(16'b0),
+        .en_b(1'b1),
+        .we_b(~forward),
         
         // outputs
-        .data_out_a(data_out_a),
+        .data_out(data_out),        
         .neuron_id(neuron_id)
+        
     ); 
     
     
     biases_fc2_blk_mem biases_fc2_blk_mem_i (
         .addra(bias_ptr),
         .clka(clk),
-        .dina(16'b0),
-        .douta(bias[0]),
+        .dina(32'b0),
+        .douta({bias[1], bias[0]}),
         .ena(1'b1),
         .wea(1'b0)
     );
@@ -162,7 +167,7 @@ module fc2_layer(
             kern_has_bias       <= bram_has_bias;
             kern_bias           <= bias;
             kern_neuron_id      <= neuron_id;
-            weights             <= data_out_a;
+            weights             <= data_out;
         end
     end
     
@@ -181,10 +186,11 @@ module fc2_layer(
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
+                .last_layer(1'b1),
                 // output
                 .activation_o(activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
-                .valid_o(valid)
+                .valid_o(valid[i])
             );
         end
     endgenerate    

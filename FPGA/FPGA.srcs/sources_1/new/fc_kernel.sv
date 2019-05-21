@@ -14,6 +14,7 @@ module fc_kernel #(
     input   [ID_WIDTH - 1: 0]       neuron_id_i,
     input                           has_bias,
     input                           valid_i,
+    input                           last_layer,
     
     output logic [15: 0]            activation_o,
     output logic [ID_WIDTH - 1: 0]  neuron_id_o,
@@ -55,7 +56,7 @@ module fc_kernel #(
             valid_o         <= 0;
         end
         else if (last) begin
-            activation_o    <= dsp_o[23] ? 0 : dsp_o[23: 8];       // ReLU
+            activation_o    <= (dsp_o[23] & ~last_layer) ? 0 : dsp_o[23: 8];       // ReLU
             neuron_id_o     <= prev_neuron_id_i;
             valid_o         <= 1'b1;
         end
