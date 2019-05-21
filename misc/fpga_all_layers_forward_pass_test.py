@@ -56,7 +56,7 @@ for fname in glob.glob(path):
                 if (bit == '1'):
                     weight_val += bit_val
                 bit_val /= 2.
-            fc0_neurons[curr_neuron].append(weight_val)
+            fc0_neurons[fc0_n_neurons - (curr_neuron + 1)].append(weight_val)
 
 
 # FC1 layer

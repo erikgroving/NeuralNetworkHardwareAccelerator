@@ -74,7 +74,7 @@ module fc0_layer(
         end
             
         $display("\nACT_O\t\tNEURON_ID_O\t\tVALID_ACT_O");
-        for (it = 0; it < 5; it=it+1) begin
+        for (it = 0; it < `FC0_NEURONS; it=it+1) begin
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
         end        
