@@ -45,7 +45,6 @@ for fname in glob.glob(path):
             end_bit = (i + 1) * 16
 
             bit_str = line[st_bit: end_bit]
-
             weight_val = 0
             bit_val = 2 ** (integer_bits - 1)
 

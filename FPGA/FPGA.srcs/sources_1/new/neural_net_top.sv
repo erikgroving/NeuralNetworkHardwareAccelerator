@@ -12,8 +12,8 @@ module neural_net_top(
     // Logics for the fc0 layer
     logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_activation_i;
     logic                                   fc0_valid_i;    
-    logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_activation_o;
-    logic [`FC0_N_KERNELS - 1: 0][4: 0]     fc0_neuron_id_o;
+    logic [`FC0_NEURONS - 1: 0][15: 0]      fc0_activation_o;
+    logic [`FC0_NEURONS - 1: 0][6: 0]       fc0_neuron_id_o;
     logic                                   fc0_valid_act_o; 
     logic                                   fc0_busy; 
     // Logics for the fc1 layer    
@@ -41,10 +41,17 @@ module neural_net_top(
         
     always_ff @(posedge clk) begin
         prev_reset  <= reset;
+        if (reset) begin
+            fc0_activation_i <= 0;
+            fc0_valid_i <= 0;
+        end
+        else begin
+            fc0_activation_i <= {`FC0_N_KERNELS{16'h0100}};
+            fc0_valid_i      <= 1'b1;       
+        end
     end
 
-    assign fc0_activation_i = {`FC0_N_KERNELS{16'h0100}};
-    assign fc0_valid_i      = 1'b1;
+
 
     // FC0  
     fc0_layer fc0_layer_i (
@@ -105,7 +112,8 @@ module neural_net_top(
         // outputs
         .activation_o(fc1_activation_o),
         .neuron_id_o(fc1_neuron_id_o),
-        .valid_act_o(fc1_valid_act_o)    
+        .valid_act_o(fc1_valid_act_o),
+        .fc1_busy(fc1_busy)   
     );
     
 
@@ -185,7 +193,8 @@ module neural_net_top(
             fc2_buf_valid   <= fc2_neuron_id_o[`FC2_N_KERNELS - 1] == `FC2_NEURONS - 1;
         end
     end
-
+    
+    assign led_o = |fc2_activation_o;
     
     `ifdef DEBUG
      integer clk_cycle;
@@ -199,8 +208,14 @@ module neural_net_top(
             clk_cycle   <=  clk_cycle + 1'b1;
         end
         $display("\n\n------ CYCLE %04d ------", clk_cycle);
-        $display("FC1_iter: %04d\nFC1_buf_offset: %04d", fc1_iter, fc1_buf_offset);
-        $display("FC1_BUF_PTR: %04d\nFC1_ACT_I: %04h", fc1_buf_ptr, fc1_buf_act_i);  
+  
+        $display("\n--- FC0 ---");
+        $display("FC0_act_i: %04h\t\tFC0_valid_i: %01b", fc0_activation_i[0], fc0_valid_i);
+        $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
+        for (it = 0; it < 5; it=it+1) begin
+            $display("%04h\t\t%04d\t\t%01b", fc0_activation_o[it], fc0_neuron_id_o[it], fc0_valid_act_o);
+        end        
+        /*
         $display("\n--- FC1 ---");
         $display("FC1_act_i: %04h\t\tFC1_valid_i: %01b", fc1_activation_i[0], fc1_valid_i);
         $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
@@ -219,7 +234,7 @@ module neural_net_top(
         for (it= 0; it < `FC2_NEURONS; it=it+1) begin
             $display("%02d: %04h", it, fc2_act_o_buf[it]); 
         end
-        $display("LEDS: %08b", led_o);
+        $display("LEDS: %08b", led_o);*/
      end 
     `endif    
 

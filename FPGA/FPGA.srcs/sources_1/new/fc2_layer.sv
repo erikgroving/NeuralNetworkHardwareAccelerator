@@ -165,7 +165,7 @@ module fc2_layer(
             kern_activations    <= bram_activations;
             kern_valid          <= bram_valid;
             kern_has_bias       <= bram_has_bias;
-            kern_bias           <= bias;
+            kern_bias           <= 0;//bias;
             kern_neuron_id      <= neuron_id;
             weights             <= data_out;
         end

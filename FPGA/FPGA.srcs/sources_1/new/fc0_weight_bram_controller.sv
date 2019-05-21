@@ -18,19 +18,18 @@ module fc0_weight_bram_controller (
     
     output logic [`FC0_PORT_WIDTH - 1: 0][15: 0]        data_out_a,
     output logic [`FC0_PORT_WIDTH - 1: 0][15: 0]        data_out_b,
-    output logic [`FC0_N_KERNELS - 1: 0][5: 0]          neuron_id
+    output logic [`FC0_PORT_WIDTH - 1: 0][6: 0]         neuron_id
     
     );
     
-    bit [`FC0_PORT_WIDTH - 1: 0]  i, j;
+    bit [6: 0]  i, j;
     always_ff @(posedge clk) begin
         if (rst) begin 
             neuron_id       <= 0;
         end
         else begin 
-            for (i = 0, j = `FC0_PORT_WIDTH; i < `FC0_PORT_WIDTH; i=i+1, j=j+1) begin
+            for (i = 0; i < `FC0_PORT_WIDTH; i=i+1) begin
                 neuron_id[i]    <= i; 
-                neuron_id[j]    <= i;
             end
         end
     end

@@ -48,7 +48,7 @@ module fc1_layer(
     
     `ifdef DEBUG
     integer it;
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk) begin/*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
         $display("\n--- MEMORY CONTROLLER ---");
@@ -77,7 +77,7 @@ module fc1_layer(
         for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
-        end        
+        end  */      
      end
     `endif
 
@@ -171,7 +171,7 @@ module fc1_layer(
             kern_activations    <= bram_activations;
             kern_valid          <= bram_valid;
             kern_has_bias       <= bram_has_bias;
-            kern_bias           <= bias;
+            kern_bias           <= 0;//bias;
             kern_neuron_id      <= neuron_id;
             weights             <= {data_out_b, data_out_a};
         end
