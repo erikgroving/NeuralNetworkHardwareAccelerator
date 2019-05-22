@@ -1,0 +1,12 @@
+\babel@toc {english}{}
+\contentsline {chapter}{Summary (English)}{i}{chapter*.1}
+\contentsline {chapter}{Preface}{iii}{chapter*.2}
+\contentsline {chapter}{Acknowledgements}{v}{chapter*.3}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Project plan}{2}{section.1.1}
+\contentsline {section}{\numberline {1.2}The ``separate document''}{2}{section.1.2}
+\contentsline {chapter}{\numberline {2}Introduction}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Project plan}{4}{section.2.1}
+\contentsline {section}{\numberline {2.2}The ``separate document''}{4}{section.2.2}
+\contentsline {chapter}{\numberline {A}Stuff}{5}{appendix.A}
+\contentsline {chapter}{Bibliography}{7}{appendix.A}
