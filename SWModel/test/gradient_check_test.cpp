@@ -149,7 +149,7 @@ TEST(GradientTest, ConvGradientCheck) {
         net.computeLossAndGradients(out);
         net.backpropLoss();
         int l_idx = (rand() % num_layers);
-        while (l_idx == 1) {
+        while (l_idx == 1) {    // don't select the pooling layer
             l_idx = (rand() % num_layers);
         }
         Layer* l = (FullyConnected* )net.getLayers()[l_idx];

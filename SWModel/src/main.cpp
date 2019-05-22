@@ -44,21 +44,27 @@ int main () {
     /*Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 3);
     Layer* pool1 = new PoolingLayer(28, 14, 3);
     Layer* conv2 = new ConvLayer(14, 3, 1, 1, 3, 5);
-    Layer* pool2 = new PoolingLayer(14, 7, 5);*/
+    Layer* pool2 = new PoolingLayer(14, 7, 5);
+    Layer* fc1 = new FullyConnected(5*7*7, 32);
+    Layer* fc2 = new FullyConnected(32, 10);
+    
+    net.addLayer(conv1);
+    net.addLayer(pool1);
+    net.addLayer(conv2);
+    net.addLayer(pool2);
+    net.addLayer(fc1);
+    net.addLayer(fc2);*/
+
+
     Layer* fc1 = new FullyConnected(28*28, 98);
     Layer* fc2 = new FullyConnected(98, 64);
     Layer* fc3 = new FullyConnected(64, 10);
-
-
-   /* net.addLayer(conv1);
-    net.addLayer(pool1);
-    net.addLayer(conv2);
-    net.addLayer(pool2);*/
+    
     net.addLayer(fc1);
     net.addLayer(fc2);
     net.addLayer(fc3);
     
-    trainNet(net, trainX, trainY, testX, testY, n_epochs, 5, 1/(sqrt(10.)));
+    trainNet(net, trainX, trainY, testX, testY, n_epochs, 10, .1);
 
     printAccuracy(net, testX, testY);   
 }
@@ -107,56 +113,6 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
         }
     }
 }
-
-/*
-    Layer* fc = new FullyConnected(input_size, 128);
-    Layer* fc2 = new FullyConnected(128, 64);
-    Layer* fc3 = new FullyConnected(64, output_size);
-
-
-    net.addLayer(fc);
-    net.addLayer(fc2);
-    net.addLayer(fc3);*/
-    
-    /*
-    std::vector< std::vector<double> > in; 
-    std::vector<int> out; 
-
-    std::uniform_real_distribution<double> distribution(-1.0, 1.0);  
-    std::uniform_int_distribution<int> distribution_out(0, output_size - 1);  
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::default_random_engine generator(seed);
-    int test_size = 100;
-    for (int i = 0; i < test_size; i++) {
-        std::vector<double> smpl;
-        for (int j = 0; j < input_size; j++) {
-            smpl.push_back(distribution(generator));
-        }
-        in.push_back(smpl);
-        out.push_back(distribution_out(generator));
-    }
-
-
-    int epochs = 10000;
-    for (int j = 0; j <= epochs; j++) {
-        if ((j) % 10 == 0) {
-            auto result = net(in);
-            double loss = net.computeLossAndGradients(out);
-            std::cout << "Epoch: " << j<< std::endl;
-            printAccuracy(net, in, out);
-            std::cout << "Loss: " << loss / out.size() << std::endl << std::endl;
-        }
-        auto result = net(in);
-        net.computeLossAndGradients(out);
-
-        net.backpropLossAndUpdate();
-        net.clearSavedData();
-        
-    }
-
-    printAccuracy(net, in, out);
-}*/
-
 
 double printAccuracy(Net& net, std::vector< std::vector<double> >& in, std::vector<int>& out) {
     auto result = net(in);

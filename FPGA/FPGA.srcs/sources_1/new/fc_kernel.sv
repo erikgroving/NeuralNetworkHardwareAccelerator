@@ -14,6 +14,7 @@ module fc_kernel #(
     input   [ID_WIDTH - 1: 0]       neuron_id_i,
     input                           has_bias,
     input                           valid_i,
+    input                           last_layer,
     
     output logic [15: 0]            activation_o,
     output logic [ID_WIDTH - 1: 0]  neuron_id_o,
@@ -33,8 +34,17 @@ module fc_kernel #(
     
     logic                       last;
     logic                       prev_valid_i;
-    
-    assign last = ((neuron_id_i != prev_neuron_id_i) && prev_valid_i) || (prev_valid_i && !valid_i);
+    logic [8: 0]                cnt;
+    //assign last = ((neuron_id_i != prev_neuron_id_i) && prev_valid_i) || (prev_valid_i && !valid_i);
+    assign last = (cnt == FAN_IN - 1);
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            cnt <= 0;
+        end
+        else if (valid_i) begin
+            cnt <= (cnt == FAN_IN - 1) ? 0 : cnt + 1'b1;
+        end
+    end
     
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -55,7 +65,7 @@ module fc_kernel #(
             valid_o         <= 0;
         end
         else if (last) begin
-            activation_o    <= dsp_o[23] ? 0 : dsp_o[23: 8];       // ReLU
+            activation_o    <= dsp_o[23: 8];
             neuron_id_o     <= prev_neuron_id_i;
             valid_o         <= 1'b1;
         end
@@ -86,10 +96,10 @@ module fc_kernel #(
     end
     
     `ifdef DEBUG
-    always_ff @(posedge clk) begin
+    /*always_ff @(posedge clk) begin
         $display("--- INTERNAL KERNEL ---");
         $display("neuron_id: %02d\t\tweight: %04h\t\tactivation_i: %04h\t\tkernel_in: %06h\t\tdsp_o:%06h\t\tvalid_i: %01b", neuron_id_i, weight, activation_i, kernel_in, dsp_o, valid_i);
-    end
+    end*/
     `endif
 
 
