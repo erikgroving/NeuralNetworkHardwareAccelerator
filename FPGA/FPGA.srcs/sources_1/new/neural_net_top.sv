@@ -231,7 +231,7 @@ module neural_net_top(
             fc2_act_o_buf   <= 0;
         end
         else begin
-            for (m = 0; m < `FC1_N_KERNELS; m=m+1) begin
+            for (m = 0; m < `FC2_N_KERNELS; m=m+1) begin
                 if (fc2_valid_o) begin
                     fc2_act_o_buf[fc2_neuron_id_o[m]]  <= fc2_activation_o[m];
                 end 
@@ -246,7 +246,37 @@ module neural_net_top(
         end
     end
     
-    assign led_o = |fc2_activation_o;
+    
+    
+    logic [4: 0][15: 0] max1;
+    logic [15: 0]       max2;
+    logic [15: 0]       max3;
+    logic [15: 0]       max4;
+    logic [15: 0]       max5;
+    bit [3: 0] k;
+    bit [3: 0] j;
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            led_o    <= 0;
+        end
+        else if (fc2_buf_valid) begin
+            for (j = 0; j < 8; j=j+1) begin
+                led_o[j] = fc2_act_o_buf[j] == max5;
+            end        
+        end
+    end
+    
+    always_comb begin
+        for (k = 0; k < 5; k=k+1) begin
+            max1[k] = $signed(fc2_act_o_buf[2*k]) > $signed(fc2_act_o_buf[2*k+1]) ? 
+                        fc2_act_o_buf[2*k] : fc2_act_o_buf[2*k + 1];
+        end
+        max2 = $signed(max1[0]) > $signed(max1[1]) ? max1[0] : max1[1];
+        max3 = $signed(max1[2]) > $signed(max1[3]) ? max1[2] : max1[3];
+        max4 = $signed(max2) > $signed(max3) ? max2 : max3;
+        max5 = $signed(max4) > $signed(max1[4]) ? max4 : max1[4];        
+    end
+
     
     `ifdef DEBUG
      integer clk_cycle;
