@@ -2,10 +2,10 @@ from random import seed
 from random import gauss
 import math
 
-n_neurons = 98
-params_per_neuron = 1
-r_width = 98
-fan_in = 28*28
+n_neurons = 1
+params_per_neuron = 784
+r_width = 1
+fan_in = 256
 int_bits = 3
 dec_bits = 13
 

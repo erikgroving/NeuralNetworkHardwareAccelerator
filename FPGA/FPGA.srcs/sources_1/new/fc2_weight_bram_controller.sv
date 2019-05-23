@@ -33,8 +33,8 @@ module fc2_weight_bram_controller (
         end
         else begin 
             for (i = 0, j = 1; i < `FC2_BRAM; i=i+1, j=j+1) begin 
-                neuron_id[i]    <= addr_a[8: 5];    // abuse the fact that fan in is a power of 2
-                neuron_id[j]    <= addr_a[8: 5] + `FC2_HALF_NEURONS;
+                neuron_id[i]    <= addr_a[9: 6];    // abuse the fact that fan in is a power of 2
+                neuron_id[j]    <= addr_a[9: 6] + `FC2_HALF_NEURONS;
             end
         end
     end

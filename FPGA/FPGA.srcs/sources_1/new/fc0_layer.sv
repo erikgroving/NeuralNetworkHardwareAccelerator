@@ -51,7 +51,7 @@ module fc0_layer(
     
     `ifdef DEBUG
     integer it;
-    always_ff @(posedge clk) begin
+   /* always_ff @(posedge clk) begin
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);    
         $display("Addr_a: %03d Addr_b: %03d", addr_a, addr_b);
@@ -60,15 +60,15 @@ module fc0_layer(
         for (it = 0; it < 5; it = it + 1) begin
             $display("%04h\t\t\t%04h", data_out_a[it], data_out_b[it]);       
         end
-        /*$display("\nBias");
+        $display("\nBias");
         for (it = 0; it < `FC0_N_KERNELS; it = it + 1) begin
             $display("%04h", bias[it]);
-        end*/
+        end
  
         $display("\n--- KERNELS---");
         $display("has_bias: %01b", bram_has_bias);
         $display("ACT_I\t\tWEIGHT\t\tBIAS\t\tKERN_VALID");
-        for (it = 0; it < 5; it=it+1) begin
+        for (it = 0; it < 10; it=it+1) begin
             $display("%04h\t\t%04h\t\t%04h\t\t\t%01b",
             bram_activations[it], weights[it], bias[it], kern_valid);
         end
@@ -78,7 +78,7 @@ module fc0_layer(
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
         end        
-     end
+     end*/
     `endif
 
     
@@ -94,7 +94,7 @@ module fc0_layer(
     end
 
     // Scheduler for the fully connected layer
-    fc_scheduler #(.ADDR(`FC0_ADDR), .BIAS_ADDR(`FC0_BIAS_ADDR), .MID_PTR_OFFSET(`FC0_MID_PTR_OFFSET), .FAN_IN(`FC0_FAN_IN)) fc0_scheduler_i (
+    fc_scheduler #(.ADDR(`FC0_ADDR), .BIAS_ADDR(`FC0_BIAS_ADDR), .MID_PTR_OFFSET(`FC0_KERNEL_FAN_IN), .FAN_IN(`FC0_FAN_IN)) fc0_scheduler_i (
         //inputs
         .clk(clk),
         .rst(rst),
@@ -173,6 +173,8 @@ module fc0_layer(
     end
     
     
+    logic [195: 0] ll;
+    assign ll = 196'b1_00000 | (196'b1_00000 << 98);
     // Computational kernel for the fully connected layer    
     genvar i;
     generate
@@ -187,7 +189,7 @@ module fc0_layer(
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
-                .last_layer(1'b0),
+                .last_layer(ll[i]),
                 // output
                 .activation_o(kern_activation_o[i]),
                 .neuron_id_o(kern_neuron_id_o[i]),

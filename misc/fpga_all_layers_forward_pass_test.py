@@ -4,23 +4,23 @@ integer_bits = 3
 
 # Set activations in
 fc0_fan_in = 28*28
-activations_i = [0.03125 for i in range(fc0_fan_in)]
-#f = open('../FPGA/FPGA.srcs/sources_1/ip/fc0_fc1_rand_activations.coe')
-#next(f)
-#next(f)
-#for line in f:
-#    act = 0
-#    bit_val = 2 ** (integer_bits - 1)
-#
-#    if (line[0] == '1'):
-#        act -= bit_val
-#    bit_val /= 2.
-#
-#    for bit in line[1:]:
-#        if (bit == '1'):
-#            act += bit_val
-#        bit_val /= 2.
-#    activations_i.append(act)
+activations_i = []
+f = open('../FPGA/FPGA.srcs/sources_1/ip/fc0_random_input2.coe')
+next(f)
+next(f)
+for line in f:
+    act = 0
+    bit_val = 2 ** (integer_bits - 1)
+
+    if (line[0] == '1'):
+        act -= bit_val
+    bit_val /= 2.
+
+    for bit in line[1:]:
+        if (bit == '1'):
+            act += bit_val
+        bit_val /= 2.
+    activations_i.append(act)
 
 # FC0 layer
 fc0_n_neurons = 98
@@ -76,8 +76,8 @@ for fname in glob.glob(path):
     next(f)
     next(f)
     for line in f:
-        curr_neuron = n_offset
         for i in range(8):
+            curr_neuron = n_offset + (7 - i)
             st_bit = i * 16
             end_bit = (i + 1) * 16     
 
@@ -85,7 +85,7 @@ for fname in glob.glob(path):
             weight_val = 0
             bit_val = 2 ** (integer_bits - 1)
 
-            if (line[0] == '1'):
+            if (bit_str[0] == '1'):
                 weight_val -= bit_val
             bit_val /= 2.
 
@@ -94,7 +94,6 @@ for fname in glob.glob(path):
                     weight_val += bit_val
                 bit_val /= 2.
             fc1_neurons[curr_neuron].append(weight_val)
-            curr_neuron += 1
         if len(fc1_neurons[n_offset]) == fc1_fan_in:
             n_offset += 8
 
@@ -158,6 +157,20 @@ for neuron in fc2_neurons:
 print('--- FC0 OUT ---')
 for i in range(len(fc0_output)):
     print("Neuron " + str(i) + ": " + str(fc0_output[i]))
+
+sum1 = 0
+sum2 = 0
+for w in range(int(len(fc0_neurons[84]) / 2)):
+    idx1 = 2*w
+    idx2 = idx1 + 1
+    #print('----')
+    #print("Weight: " + str(fc0_neurons[84][idx1]) + "\tActivation: " + str(activations_i[idx1]) + "\tKern_in: " + str(sum1))
+    #print("Weight: " + str(fc0_neurons[84][idx2]) + "\tActivation: " + str(activations_i[idx2]) + "\tKern_in: " + str(sum2))
+    sum1 += fc0_neurons[84][idx1] * activations_i[idx1]
+    sum2 += fc0_neurons[84][idx2] * activations_i[idx2]
+#print(sum1)
+#print(sum2)
+#print(str(sum1+sum2))
 
 print('--- FC1 OUT ---')
 for i in range(len(fc1_output)):

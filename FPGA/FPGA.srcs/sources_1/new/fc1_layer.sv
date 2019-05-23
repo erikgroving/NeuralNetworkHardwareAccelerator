@@ -44,6 +44,7 @@ module fc1_layer(
 
     logic   [`FC1_N_KERNELS - 1: 0]                 valid;
     
+    logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_activation_o;
  
     
     `ifdef DEBUG
@@ -194,12 +195,19 @@ module fc1_layer(
                 .valid_i(kern_valid),
                 .last_layer(1'b0),
                 // output
-                .activation_o(activation_o[i]),
+                .activation_o(kern_activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
                 .valid_o(valid[i])
             );
         end
     endgenerate    
+    
+    bit [10: 0] j;
+    always_comb begin
+        for (j = 0; j < `FC1_N_KERNELS; j=j+1) begin
+            activation_o[j] = kern_activation_o[j][15] ? 0 : kern_activation_o[j];
+        end
+    end
 
     assign valid_act_o = &valid;
 endmodule
