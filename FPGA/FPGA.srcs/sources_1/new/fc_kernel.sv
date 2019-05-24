@@ -14,7 +14,6 @@ module fc_kernel #(
     input   [ID_WIDTH - 1: 0]       neuron_id_i,
     input                           has_bias,
     input                           valid_i,
-    input                           last_layer,
     
     output logic [15: 0]            activation_o,
     output logic [ID_WIDTH - 1: 0]  neuron_id_o,
@@ -35,7 +34,7 @@ module fc_kernel #(
     logic                       last;
     logic                       prev_valid_i;
     logic [8: 0]                cnt;
-    //assign last = ((neuron_id_i != prev_neuron_id_i) && prev_valid_i) || (prev_valid_i && !valid_i);
+
     always_ff @(posedge clk) begin
         if (rst) begin
             cnt     <= 0;
@@ -54,11 +53,9 @@ module fc_kernel #(
     always_ff @(posedge clk) begin
         if (rst) begin
             prev_neuron_id_i    <= 0;
-            prev_valid_i        <= 0;
         end
         else begin
             prev_neuron_id_i    <= neuron_id_i;
-            prev_valid_i        <= valid_i;
         end
     end
     

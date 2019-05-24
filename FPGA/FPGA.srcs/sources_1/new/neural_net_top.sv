@@ -40,8 +40,6 @@ module neural_net_top(
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
     logic                                   fc2_valid_o;       
-    assign forward = 1'b1;
-
     
     
     logic [9: 0]        input_addr;
@@ -71,6 +69,19 @@ module neural_net_top(
             input_addr  <= 10'b0;
         end
     end
+    
+    
+    logic backward;
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            backward    <= 1'b0;
+        end
+        else if (fc2_buff_rdy) begin
+            backward    <= 1'b1;
+        end
+    end
+    
+    assign forward = ~backward;
     
     logic [9: 0] fc0_addr_a;
     logic [9: 0] fc0_addr_b;
@@ -202,7 +213,11 @@ module neural_net_top(
         
         .buff_rdy(fc2_buff_rdy)
     );
-
+    
+    
+    logic [`FC2_NEURONS - 1: 0][15: 0]  fc2_gradients;
+    
+    assign fc2_gradients = {`FC2_NEURONS{16'h0080}};
 
     // FC2, fed directly from FC1 due to the small size
     fc2_layer fc2_layer_i (
@@ -213,12 +228,16 @@ module neural_net_top(
         .activations_i(fc2_activation_i),
         .valid_i(fc2_valid_i),
         
+        // backward pass inputs
+        .gradients_i(fc2_gradients),
+        
         // outputs
         .activation_o(fc2_activation_o),
         .neuron_id_o(fc2_neuron_id_o),
         .valid_act_o(fc2_valid_o),
         .fc2_busy(fc2_busy)
     );
+
 
 
 

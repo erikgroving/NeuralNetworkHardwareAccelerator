@@ -173,8 +173,6 @@ module fc0_layer(
     end
     
     
-    logic [195: 0] ll;
-    assign ll = 196'b1_00000 | (196'b1_00000 << 98);
     // Computational kernel for the fully connected layer    
     genvar i;
     generate
@@ -189,7 +187,6 @@ module fc0_layer(
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
-                .last_layer(ll[i]),
                 // output
                 .activation_o(kern_activation_o[i]),
                 .neuron_id_o(kern_neuron_id_o[i]),

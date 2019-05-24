@@ -5,7 +5,9 @@ module fc2_layer(
         input                                       rst,
         input                                       forward,
         input  [`FC2_N_KERNELS - 1: 0][15: 0]       activations_i,
-        input                                       valid_i,        
+        input                                       valid_i,
+                
+        input  [`FC2_N_KERNELS - 1: 0][15: 0]       gradients_i,
         
         output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
@@ -186,7 +188,6 @@ module fc2_layer(
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
-                .last_layer(1'b1),
                 // output
                 .activation_o(activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
