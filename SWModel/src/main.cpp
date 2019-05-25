@@ -19,7 +19,7 @@ int main () {
 
     int input_size = 28*28;
     int output_size = 10;
-    int batch_size = 100;
+    int batch_size = 200;
     double momentum = 0.9;
     double lr = 0.01; 
     int n_epochs = 50;
@@ -45,8 +45,8 @@ int main () {
     Layer* pool1 = new PoolingLayer(28, 14, 8);
     Layer* conv2 = new ConvLayer(14, 3, 1, 1, 8, 16);
     Layer* pool2 = new PoolingLayer(14, 7, 16);
-    Layer* fc1 = new FullyConnected(16*7*7, 100);
-    Layer* fc2 = new FullyConnected(100, 10);
+    Layer* fc1 = new FullyConnected(16*7*7, 64);
+    Layer* fc2 = new FullyConnected(64, 10);
     
     net.addLayer(conv1);
     net.addLayer(pool1);
