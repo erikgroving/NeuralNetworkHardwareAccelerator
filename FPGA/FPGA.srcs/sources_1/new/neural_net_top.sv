@@ -60,7 +60,7 @@ module neural_net_top(
         else if (fc0_start) begin
             input_addr  <= input_addr + 1'b1;
         end
-        else if (!fc0_start && !fc0_busy && fc0_buff_rdy) begin
+        else if (!fc0_start && !fc0_busy && fc0_buff_rdy & forward) begin
             fc0_start   <= 1'b1;
             input_addr  <= 10'b0;
         end
@@ -137,7 +137,7 @@ module neural_net_top(
             fc1_start   <= 1'b0;
         end
         else begin
-            fc1_start   <= fc1_buff_rdy & ~fc1_busy;
+            fc1_start   <= fc1_buff_rdy & ~fc1_busy & forward;
         end
     end 
     interlayer_activation_buffer
@@ -154,7 +154,7 @@ module neural_net_top(
         .start(fc1_start),
         .activation_i(fc0_activation_o),
         .neuron_id_i(fc0_neuron_id_o),
-        .valid_act_i(fc0_valid_act_o),
+        .valid_act_i(fc0_valid_act_o & forward),
         // outputs
         .activation_o(fc1_activation_i),
         .neuron_id_o(fc1_neuron_id_i),
@@ -187,10 +187,20 @@ module neural_net_top(
         end
         else begin
             $display("fc2_buff_rdy: %01b\tfc2_busy: %01b", fc2_buff_rdy, fc2_busy);
-            fc2_start   <= fc2_buff_rdy & ~fc2_busy;
+            fc2_start   <= fc2_buff_rdy & ~fc2_busy & forward;
         end
     end 
-    
+ 
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]        fc2_b_gradient_i;
+    logic [15: 0]                               fc2_b_activation_i;
+    logic [5: 0]                                fc2_b_activation_id_i;
+    logic [5: 0]                                fc2_b_activation_id_o;
+    logic [`FC2_N_KERNELS - 1: 0][3: 0]         fc2_b_neuron_id_i;
+    logic                                       fc2_b_valid_i;
+    logic                                       fc2_b_start;
+    logic                                       fc2_b_start_r;
+    logic [3: 0]                                fc2_loops;
+       
     interlayer_activation_buffer
     #(.N_KERNELS_I(`FC1_N_KERNELS), 
         .N_KERNELS_O(`FC2_N_KERNELS), 
@@ -205,20 +215,59 @@ module neural_net_top(
         .start(fc2_start),
         .activation_i(fc1_activation_o),
         .neuron_id_i(fc1_neuron_id_o),
-        .valid_act_i(fc1_valid_act_o),
+        .valid_act_i(fc1_valid_act_o & forward),
+        .b_ptr(fc2_b_activation_id_i),
         // outputs
+        
         .activation_o(fc2_activation_i),
         .neuron_id_o(fc2_neuron_id_i),
         .valid_o(fc2_valid_i),
+        
+        .b_act_o(fc2_b_activation_i),
         
         .buff_rdy(fc2_buff_rdy)
     );
     
     
-    logic [`FC2_NEURONS - 1: 0][15: 0]  fc2_gradients;
+    logic [`FC2_NEURONS - 1: 0][15: 0]      fc2_gradients;
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_gradients_i;
+    logic                                   fc2_gradients_rdy;
+    assign fc2_gradients        = {`FC2_NEURONS{16'h0700}};
+    assign fc2_gradients_rdy    = 1'b1;
     
-    assign fc2_gradients = {`FC2_NEURONS{16'h0080}};
 
+    
+    
+    // Start when backward is good and gradients are ready. Only do backprop once   
+    assign fc2_b_start = backward & fc2_gradients_rdy & (fc2_loops != `FC2_LOOPS);
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            fc2_b_start_r   <= 1'b0;
+        end
+        else begin
+            fc2_b_start_r   <= fc2_b_start;
+        end
+        
+        // Loop over fan in
+        if (reset) begin
+            fc2_loops   <= 0;
+        end
+        else if (fc2_b_activation_id_i == (`FC1_NEURONS - 1)) begin
+            fc2_loops   <= fc2_loops + 1'b1;
+        end
+        
+        if (reset) begin
+            fc2_b_activation_id_i <= 0;       
+        end
+        else if (fc2_b_start) begin
+            //fc2_b_activation_i  <=
+            fc2_b_activation_id_i <= fc2_b_activation_id_i + 1'b1;
+        end
+        fc2_gradients_i         <= {fc2_gradients[fc2_loops+5], fc2_gradients[fc2_loops]};
+        fc2_b_neuron_id_i       <= {fc2_loops + 5, fc2_loops};
+        fc2_b_activation_id_o   <= fc2_b_activation_id_i;
+    end
+    
     // FC2, fed directly from FC1 due to the small size
     fc2_layer fc2_layer_i (
         // inputs
@@ -229,8 +278,12 @@ module neural_net_top(
         .valid_i(fc2_valid_i),
         
         // backward pass inputs
-        .gradients_i(fc2_gradients),
-        
+        .b_gradient_i(fc2_gradients_i),
+        .b_activation_i({fc2_b_activation_i, fc2_b_activation_i}),
+        .b_activation_id(fc2_b_activation_id_o),
+        .b_neuron_id_i(fc2_b_neuron_id_i),
+        .b_valid_i(fc2_b_start_r),
+    
         // outputs
         .activation_o(fc2_activation_o),
         .neuron_id_o(fc2_neuron_id_o),

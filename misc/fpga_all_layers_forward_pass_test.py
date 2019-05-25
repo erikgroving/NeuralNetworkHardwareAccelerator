@@ -4,6 +4,7 @@ integer_bits = 3
 
 # Set activations in
 fc0_fan_in = 28*28
+gradients = [0.21875 for i in range(64)]
 activations_i = []
 f = open('../FPGA/FPGA.srcs/sources_1/ip/fc0_random_input2.coe')
 next(f)
@@ -179,3 +180,12 @@ for i in range(len(fc1_output)):
 print('--- FC2 OUT ---')
 for i in range(len(fc2_output)):
     print("Neuron " + str(i) + ": " + str(fc2_output[i]))
+
+weight_grad = [[] for i in range(fc2_n_neurons)]
+for i in range(len(fc2_neurons)):
+    for j in range(len(fc2_neurons[i])):
+        weight_grad[i].append(gradients[j] * fc1_output[j])
+
+print('--- FC2 WEIGHT GRADIENTS ---')
+for i in range(len(weight_grad[0])):
+    print(str(i) + ": " + str(weight_grad[0][i]))

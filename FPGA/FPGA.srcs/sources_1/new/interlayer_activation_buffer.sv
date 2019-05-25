@@ -15,10 +15,14 @@ module interlayer_activation_buffer #(
     input [N_KERNELS_I - 1: 0][ID_WIDTH - 1: 0]         neuron_id_i,
     input                                               valid_act_i,
     
+    input  [ID_WIDTH - 1: 0]                            b_ptr,
+    
     
     output logic [N_KERNELS_O - 1: 0][15: 0]            activation_o,
     output logic [N_KERNELS_O - 1: 0][ID_WIDTH - 1: 0]  neuron_id_o,
     output logic                                        valid_o,
+    
+    output logic [15: 0]                                b_act_o,
         
     output logic                                        buff_rdy
 );
@@ -85,6 +89,15 @@ module interlayer_activation_buffer #(
                 neuron_id_o     <= j;
             end
             valid_o <= read_o;
+        end
+    end
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            b_act_o <= 0;
+        end
+        else begin
+            b_act_o <= buffer[b_ptr];
         end
     end
     

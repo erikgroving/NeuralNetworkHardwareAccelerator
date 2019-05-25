@@ -6,8 +6,14 @@ module fc2_layer(
         input                                       forward,
         input  [`FC2_N_KERNELS - 1: 0][15: 0]       activations_i,
         input                                       valid_i,
-                
-        input  [`FC2_N_KERNELS - 1: 0][15: 0]       gradients_i,
+
+   
+        input [`FC2_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
+        input [`FC2_N_KERNELS - 1: 0][15: 0]        b_activation_i,
+        input [5: 0]                                b_activation_id,
+        input [`FC2_N_KERNELS - 1: 0][3: 0]         b_neuron_id_i,
+        input                                       b_valid_i,
+        
         
         output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
@@ -42,6 +48,29 @@ module fc2_layer(
     
     logic   [`FC2_N_KERNELS - 1: 0]                 valid;
     
+    
+   logic [`FC2_N_KERNELS - 1: 0][15: 0]             b_kern_grad;
+   logic [`FC2_N_KERNELS - 1: 0][15: 0]             b_kern_act;   
+   logic [`FC2_N_KERNELS - 1: 0][15: 0]             b_kern_grad_o;
+   logic [`FC2_N_KERNELS - 1: 0]                    b_kern_valid_o;
+   logic [5: 0]                                     b_act_id;
+   logic [`FC2_N_KERNELS - 1: 0][3: 0]              b_neuron_id;     
+   logic [5: 0]                                     b_act_id_pl;
+   logic [`FC2_N_KERNELS - 1: 0][3: 0]              b_neuron_id_pl;    
+   logic                                            b_kern_valid;
+   
+   
+   logic [`FC2_NEURONS - 1: 0][`FC2_FAN_IN - 1: 0][15: 0]   gradients;
+   logic                                                    prev_b_kern_valid; 
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            prev_b_kern_valid   <= 0;
+        end
+        else begin
+            prev_b_kern_valid   <= &b_kern_valid_o;
+        end
+    end
     
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -119,15 +148,50 @@ module fc2_layer(
         .wea(1'b0)
     );
 
+    bit [2: 0] z;
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            gradients   <= 0;
+        end
+        else if (&b_kern_valid_o) begin
+            for (z = 0; z < `FC2_N_KERNELS; z=z+1) begin
+                gradients[b_neuron_id_pl[z]][b_act_id_pl]    <= b_kern_grad_o[z];
+            end
+        end
+    end
+
     `ifdef DEBUG
-    integer it;
-    /*always_ff @(posedge clk) begin
+    integer it, it2;
+    always_ff @(posedge clk) begin
+
+        $display("\n--- BACKWARD PASS ---");
+        $display("INPUT");
+        $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
+        $display("Gradient\t\tNeuronID\t\tAct_I");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t\t%01d\t\t\t\t%04h", b_gradient_i[it], b_neuron_id[it], b_activation_i[it]) ;
+        end
+        $display("OUTPUT");      
+        $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id_pl[it], 
+                    b_act_id_pl, b_kern_valid_o[it]);
+        end
+        if ({prev_b_kern_valid, &b_kern_valid_o} == 2'b10) begin
+            $display("\n--- GRADIENTS ---");
+            for (it = 0; it < `FC2_NEURONS; it=it+1) begin
+                $display("Neuron %01d", it);
+                for (it2 = 0; it2 < `FC2_FAN_IN; it2=it2+1) begin
+                    $display("%02d:\t%04h", it2, gradients[it][it2]);
+                end
+            end
+        end
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
         $display("\n--- MEMORY CONTROLLER ---");
         $display("data_out_a\t");
         for (it = 0; it < `FC2_BRAM; it = it + 1) begin
-            $display("%04h", data_out_a[it]);       
+            $display("%04h", data_out[it]);       
         end
         $display("\nBias");
         for (it = 0; it < `FC2_N_KERNELS; it = it + 1) begin
@@ -151,7 +215,7 @@ module fc2_layer(
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
         end        
-     end*/
+     end
     `endif
 
     always_ff @(posedge clk) begin
@@ -173,7 +237,12 @@ module fc2_layer(
         end
     end
     
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]    kern_mult1;
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]    kern_mult2;
     
+    assign kern_mult1   = (forward) ? weights           : b_kern_grad;
+    assign kern_mult2   = (forward) ? kern_activations  : b_kern_act; 
+
     // Computational kernel for the fully connected layer    
     genvar i;
     generate
@@ -182,13 +251,16 @@ module fc2_layer(
                 // input
                 .clk(clk),
                 .rst(rst),
-                .activation_i(kern_activations[i]),
-                .weight(weights[i]),
+                .activation_i(kern_mult2[i]),
+                .weight(kern_mult1[i]),
                 .bias(kern_bias[i]),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
+                .b_valid_i(b_kern_valid),
                 // output
+                .b_gradient_o(b_kern_grad_o[i]),
+                .b_valid_o(b_kern_valid_o[i]),
                 .activation_o(activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
                 .valid_o(valid[i])
@@ -198,5 +270,28 @@ module fc2_layer(
      
     assign valid_act_o = &valid;
    
+
+   // Backward pass logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            b_kern_grad     <= 0;
+            b_kern_act      <= 0;
+            b_act_id        <= 0;
+            b_neuron_id     <= 0;            
+            b_act_id_pl     <= 0;
+            b_neuron_id_pl  <= 0;
+            b_kern_valid    <= 0;            
+        end
+        else begin
+            b_kern_grad     <= b_gradient_i;
+            b_kern_act      <= b_activation_i;
+            b_act_id        <= b_activation_id;
+            b_neuron_id     <= b_neuron_id_i;
+            b_act_id_pl     <= b_act_id;
+            b_neuron_id_pl  <= b_neuron_id;
+            b_kern_valid    <= b_valid_i;
+        end
+    end
+        
     
 endmodule

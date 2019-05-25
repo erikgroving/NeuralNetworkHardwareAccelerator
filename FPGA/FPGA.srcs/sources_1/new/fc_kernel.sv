@@ -14,7 +14,10 @@ module fc_kernel #(
     input   [ID_WIDTH - 1: 0]       neuron_id_i,
     input                           has_bias,
     input                           valid_i,
+    input                           b_valid_i,
     
+    output logic [15: 0]            b_gradient_o,
+    output logic                    b_valid_o,
     output logic [15: 0]            activation_o,
     output logic [ID_WIDTH - 1: 0]  neuron_id_o,
     output logic                    valid_o
@@ -58,6 +61,29 @@ module fc_kernel #(
             prev_neuron_id_i    <= neuron_id_i;
         end
     end
+    
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            b_gradient_o    <= 0;
+        end
+        else if ({mult_res[31], &mult_res[29:27]} == 2'b10) begin // negative saturation
+            b_gradient_o    <= 16'h8000;
+        end
+        else if ({mult_res[31], |mult_res[29:27]} == 2'b01) begin // positive saturation
+            b_gradient_o    <= 16'h7FFF;
+        end
+        else begin
+            b_gradient_o    <= mult_res[28: 13];
+        end
+        
+        if (rst) begin
+            b_valid_o       <= 0;
+        end
+        else begin
+            b_valid_o       <= b_valid_i;
+        end
+    end
+    
     
     
     always_ff @(posedge clk) begin

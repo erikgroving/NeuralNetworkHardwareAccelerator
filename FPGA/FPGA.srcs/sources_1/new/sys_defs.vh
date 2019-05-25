@@ -40,4 +40,8 @@
 `define FC2_MID_PTR_OFFSET      320
 `define FC2_HALF_NEURONS        5
 
+
+// Backward pass defines
+`define FC2_LOOPS               5
+
 `endif
