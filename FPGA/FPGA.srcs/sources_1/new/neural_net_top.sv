@@ -40,7 +40,8 @@ module neural_net_top(
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
     logic                                   fc2_valid_o;       
-    
+    logic [`FC2_NEURONS - 1: 0][15: 0]      fc2_act_o_buf;
+    logic                                   fc2_buf_valid;    
     
     logic [9: 0]        input_addr;
     logic [15: 0]       input_data_a;
@@ -76,7 +77,7 @@ module neural_net_top(
         if (reset) begin
             backward    <= 1'b0;
         end
-        else if (fc2_buff_rdy) begin
+        else if (fc2_buf_valid) begin
             backward    <= 1'b1;
         end
     end
@@ -234,7 +235,6 @@ module neural_net_top(
     logic                                   fc2_gradients_rdy;
     logic [3: 0]                            fc2_n_offset;
     
-    assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
     
     
     localparam WEIGHT_MODE = 0;
@@ -242,10 +242,15 @@ module neural_net_top(
     
     logic                                   fc2_bp_mode;
     
-    assign fc2_gradients        = {`FC2_NEURONS{16'h0700}};
+    assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
+                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};
     assign fc2_gradients_rdy    = 1'b1;
     
     assign fc2_bp_mode = fc2_loops >= `FC2_MODE_SWITCH ? WEIGHT_MODE : NEURON_MODE;
+    
+    
+    assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
+
     // Start when backward is good and gradients are ready. Only do backprop once   
     assign fc2_b_start = backward & fc2_gradients_rdy & (fc2_loops != `FC2_LOOPS);
     always_ff @(posedge clk) begin
@@ -303,8 +308,7 @@ module neural_net_top(
 
 
 
-    logic [`FC2_NEURONS - 1: 0][15: 0]  fc2_act_o_buf;
-    logic                               fc2_buf_valid;
+
     bit [`FC1_N_KERNELS - 1: 0] m;
     always_ff @(posedge clk) begin
         if (reset) begin

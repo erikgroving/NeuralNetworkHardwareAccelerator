@@ -75,7 +75,6 @@ module fc2_layer(
    
     logic [`FC1_NEURONS - 1: 0][15: 0]                      pl_gradients;   // previous layer, to be backpropagated after calculated
     logic                                                   sch_valid_i;
-    logic [5: 0]                                            n_grad_idx;
     
     localparam WEIGHT_MODE = 0;
     localparam NEURON_MODE = 1;   
@@ -188,8 +187,10 @@ module fc2_layer(
         if (rst) begin
             pl_gradients    <= 0;
         end
-        else if (&b_kern_valid_o & kern_bp_mode == NEURON_MODE) begin
-            pl_gradients[n_grad_idx]    <= pl_gradients[n_grad_idx] + b_kern_grad_o[0] + b_kern_grad_o[1];
+        else if (&b_kern_valid_o & kern_bp_mode_o == NEURON_MODE) begin
+            pl_gradients[b_act_id[3]]    <= $signed(pl_gradients[b_act_id[3]]) + 
+                                            $signed(b_kern_grad_o[0]) + 
+                                            $signed(b_kern_grad_o[1]);
         end
     end
 
@@ -291,15 +292,7 @@ module fc2_layer(
         end
     end
     
-    
-    always_ff @(posedge clk) begin
-        if (rst) begin 
-            n_grad_idx  <= 0;
-        end
-        else if (&b_kern_valid_o && kern_bp_mode_o == NEURON_MODE) begin
-            n_grad_idx  <= n_grad_idx + 1'b1;
-        end
-    end
+
     
     
     `ifdef DEBUG
@@ -313,6 +306,12 @@ module fc2_layer(
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%04h\t\t\t%01d\t\t\t\t%04h", b_gradient_i[it], b_neuron_id_i[it], b_activation_i[it]) ;
         end
+        $display("KERNEL INPUT");
+        $display("Activation id: %02d\t\tValid: %01b", b_act_id[2], b_valid[2]);
+        $display("Gradient\t\tWeight");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t\t%04h", b_kern_grad[it], weights[it]);
+        end        
         $display("OUTPUT");
         $display("Mode: %01b", kern_bp_mode_o);
         $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
@@ -334,7 +333,7 @@ module fc2_layer(
             end
         end
         $display("\n--- SCHEDULER ---");
-        $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
+        $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d\t\tsch_valid_i: %01b", head_ptr, mid_ptr, bias_ptr, sch_valid_i);
         $display("\n--- MEMORY CONTROLLER ---");
         $display("data_out_a\t");
         for (it = 0; it < `FC2_BRAM; it = it + 1) begin

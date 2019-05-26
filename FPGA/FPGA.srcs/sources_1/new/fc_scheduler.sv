@@ -22,27 +22,33 @@ module fc_scheduler #(
     logic   [ADDR - 1: 0]          next_head_ptr;
     logic   [ADDR - 1: 0]          next_mid_ptr;
     logic   [BIAS_ADDR - 1: 0]     next_bias_ptr;
+    logic                          prev_forw;
+    logic                          mode_switch;
     
     assign h_thresh         = MID_PTR_OFFSET - 2;
+    assign mode_switch      = prev_forw ^ forward;
     
-    assign next_head_ptr    = (!valid_i) ? head_ptr     :
-                                (!start) ? 0            : head_ptr + 1'b1;
+    assign next_head_ptr    = (mode_switch || !start)   ? 0         : 
+                                (!valid_i)              ? head_ptr  : head_ptr + 1'b1;
                                         
-    assign next_mid_ptr     = (!valid_i) ? mid_ptr      :
-                                (!start) ? MID_PTR_OFFSET : mid_ptr + 1'b1;
+    assign next_mid_ptr     = (mode_switch || !start)   ? MID_PTR_OFFSET    : 
+                                (!valid_i)              ? mid_ptr           : mid_ptr + 1'b1;
                                 
-    assign next_bias_ptr    = (!valid_i) ? bias_ptr     :
-                                (!start) ? 0            : bias_ptr + 1'b1;
+    assign next_bias_ptr    = (mode_switch || !start)   ? 0         :
+                                (!valid_i)              ? bias_ptr  : bias_ptr + 1'b1;
 
+    
     
     always_ff @(posedge clk) begin
         if (rst) begin
             head_ptr    <= 0;
             mid_ptr     <= MID_PTR_OFFSET;
+            prev_forw   <= 0;
         end
         else begin
             head_ptr    <= next_head_ptr;
             mid_ptr     <= next_mid_ptr;
+            prev_forw   <= forward;
         end
     end
 
@@ -65,7 +71,7 @@ module fc_scheduler #(
             has_bias    <= 0;
             bias_ptr    <= 0;
         end
-        else if (valid_i && bias_cntr == 0) begin 
+        else if (valid_i && bias_cntr == 0 && forward) begin 
             has_bias    <= 1'b1;
             bias_ptr    <= next_bias_ptr;
         end
@@ -83,6 +89,9 @@ module fc_scheduler #(
             start   <= 1'b1;
         end
         else if (valid_i && head_ptr == h_thresh) begin
+            start   <= 1'b0;
+        end
+        else if (mode_switch) begin
             start   <= 1'b0;
         end
     end
