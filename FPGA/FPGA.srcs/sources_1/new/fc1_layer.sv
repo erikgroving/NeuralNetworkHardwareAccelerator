@@ -136,12 +136,12 @@ module fc1_layer(
         .addr_a(head_ptr),
         .data_in_a(128'b0),
         .en_a(1'b1),
-        .we_a(~forward),
+        .we_a(1'b0),
         
         .addr_b(mid_ptr),
         .data_in_b(128'b0),
         .en_b(1'b1),
-        .we_b(~forward),
+        .we_b(1'b0),
         
         // outputs
         .data_out_a(data_out_a),

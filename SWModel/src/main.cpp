@@ -40,7 +40,7 @@ int main () {
 
     testX = std::vector< std::vector<double> > (testX.begin(), testX.begin() + 10000);
     testY = std::vector<int> (testY.begin(), testY.begin() + 10000);
-
+/*
     Layer* conv1 = new ConvLayer(28, 3, 1, 1, 1, 8);
     Layer* pool1 = new PoolingLayer(28, 14, 8);
     Layer* conv2 = new ConvLayer(14, 3, 1, 1, 8, 16);
@@ -54,8 +54,8 @@ int main () {
     net.addLayer(pool2);
     net.addLayer(fc1);
     net.addLayer(fc2);
+*/
 
-/*
     Layer* fc1 = new FullyConnected(28*28, 98);
     Layer* fc2 = new FullyConnected(98, 64);
     Layer* fc3 = new FullyConnected(64, 10);
@@ -63,7 +63,7 @@ int main () {
     net.addLayer(fc1);
     net.addLayer(fc2);
     net.addLayer(fc3);
-*/
+
     trainNet(net, trainX, trainY, testX, testY, n_epochs, 10, .1);
 
     printAccuracy(net, testX, testY);   

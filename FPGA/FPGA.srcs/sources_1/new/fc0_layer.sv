@@ -137,12 +137,12 @@ module fc0_layer(
         .addr_a(addr_a),
         .data_in_a(1568'b0),
         .en_a(1'b1),
-        .we_a(~forward),
+        .we_a(1'b0),
         
         .addr_b(addr_b),
         .data_in_b(1568'b0),
         .en_b(1'b1),
-        .we_b(~forward),
+        .we_b(1'b0),
         
         // outputs
         .data_out_a(data_out_a),

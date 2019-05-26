@@ -51,7 +51,7 @@ module fc_scheduler #(
         if (rst) begin
             bias_cntr   <= 0;
         end
-        else if (valid_i) begin
+        else if (valid_i && forward) begin
             bias_cntr   <= (bias_cntr == FAN_IN - 1) ? 0 : bias_cntr + 1'b1;
         end
         else begin

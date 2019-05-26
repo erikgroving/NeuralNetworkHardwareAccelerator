@@ -42,6 +42,7 @@
 
 
 // Backward pass defines
-`define FC2_LOOPS               5
+`define FC2_MODE_SWITCH         5
+`define FC2_LOOPS               10
 
 `endif
