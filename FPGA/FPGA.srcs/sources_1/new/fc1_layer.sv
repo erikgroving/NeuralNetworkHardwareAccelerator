@@ -193,7 +193,10 @@ module fc1_layer(
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
+                .b_valid_i(1'b0),
                 // output
+                .b_gradient_o(),
+                .b_valid_o(),
                 .activation_o(kern_activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
                 .valid_o(valid[i])

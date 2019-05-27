@@ -64,7 +64,7 @@ int main () {
     net.addLayer(fc2);
     net.addLayer(fc3);
 
-    trainNet(net, trainX, trainY, testX, testY, n_epochs, 10, .1);
+    trainNet(net, trainX, trainY, testX, testY, n_epochs, 13, .1);
 
     printAccuracy(net, testX, testY);   
 }
