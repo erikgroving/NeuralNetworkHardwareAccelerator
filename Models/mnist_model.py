@@ -63,9 +63,9 @@ def finalTrainAndTest():
     for i in range(n_epochs):
         running_loss = 0.0
 
+        batch_s = 200
         lb = 0
-        ub = 1
-        batch_s = 1
+        ub = batch_s
         
         if i == 15:
             lrate = 1e-3

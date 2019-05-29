@@ -19,7 +19,11 @@ module fc2_layer(
         output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
         output logic                                valid_act_o,
-        output logic                                fc2_busy
+        output logic                                fc2_busy,
+        
+        output logic [`FC1_NEURONS - 1: 0][15: 0]   pl_gradients,
+        output logic                                pl_grad_valid
+
     );
     
     logic   [`FC2_N_KERNELS - 1: 0][15: 0]          data_in;
@@ -73,7 +77,6 @@ module fc2_layer(
     logic [`FC2_NEURONS - 1: 0][`FC2_FAN_IN - 1: 0][15: 0]  weight_gradients;
     logic                                                   prev_b_kern_valid; 
    
-    logic [`FC1_NEURONS - 1: 0][15: 0]                      pl_gradients;   // previous layer, to be backpropagated after calculated
     logic                                                   sch_valid_i;
     
     localparam WEIGHT_MODE = 0;
@@ -191,6 +194,16 @@ module fc2_layer(
             pl_gradients[b_act_id[3]]    <= $signed(pl_gradients[b_act_id[3]]) + 
                                             $signed(b_kern_grad_o[0]) + 
                                             $signed(b_kern_grad_o[1]);
+        end
+        
+        if (rst) begin
+            pl_grad_valid   <= 0;
+        end
+        else if ({prev_b_kern_valid, &b_kern_valid_o} == 2'b10) begin
+            pl_grad_valid   <= 1'b1;
+        end
+        else if (forward) begin
+            pl_grad_valid   <= 1'b0;
         end
     end
 

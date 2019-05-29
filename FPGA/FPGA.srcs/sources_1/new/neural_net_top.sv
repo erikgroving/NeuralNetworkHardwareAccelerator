@@ -29,6 +29,9 @@ module neural_net_top(
     logic                                   fc1_valid_act_o;
     logic                                   fc1_buff_rdy; 
     logic                                   fc1_busy;   
+    logic [`FC1_NEURONS - 1: 0][15: 0]      fc1_gradients;
+    logic                                   fc1_grad_valid; 
+
      // Logics for the fc2 layer (the last fc layer)
     logic                                   fc2_start;
     logic                                   fc2_buff_rdy;
@@ -36,7 +39,7 @@ module neural_net_top(
     logic [`FC2_N_KERNELS - 1: 0][5: 0]     fc2_neuron_id_i;
     logic                                   fc2_valid_i;
     logic                                   fc2_busy;
-    
+
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
     logic                                   fc2_valid_o;       
@@ -302,7 +305,11 @@ module neural_net_top(
         .activation_o(fc2_activation_o),
         .neuron_id_o(fc2_neuron_id_o),
         .valid_act_o(fc2_valid_o),
-        .fc2_busy(fc2_busy)
+        .fc2_busy(fc2_busy),
+        
+        // backward pass outputs
+        .pl_gradients(fc1_gradients),
+        .pl_grad_valid(fc1_grad_valid)
     );
 
 

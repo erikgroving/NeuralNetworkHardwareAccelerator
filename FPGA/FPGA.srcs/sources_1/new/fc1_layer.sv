@@ -7,11 +7,23 @@ module fc1_layer(
         input                                       forward,
         input  [`FC1_N_KERNELS - 1: 0][15: 0]       activations_i,
         input                                       valid_i,        
+
+
+        input [`FC1_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
+        input [`FC1_N_KERNELS - 1: 0][15: 0]        b_activation_i,
+        input [5: 0]                                b_activation_id,
+        input [`FC1_N_KERNELS - 1: 0][3: 0]         b_neuron_id_i,
+        input                                       b_valid_i,
+        input                                       bp_mode,
+
         
         output logic [`FC1_N_KERNELS - 1: 0][15: 0] activation_o,
         output logic [`FC1_N_KERNELS - 1: 0][5: 0]  neuron_id_o,
         output logic                                valid_act_o,
-        output logic                                fc1_busy
+        output logic                                fc1_busy,
+        
+        output logic [`FC0_NEURONS - 1: 0][15: 0]   pl_gradients,
+        output logic                                pl_grad_valid
 
     );
     
