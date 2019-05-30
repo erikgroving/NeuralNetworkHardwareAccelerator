@@ -250,9 +250,6 @@ module neural_net_top(
                                     16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};
     assign fc2_gradients_rdy    = 1'b1;
     
-    assign fc2_bp_mode = fc2_loops >= `FC2_MODE_SWITCH ? WEIGHT_MODE : NEURON_MODE;
-    
-    
     assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
 
     // Start when backward is good and gradients are ready. Only do backprop once   
@@ -260,9 +257,11 @@ module neural_net_top(
     always_ff @(posedge clk) begin
         if (reset) begin
             fc2_b_start_r   <= 1'b0;
+            fc2_bp_mode     <= 1'b0;
         end
         else begin
             fc2_b_start_r   <= fc2_b_start;
+            fc2_bp_mode     <= fc2_loops >= `FC2_MODE_SWITCH ? WEIGHT_MODE : NEURON_MODE;
         end
         
         // Loop over fan in
@@ -272,6 +271,7 @@ module neural_net_top(
         else if (fc2_b_activation_id_i == (`FC1_NEURONS - 1)) begin
             fc2_loops   <= fc2_loops + 1'b1;
         end
+        
         
         if (reset) begin
             fc2_b_activation_id_i <= 0;       

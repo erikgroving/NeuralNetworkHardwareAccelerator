@@ -67,12 +67,17 @@ module fc2_layer(
     logic [3: 0][`FC2_N_KERNELS - 1: 0][3: 0]       b_neuron_id;     
    
     logic                                           b_kern_valid;
+    logic                                           b_weight_we;
     
     logic                                           sch_bp_mode;
     logic                                           bram_bp_mode;
     logic                                           kern_bp_mode;
     logic                                           kern_bp_mode_o;
-   
+    
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult1;
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
+    logic [`FC2_N_KERNELS - 1: 0][9: 0]             fc2_weight_grad_addr;    
    
     logic [`FC2_NEURONS - 1: 0][`FC2_FAN_IN - 1: 0][15: 0]  weight_gradients;
     logic                                                   prev_b_kern_valid; 
@@ -141,6 +146,7 @@ module fc2_layer(
         end
     end
     
+    
     // BRAM for the weights of the fully connected layer
     fc2_weight_bram_controller fc2_weight_bram_controller_i (
         // inputs
@@ -163,8 +169,7 @@ module fc2_layer(
         
     ); 
     
-    
-    biases_fc2_blk_mem biases_fc2_blk_mem_i (
+     biases_fc2_blk_mem biases_fc2_blk_mem_i (
         .addra(bias_ptr),
         .clka(clk),
         .dina(32'b0),
@@ -172,7 +177,28 @@ module fc2_layer(
         .ena(1'b1),
         .wea(1'b0)
     );
+    
+    assign b_weight_we = &b_kern_valid_o & kern_bp_mode_o == WEIGHT_MODE;
+    assign fc2_weight_grad_addr[0] = ({6'b0, b_neuron_id[3][0]} << 6) + b_act_id[3];
+    assign fc2_weight_grad_addr[1] = ({6'b0, b_neuron_id[3][1]} << 6) + b_act_id[3];
 
+    fc2_weight_gradients fc2_weight_gradients_i (
+        .addra(fc2_weight_grad_addr[0]),
+        .clka(clk),
+        .dina(b_kern_grad_o[0]),
+        .douta(weight_grad_o[0]),
+        .ena(1'b1),
+        .wea(b_weight_we),
+        
+        .addrb(fc2_weight_grad_addr[1]),
+        .clkb(clk),
+        .dinb(b_kern_grad_o[1]),
+        .doutb(weight_grad_o[1]),
+        .enb(1'b1),
+        .web(b_weight_we)
+    );
+    
+    
     bit [2: 0] z;
     always_ff @(posedge clk) begin
     
@@ -180,7 +206,7 @@ module fc2_layer(
         if (rst) begin
             weight_gradients   <= 0;
         end
-        else if (&b_kern_valid_o & kern_bp_mode == WEIGHT_MODE) begin
+        else if (b_weight_we) begin
             for (z = 0; z < `FC2_N_KERNELS; z=z+1) begin
                 weight_gradients[b_neuron_id[3][z]][b_act_id[3]]    <= b_kern_grad_o[z];
             end
@@ -231,9 +257,7 @@ module fc2_layer(
             weights             <= data_out;
         end
     end
-    
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]    kern_mult1;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]    kern_mult2;
+
     
     
     // 3 modes of use in kernel
@@ -332,6 +356,11 @@ module fc2_layer(
             $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3][it], 
                     b_act_id[3], b_kern_valid_o[it]);
         end
+        $display("--- GBRAM ---");
+        $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
+        $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc2_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
+        $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc2_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
+
         if ({prev_b_kern_valid, &b_kern_valid_o} == 2'b10) begin
             $display("\n--- NEURON GRADIENTS ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
