@@ -261,7 +261,7 @@ module neural_net_top(
         .rst(reset),    
         .forward(forward), 
         .activations_i(fc1_activation_i),
-        .valid_i(fc1_valid_i),        
+        .valid_i(fc1_valid_i & forward),        
         
         // backward pass inputs
         .b_gradient_i(fc1_gradients_i),
@@ -369,7 +369,7 @@ module neural_net_top(
         .rst(reset),
         .forward(forward),
         .activations_i(fc2_activation_i),
-        .valid_i(fc2_valid_i),
+        .valid_i(fc2_valid_i & forward),
         
         // backward pass inputs
         .b_gradient_i(fc2_gradients_i),

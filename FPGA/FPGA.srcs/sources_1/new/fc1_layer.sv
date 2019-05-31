@@ -84,6 +84,7 @@ module fc1_layer(
     logic [`FC1_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
     logic [`FC1_N_KERNELS - 1: 0][9: 0]             fc1_weight_grad_addr;    
     logic [1: 0][9: 0]                              fc1_weight_grad_addr_offset;
+    logic [`FC1_NEURONS - 1: 0]                     act_o_sign;
   
     logic                                           sch_valid_i;
     
@@ -276,7 +277,19 @@ module fc1_layer(
                 .valid_o(valid[i])
             );
         end
-    endgenerate    
+    endgenerate
+    
+    bit [6: 0] b;
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            act_o_sign  <= 0;
+        end
+        else if (&valid) begin
+            for (b = 0; b < `FC1_N_KERNELS; b = b + 1) begin
+                act_o_sign[neuron_id_o[b]]   <= kern_activation_o[b][15];
+            end
+        end
+    end
     
     bit [10: 0] j;
     always_comb begin
@@ -305,8 +318,10 @@ module fc1_layer(
             b_kern_valid    <= 0;            
         end
         else begin
+            $display("neur_id\t\tsign\t\tgradient");
             for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
-                b_gradient[q]   <= b_gradient_i[q];
+                $display("%02d\t\t\t%01b\t\t\t%04h", b_neuron_id_i[q], act_o_sign[b_neuron_id_i[q]], b_gradient_i[q]);
+                b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
             end
             b_gradient_pl   <= b_gradient;
             b_kern_grad     <= b_gradient_pl;            
