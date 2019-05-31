@@ -183,7 +183,7 @@ module fc1_layer(
     assign fc1_weight_grad_addr[0] = fc1_weight_grad_addr_offset + b_act_id[3];
     assign fc1_weight_grad_addr[1] = fc1_weight_grad_addr_offset + b_act_id[3] + `FC1_HALF_NEURONS;
 
-    fc2_weight_gradients fc2_weight_gradients_i (
+    fc1_weight_gradients fc1_weight_gradients_i (
         .addra(fc1_weight_grad_addr[0]),
         .clka(clk),
         .dina(b_kern_grad_o[7: 0]),
@@ -204,6 +204,7 @@ module fc1_layer(
         // inputs
         .clk(clk),
         .rst(rst),
+        .forward(forward),
         .grad_i(b_kern_grad_o),
         .neuron_id_i(b_act_id[3]),
         .valid_i(&b_kern_valid_o),
@@ -322,7 +323,38 @@ module fc1_layer(
     
     `ifdef DEBUG
     integer it;
-    always_ff @(posedge clk) begin/*
+    always_ff @(posedge clk) begin
+         $display("\n--- BACKWARD PASS1 ---");
+        $display("INPUT");
+        $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
+        $display("Gradient\t\tNeuronID\t\tAct_I");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t\t%01d\t\t\t\t%04h", b_gradient_i[it], b_neuron_id_i[it], b_activation_i[it]) ;
+        end
+        $display("KERNEL INPUT");
+        $display("Activation id: %02d\t\tValid: %01b", b_act_id[2], b_valid[2]);
+        $display("Gradient\t\tWeight");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t\t%04h", b_kern_grad[it], weights[it]);
+        end        
+        $display("OUTPUT");
+        $display("Mode: %01b", kern_bp_mode_o);
+        $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
+        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+            $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3][it], 
+                    b_act_id[3], b_kern_valid_o[it]);
+        end
+        $display("--- GBRAM ---");
+        $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
+        $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc1_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
+        $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc1_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
+
+        $display("\n--- NEURON GRADIENTS1 ---");
+        for (it = 0; it < 10; it=it+1) begin
+            $display("%02d:\t%04h", it, pl_gradients[it]);
+        end
+  
+    /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
         $display("\n--- MEMORY CONTROLLER ---");

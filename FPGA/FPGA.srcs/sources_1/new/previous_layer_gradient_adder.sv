@@ -3,8 +3,9 @@
 module previous_layer_gradient_adder (
         input                                       clk,
         input                                       rst,
+        input                                       forward,
         input [`FC1_N_KERNELS - 1: 0][15: 0]        grad_i,
-        input [6: 0]                                neuron_id,
+        input [6: 0]                                neuron_id_i,
         input                                       valid_i,
         input                                       bp_mode_i,
         
@@ -18,56 +19,107 @@ module previous_layer_gradient_adder (
     logic [7: 0][15: 0] stage1_grad;
     logic               stage1_valid;
     logic [6: 0]        stage1_neuron_id;
+    logic               stage1_bp_mode;
     
     logic [3: 0][15: 0] stage2_grad;
     logic               stage2_valid;
     logic [6: 0]        stage2_neuron_id;
+    logic               stage2_bp_mode;
     
     logic [1: 0][15: 0] stage3_grad;
     logic               stage3_valid;
     logic [6: 0]        stage3_neuron_id;
+    logic               stage3_bp_mode;
     
     logic [15: 0]       stage4_grad;
     logic               stage4_valid;
+    logic               prev_stage4_valid;
     logic [6: 0]        stage4_neuron_id;
+    logic               stage4_bp_mode;
     
     
-    bit [3: 0] i, j, m;  
+    bit [4: 0] i, j, m;  
     always_ff @(posedge clk) begin
         // Stage 1 of Adder
         if (rst) begin
             stage1_grad         <= 0;
             stage1_valid        <= 0;
             stage1_neuron_id    <= 0;
+            stage1_bp_mode      <= 0;
         end
         else begin
-            for (i = 0; i < 8; i = i + 2) begin
-                stage1_grad <= $signed(grad_i[i]) + $signed(grad_i[i + 1]);
+            for (i = 0; i < 16; i = i + 2) begin
+                stage1_grad[i]  <= $signed(grad_i[i]) + $signed(grad_i[i + 1]);
             end
             stage1_valid        <= valid_i;
             stage1_neuron_id    <= neuron_id_i;
+            stage1_bp_mode      <= bp_mode_i;
         end
         
         // Stage 2 of Adder
+        if (rst) begin
+            stage2_grad         <= 0;
+            stage2_valid        <= 0;
+            stage2_neuron_id    <= 0;
+            stage2_bp_mode      <= 0;
+        end
+        else begin
+            for (j = 0; j < 8; j = j + 2) begin
+                stage2_grad[j]  <= $signed(stage1_grad[j]) + $signed(stage1_grad[j + 1]);
+            end
+            stage2_valid        <= stage1_valid;
+            stage2_neuron_id    <= stage2_valid;
+            stage2_bp_mode      <= stage1_bp_mode;
+        end
+
         
         // Stage 3 of Adder
+        if (rst) begin
+            stage3_grad         <= 0;
+            stage3_valid        <= 0;
+            stage3_neuron_id    <= 0;
+            stage3_bp_mode      <= 0;
+        end
+        else begin
+            for (m = 0; m < 4; m = m + 2) begin
+                stage3_grad[m]  <= $signed(stage2_grad[m]) + $signed(stage2_grad[m + 1]);
+            end
+            stage3_valid        <= stage2_valid;
+            stage3_neuron_id    <= stage2_valid;
+            stage3_bp_mode      <= stage2_bp_mode;
+        end
+
         
         // Stage 4 of Adder
+        if (rst) begin
+            stage4_grad         <= 0;
+            stage4_valid        <= 0;
+            prev_stage4_valid   <= 0;
+            stage4_neuron_id    <= 0;
+            stage4_bp_mode      <= 0;
+        end
+        else begin
+            stage4_grad         <= $signed(stage3_grad[0]) + $signed(stage3_grad[1]);
+            stage4_valid        <= stage3_valid;
+            prev_stage4_valid   <= stage4_valid;
+            stage4_neuron_id    <= stage3_valid;
+            stage4_bp_mode      <= stage3_bp_mode;
+        end
+
         
-        // Calculating gradients for the neurons of the previous layer
+        // Stage 5
         if (rst) begin
             pl_gradients    <= 0;
         end
-        else if (&valid_i & bp_mode_i == NEURON_MODE) begin
-            pl_gradients[neuron_id]    <= $signed(pl_gradients[b_act_id[3]]) + 
-                                            $signed(b_kern_grad_o[0]) + 
-                                            $signed(b_kern_grad_o[1]);
+        else if (stage4_valid & stage4_bp_mode == NEURON_MODE) begin
+            pl_gradients[stage4_neuron_id]  <= $signed(pl_gradients[stage4_neuron_id]) + $signed(stage4_grad);
         end
+        
         
         if (rst) begin
             pl_grad_valid   <= 0;
         end
-        else if ({prev_b_kern_valid, &b_kern_valid_o} == 2'b10) begin
+        else if ({prev_stage4_valid, stage4_valid} == 2'b10) begin
             pl_grad_valid   <= 1'b1;
         end
         else if (forward) begin
