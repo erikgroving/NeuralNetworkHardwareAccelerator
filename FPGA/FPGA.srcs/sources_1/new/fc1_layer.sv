@@ -82,26 +82,14 @@ module fc1_layer(
     logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_mult1;
     logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
     logic [`FC1_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
-    logic [`FC1_N_KERNELS - 1: 0][12: 0]            fc1_weight_grad_addr;    
-   
-    logic                                           prev_b_kern_valid; 
-   
+    logic [`FC1_N_KERNELS - 1: 0][9: 0]             fc1_weight_grad_addr;    
+    logic [9: 0]                                    fc1_weight_grad_addr_offset;
+  
     logic                                           sch_valid_i;
     
     localparam WEIGHT_MODE = 0;
     localparam NEURON_MODE = 1;   
-    
-    always_ff @(posedge clk) begin
-        if (rst) begin
-            prev_b_kern_valid   <= 0;
-        end
-        else begin
-            prev_b_kern_valid   <= &b_kern_valid_o;
-        end
-    end 
-    
 
-    
     always_ff @(posedge clk) begin
         if (rst) begin
             sch_activations <= 0;
@@ -185,8 +173,47 @@ module fc1_layer(
         .ena(1'b1),
         .wea(1'b0)
     );
+    
+    assign b_weight_we = &b_kern_valid_o & kern_bp_mode_o == WEIGHT_MODE;
+    
+    assign fc1_weight_grad_addr_offset = ({6'b0, b_neuron_id[3][0]} << 6) +
+                                         ({6'b0, b_neuron_id[3][0]} << 5) +
+                                         ({6'b0, b_neuron_id[3][0]} << 1);
+    
+    assign fc1_weight_grad_addr[0] = fc1_weight_grad_addr_offset + b_act_id[3];
+    assign fc1_weight_grad_addr[1] = fc1_weight_grad_addr_offset + b_act_id[3] + `FC1_HALF_NEURONS;
 
-
+    fc2_weight_gradients fc2_weight_gradients_i (
+        .addra(fc1_weight_grad_addr[0]),
+        .clka(clk),
+        .dina(b_kern_grad_o[7: 0]),
+        .douta(weight_grad_o[7: 0]),
+        .ena(1'b1),
+        .wea(b_weight_we),
+        
+        .addrb(fc1_weight_grad_addr[1]),
+        .clkb(clk),
+        .dinb(b_kern_grad_o[15:8]),
+        .doutb(weight_grad_o[15:8]),
+        .enb(1'b1),
+        .web(b_weight_we)
+    );  
+    
+    
+    previous_layer_gradient_adder previous_layer_gradient_adder_i (
+        // inputs
+        .clk(clk),
+        .rst(rst),
+        .grad_i(b_kern_grad_o),
+        .neuron_id_i(b_act_id[3]),
+        .valid_i(&b_kern_valid_o),
+        .bp_mode_i(kern_bp_mode_o),        
+        
+        // outputs
+        .pl_gradients(pl_gradients),
+        .pl_grad_valid(pl_grad_valid)        
+    );
+    
     always_ff @(posedge clk) begin
         if (rst) begin
             kern_activations    <= 0;
@@ -194,6 +221,8 @@ module fc1_layer(
             kern_has_bias       <= 0;
             kern_bias           <= 0;
             kern_neuron_id      <= 0;
+            kern_bp_mode        <= 0;
+            kern_bp_mode_o      <= 0;
             weights             <= 0;
         end
         else begin
@@ -202,9 +231,22 @@ module fc1_layer(
             kern_has_bias       <= bram_has_bias;
             kern_bias           <= 0;//bias;
             kern_neuron_id      <= neuron_id;
+            kern_bp_mode        <= bram_bp_mode;
+            kern_bp_mode_o      <= kern_bp_mode;
             weights             <= {data_out_b, data_out_a};
         end
     end
+    
+    
+    // 3 modes of use in kernel
+    // forward: weight * activations
+    // weight gradient: gradient * activations
+    // neuron gradient: weight * gradient
+    assign kern_mult1   =   (forward)                       ? weights           : 
+                            (bram_bp_mode == WEIGHT_MODE)   ? b_kern_grad       : weights;
+    
+    assign kern_mult2   =   (forward)                       ? kern_activations  : 
+                            (bram_bp_mode == WEIGHT_MODE)   ? b_kern_act        : b_kern_grad;
     
     
     // Computational kernel for the fully connected layer    
@@ -215,16 +257,16 @@ module fc1_layer(
                 // input
                 .clk(clk),
                 .rst(rst),
-                .activation_i(kern_activations[i]),
-                .weight(weights[i]),
+                .activation_i(kern_mult2[i]),
+                .weight(kern_mult1[i]),
                 .bias(kern_bias[i]),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
-                .b_valid_i(1'b0),
+                .b_valid_i(b_valid[2]),
                 // output
-                .b_gradient_o(),
-                .b_valid_o(),
+                .b_gradient_o(b_kern_grad_o[i]),
+                .b_valid_o(b_kern_valid_o[i]),
                 .activation_o(kern_activation_o[i]),
                 .neuron_id_o(neuron_id_o[i]),
                 .valid_o(valid[i])
@@ -241,7 +283,44 @@ module fc1_layer(
 
     assign valid_act_o = &valid;
     
-        `ifdef DEBUG
+
+   // Backward pass logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            b_gradient      <= 0;
+            b_gradient_pl   <= 0;
+            
+            b_act           <= 0;
+            b_act_pl        <= 0;
+           
+            b_kern_grad     <= 0;
+            b_kern_act      <= 0;
+            b_act_id        <= 0;
+            b_neuron_id     <= 0;            
+            b_kern_valid    <= 0;            
+        end
+        else begin
+            b_gradient      <= b_gradient_i;
+            b_gradient_pl   <= b_gradient;
+            b_kern_grad     <= b_gradient_pl;            
+            
+            b_act           <= b_activation_i;
+            b_act_pl        <= b_act;
+            b_kern_act      <= b_act_pl;            
+            
+            
+            b_act_id        <= {b_act_id[2:0], b_activation_id};
+            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
+            b_valid         <= {b_valid[1: 0], b_valid_i};
+        end
+    end
+        
+    
+    
+    
+    
+    
+    `ifdef DEBUG
     integer it;
     always_ff @(posedge clk) begin/*
         $display("\n--- SCHEDULER ---");
