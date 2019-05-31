@@ -213,12 +213,12 @@ module neural_net_top(
     );
     
     
-
+    
     assign fc1_gradients_rdy    = fc1_grad_valid;    
     assign fc1_n_offset         = (fc1_loops >= `FC1_MODE_SWITCH) ? fc1_loops - 4 : fc1_loops;
     // Start when backward is good and gradients are ready. Only do backprop once   
     assign fc1_b_start = backward & fc1_gradients_rdy & (fc1_loops != `FC1_LOOPS);
-    bit [3: 0] o, p;
+    bit [5: 0] o, p;
     always_ff @(posedge clk) begin
         if (reset) begin
             fc1_b_start_r   <= 1'b0;
@@ -237,19 +237,19 @@ module neural_net_top(
             fc1_loops   <= fc1_loops + 1'b1;
         end
         
-        
         if (reset) begin
             fc1_b_activation_id_i <= 0;       
         end
         else if (fc1_b_start) begin
-            fc1_b_activation_id_i <= fc1_b_activation_id_i + 1'b1;
+            fc1_b_activation_id_i <= (fc1_b_activation_id_i == (`FC1_FAN_IN - 1'b1)) ? 
+                                        0 : fc1_b_activation_id_i + 1'b1;
         end
         
         for (p = 0, o = `FC1_PORT_WIDTH; p < `FC1_PORT_WIDTH; p=p+1, o=o+1) begin
             fc1_gradients_i[p]      <= fc1_gradients[(fc1_n_offset << 3) + p];
-            fc1_gradients_i[o]      <= fc1_gradients[(fc1_n_offset << 3) + o];
+            fc1_gradients_i[o]      <= fc1_gradients[((fc1_n_offset << 3) + p) | 6'd32];
             fc1_b_neuron_id_i[p]    <= (fc1_n_offset << 3) + p;      
-            fc1_b_neuron_id_i[o]    <= (fc1_n_offset << 3) + o;
+            fc1_b_neuron_id_i[o]    <= ((fc1_n_offset << 3) + p) | 6'd32;
         end
         fc1_b_activation_id_o   <= fc1_b_activation_id_i;
     end
@@ -265,7 +265,7 @@ module neural_net_top(
         
         // backward pass inputs
         .b_gradient_i(fc1_gradients_i),
-        .b_activation_i({`FC1_N_KERNELS{fc2_b_activation_i}}),
+        .b_activation_i({`FC1_N_KERNELS{fc1_b_activation_i}}),
         .b_activation_id(fc1_b_activation_id_o),
         .b_neuron_id_i(fc1_b_neuron_id_i),
         .b_valid_i(fc1_b_start_r),

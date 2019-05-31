@@ -225,7 +225,7 @@ module fc2_layer(
         if (rst) begin
             pl_grad_valid   <= 0;
         end
-        else if ({prev_b_kern_valid, &b_kern_valid_o} == 2'b10) begin
+        else if (&b_kern_valid_o & {kern_bp_mode_o, kern_bp_mode} == 2'b10) begin
             pl_grad_valid   <= 1'b1;
         end
         else if (forward) begin
@@ -335,7 +335,7 @@ module fc2_layer(
     `ifdef DEBUG
     integer it, it2;
     always_ff @(posedge clk) begin
-
+/*
         $display("\n--- BACKWARD PASS ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
@@ -360,20 +360,19 @@ module fc2_layer(
         $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc2_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc2_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
-
-        if ({prev_b_kern_valid, &b_kern_valid_o} == 2'b10) begin
-            $display("\n--- NEURON GRADIENTS ---");
+*/
+            $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
                 $display("%02d:\t%04h", it, pl_gradients[it]);
             end
-            $display("\n--- WEIGHT GRADIENTS ---");
+           /* $display("\n--- WEIGHT GRADIENTS2 ---");
             for (it = 0; it < `FC2_NEURONS; it=it+1) begin
                 $display("Neuron %01d", it);
                 for (it2 = 0; it2 < `FC2_FAN_IN; it2=it2+1) begin
                     $display("%02d:\t%04h", it2, weight_gradients[it][it2]);
                 end
-            end
-        end
+            end*/
+        /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d\t\tsch_valid_i: %01b", head_ptr, mid_ptr, bias_ptr, sch_valid_i);
         $display("\n--- MEMORY CONTROLLER ---");
@@ -402,7 +401,7 @@ module fc2_layer(
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
-        end        
+        end  */      
      end
     `endif   
 endmodule

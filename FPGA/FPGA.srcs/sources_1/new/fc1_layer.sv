@@ -11,8 +11,8 @@ module fc1_layer(
 
         input [`FC1_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
         input [`FC1_N_KERNELS - 1: 0][15: 0]        b_activation_i,
-        input [5: 0]                                b_activation_id,
-        input [`FC1_N_KERNELS - 1: 0][3: 0]         b_neuron_id_i,
+        input [6: 0]                                b_activation_id,
+        input [`FC1_N_KERNELS - 1: 0][5: 0]         b_neuron_id_i,
         input                                       b_valid_i,
         input                                       bp_mode,
 
@@ -83,7 +83,7 @@ module fc1_layer(
     logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
     logic [`FC1_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
     logic [`FC1_N_KERNELS - 1: 0][9: 0]             fc1_weight_grad_addr;    
-    logic [9: 0]                                    fc1_weight_grad_addr_offset;
+    logic [1: 0][9: 0]                              fc1_weight_grad_addr_offset;
   
     logic                                           sch_valid_i;
     
@@ -176,12 +176,15 @@ module fc1_layer(
     
     assign b_weight_we = &b_kern_valid_o & kern_bp_mode_o == WEIGHT_MODE;
     
-    assign fc1_weight_grad_addr_offset = ({6'b0, b_neuron_id[3][0]} << 6) +
-                                         ({6'b0, b_neuron_id[3][0]} << 5) +
-                                         ({6'b0, b_neuron_id[3][0]} << 1);
+    assign fc1_weight_grad_addr_offset[0] = ({6'b0, b_neuron_id[3][0][5:3]} << 6) +
+                                            ({6'b0, b_neuron_id[3][0][5:3]} << 5) +
+                                            ({6'b0, b_neuron_id[3][0][5:3]} << 1);
+    assign fc1_weight_grad_addr_offset[1] = ({6'b0, b_neuron_id[3][8][5:3]} << 6) +
+                                            ({6'b0, b_neuron_id[3][8][5:3]} << 5) +
+                                            ({6'b0, b_neuron_id[3][8][5:3]} << 1);
     
-    assign fc1_weight_grad_addr[0] = fc1_weight_grad_addr_offset + b_act_id[3];
-    assign fc1_weight_grad_addr[1] = fc1_weight_grad_addr_offset + b_act_id[3] + `FC1_HALF_NEURONS;
+    assign fc1_weight_grad_addr[0] = fc1_weight_grad_addr_offset[0] + b_act_id[3];
+    assign fc1_weight_grad_addr[1] = fc1_weight_grad_addr_offset[1] + b_act_id[3];
 
     fc1_weight_gradients fc1_weight_gradients_i (
         .addra(fc1_weight_grad_addr[0]),
@@ -285,6 +288,7 @@ module fc1_layer(
     assign valid_act_o = &valid;
     
 
+    bit [5: 0] q;
    // Backward pass logic
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -301,7 +305,9 @@ module fc1_layer(
             b_kern_valid    <= 0;            
         end
         else begin
-            b_gradient      <= b_gradient_i;
+            for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
+                b_gradient[q]   <= b_gradient_i[q];
+            end
             b_gradient_pl   <= b_gradient;
             b_kern_grad     <= b_gradient_pl;            
             
@@ -328,19 +334,19 @@ module fc1_layer(
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
         $display("Gradient\t\tNeuronID\t\tAct_I");
-        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+        for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t\t%01d\t\t\t\t%04h", b_gradient_i[it], b_neuron_id_i[it], b_activation_i[it]) ;
         end
         $display("KERNEL INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_act_id[2], b_valid[2]);
         $display("Gradient\t\tWeight");
-        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+        for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t\t%04h", b_kern_grad[it], weights[it]);
         end        
         $display("OUTPUT");
         $display("Mode: %01b", kern_bp_mode_o);
         $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
-        for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
+        for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3][it], 
                     b_act_id[3], b_kern_valid_o[it]);
         end
@@ -350,7 +356,8 @@ module fc1_layer(
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc1_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
 
         $display("\n--- NEURON GRADIENTS1 ---");
-        for (it = 0; it < 10; it=it+1) begin
+        $display("pl_grad_valid: %01b", pl_grad_valid);
+        for (it = 0; it < `FC0_NEURONS; it=it+1) begin
             $display("%02d:\t%04h", it, pl_gradients[it]);
         end
   
