@@ -20,7 +20,7 @@
 `define FC1_PORT_WIDTH          8
 `define FC1_PORT_WIDTH_TIMES2   16
 `define FC1_PORT_WIDTH_TIMES3   24
-`define FC1_BRAM                1			// total     
+`define FC1_BRAM                1			 
 `define FC1_NEURONS             64
 `define FC1_BIAS_ADDR           2
 `define FC1_FAN_IN              10'd98
@@ -42,6 +42,8 @@
 
 
 // Backward pass defines
+`define FC0_LOOPS               0
+
 `define FC1_MODE_SWITCH         4
 `define FC1_LOOPS               8
 

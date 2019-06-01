@@ -302,7 +302,7 @@ module fc1_layer(
     
 
     bit [5: 0] q;
-   // Backward pass logic
+    // Backward pass logic
     always_ff @(posedge clk) begin
         if (rst) begin
             b_gradient      <= 0;
@@ -345,7 +345,8 @@ module fc1_layer(
     `ifdef DEBUG
     integer it;
     always_ff @(posedge clk) begin
-         $display("\n--- BACKWARD PASS1 ---");
+    /*
+        $display("\n--- BACKWARD PASS1 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
         $display("Gradient\t\tNeuronID\t\tAct_I");
@@ -375,7 +376,7 @@ module fc1_layer(
         for (it = 0; it < `FC0_NEURONS; it=it+1) begin
             $display("%02d:\t%04h", it, pl_gradients[it]);
         end
-  
+  */
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
