@@ -66,7 +66,7 @@ module fc0_layer(
     logic [`FC0_N_KERNELS - 1: 0]                   b_kern_valid_o;
     logic [2: 0]                                    b_valid;
     logic [3: 0][9: 0]                              b_act_id;
-    logic [3: 0][`FC0_N_KERNELS - 1: 0][6: 0]       b_neuron_id;     
+    logic [3: 0][6: 0]                              b_neuron_id;     
    
     logic                                           b_kern_valid;
     logic                                           b_weight_we;
@@ -152,9 +152,9 @@ module fc0_layer(
     
     assign b_weight_we = &b_kern_valid_o;
     
-    assign fc0_weight_grad_addr_offset[0]   = ({6'b0, b_neuron_id[3][0][6:3]} << 9) +
-                                              ({6'b0, b_neuron_id[3][0][6:3]} << 8) +
-                                              ({6'b0, b_neuron_id[3][0][6:3]} << 4);
+    assign fc0_weight_grad_addr_offset[0]   = ({6'b0, b_neuron_id[3][6:3]} << 9) +
+                                              ({6'b0, b_neuron_id[3][6:3]} << 8) +
+                                              ({6'b0, b_neuron_id[3][6:3]} << 4);
     assign fc0_weight_grad_addr_offset[1]   = fc0_weight_grad_addr_offset[0] + 1'b1;
     assign fc0_weight_grad_addr[0]          = fc0_weight_grad_addr_offset[0] + b_act_id[3];
     assign fc0_weight_grad_addr[1]          = fc0_weight_grad_addr_offset[1] + b_act_id[3];
@@ -282,7 +282,7 @@ module fc0_layer(
             
             
             b_act_id        <= {b_act_id[2:0], b_activation_id};
-            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
+            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i[0]};
             b_valid         <= {b_valid[1: 0], b_valid_i};
         end
     end
@@ -307,14 +307,14 @@ module fc0_layer(
         $display("OUTPUT");
         $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
         for (it = 0; it < 10; it=it+1) begin
-            $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3][it], 
+            $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3], 
                     b_act_id[3], b_kern_valid_o[it]);
         end
         $display("--- GBRAM ---");
         $display("addr_a: %02d\t\twe: %01b", fc0_weight_grad_addr[0], b_weight_we);
         $display("addr_b: %02d\t\twe: %01b", fc0_weight_grad_addr[1], b_weight_we);
         if (b_weight_we) begin
-            $display("WEIGHT GRADS");
+            $display("WEIGHT GRADS0");
             for (it = 0; it < 16; it=it+1) begin
                 $display("%02d: %04h", it, b_kern_grad_o[it]);
             end

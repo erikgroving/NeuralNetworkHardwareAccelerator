@@ -4,6 +4,7 @@ module fc2_layer(
         input                                       clk,
         input                                       rst,
         input                                       forward,
+        input                                       update,
         input  [`FC2_N_KERNELS - 1: 0][15: 0]       activations_i,
         input                                       valid_i,
 
@@ -79,10 +80,9 @@ module fc2_layer(
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
     logic [`FC2_N_KERNELS - 1: 0][9: 0]             fc2_weight_grad_addr;    
    
-    logic [`FC2_NEURONS - 1: 0][`FC2_FAN_IN - 1: 0][15: 0]  weight_gradients;
-    logic                                                   prev_b_kern_valid; 
+    logic                                           prev_b_kern_valid; 
    
-    logic                                                   sch_valid_i;
+    logic                                           sch_valid_i;
     
     localparam WEIGHT_MODE = 0;
     localparam NEURON_MODE = 1;   
@@ -145,6 +145,44 @@ module fc2_layer(
             bram_bp_mode        <= sch_bp_mode;
         end
     end
+   
+    logic [9: 0]    update_ptr; 
+    logic           update_w;
+    logic [9: 0]    update_addr_a;
+    logic [9: 0]    update_addr_b;
+    logic [9: 0]    w_addr_a;
+    logic [9: 0]    w_addr_b;
+    logic [9: 0]    wg_addr_a;
+    logic [9: 0]    wg_addr_b;
+    logic           w_we;
+    logic           wg_we;
+    
+    assign update_addr_a = update_ptr << 1;
+    assign update_addr_b = update_addr_a + 1'b1;
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            update_ptr  <= 0;
+            update_w    <= 0;
+        end
+        else if (update && !update_w) begin 
+            update_w    <= ~update_w;
+            update_ptr  <= update_ptr;
+        end
+        else if (update) begin
+            update_w    <= ~update_w;
+            update_ptr  <= update_ptr + 1'b1;
+        end
+        else begin
+            update_ptr  <= 0;
+            update_w    <= 0;
+        end
+    end
+    
+    assign w_addr_a     = (update) ? update_addr_a : head_ptr;
+    assign w_addr_b     = (update) ? update_addr_b : mid_ptr;
+    assign wg_addr_a    = (update) ? update_addr_a : fc2_weight_grad_addr[0];
+    assign wg_addr_b    = (update) ? update_addr_b : fc2_weight_grad_addr[1];
+    assign we           = 
     
     
     // BRAM for the weights of the fully connected layer
@@ -153,12 +191,12 @@ module fc2_layer(
         .clk(clk),
         .rst(rst),
         
-        .addr_a(head_ptr),
+        .addr_a(w_addr_a),
         .data_in_a(16'b0),
         .en_a(1'b1),
         .we_a(1'b0),
         
-        .addr_b(mid_ptr),
+        .addr_b(w_addr_b),
         .data_in_b(16'b0),
         .en_b(1'b1),
         .we_b(1'b0),
@@ -183,14 +221,14 @@ module fc2_layer(
     assign fc2_weight_grad_addr[1] = ({6'b0, b_neuron_id[3][1]} << 6) + b_act_id[3];
 
     fc2_weight_gradients fc2_weight_gradients_i (
-        .addra(fc2_weight_grad_addr[0]),
+        .addra(wg_addr_a),
         .clka(clk),
         .dina(b_kern_grad_o[0]),
         .douta(weight_grad_o[0]),
         .ena(1'b1),
         .wea(b_weight_we),
         
-        .addrb(fc2_weight_grad_addr[1]),
+        .addrb(wg_addr_b),
         .clkb(clk),
         .dinb(b_kern_grad_o[1]),
         .doutb(weight_grad_o[1]),
@@ -202,16 +240,7 @@ module fc2_layer(
     bit [2: 0] z;
     always_ff @(posedge clk) begin
     
-        // Calculating gradients for the weights of this layer
-        if (rst) begin
-            weight_gradients   <= 0;
-        end
-        else if (b_weight_we) begin
-            for (z = 0; z < `FC2_N_KERNELS; z=z+1) begin
-                weight_gradients[b_neuron_id[3][z]][b_act_id[3]]    <= b_kern_grad_o[z];
-            end
-        end
-        
+       
         // Calculating gradients for the neurons of the previous layer
         if (rst) begin
             pl_gradients    <= 0;

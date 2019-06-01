@@ -374,7 +374,12 @@ module fc1_layer(
         for (it = 0; it < `FC0_NEURONS; it=it+1) begin
             $display("%02d:\t%04h", it, pl_gradients[it]);
         end
-  
+        if (b_weight_we) begin
+            $display("WEIGHT GRADS1");
+            for (it = 0; it < 16; it=it+1) begin
+                $display("%02d: %04h", it, b_kern_grad_o[it]);
+            end
+        end
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);

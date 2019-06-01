@@ -97,6 +97,7 @@ module neural_net_top(
     logic                                   fc2_gradients_rdy;
     logic [3: 0]                            fc2_n_offset;
     logic                                   fc2_bp_mode; 
+    logic                                   fc2_update;
     
     // Layer States
     logic [2: 0]    fc0_state;
@@ -466,9 +467,9 @@ module neural_net_top(
             WAITING:
                 next_fc2_state  = (fc2_gradients_rdy)       ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc2_state  = (fc2_loops == `FC2_LOOPS) ? IDLE      : BACKWARD;
+                next_fc2_state  = (fc2_loops == `FC2_LOOPS) ? UPDATE    : BACKWARD;
             UPDATE:
-                next_fc2_state  = FORWARD;
+                next_fc2_state  = UPDATE;
             IDLE:
                 next_fc2_state  = IDLE;
             default:
@@ -524,12 +525,14 @@ module neural_net_top(
         fc2_b_activation_id_o   <= fc2_b_activation_id_i;
     end
     
+    assign fc2_update = fc2_state == UPDATE;
     // FC2, fed directly from FC1 due to the small size
     fc2_layer fc2_layer_i (
         // inputs
         .clk(clk),
         .rst(reset),
         .forward(forward),
+        .update(fc2_update),
         .activations_i(fc2_activation_i),
         .valid_i(fc2_valid_i & forward),
         
