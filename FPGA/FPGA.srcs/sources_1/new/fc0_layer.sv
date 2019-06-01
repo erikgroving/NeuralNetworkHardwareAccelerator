@@ -234,8 +234,8 @@ module fc0_layer(
             act_o_sign  <= 0;
         end
         else if (&valid) begin
-            for (b = 0; b < `FC0_N_KERNELS; b = b + 1) begin
-                act_o_sign[neuron_id_o[b]]   <= kern_activation_o[b][15];
+            for (b = 0; b < `FC0_NEURONS; b = b + 1) begin
+                act_o_sign[neuron_id_o[b]]   <= activation_o_rel[b][15];
             end
         end
     end
@@ -270,9 +270,7 @@ module fc0_layer(
             b_kern_valid    <= 0;            
         end
         else begin
-            $display("neur_id\t\tsign\t\tgradient");
-            for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
-                $display("%02d\t\t\t%01b\t\t\t%04h", b_neuron_id_i[q], act_o_sign[b_neuron_id_i[q]], b_gradient_i[q]);
+            for (q = 0; q < `FC0_N_KERNELS; q = q + 1) begin
                 b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
             end
             b_gradient_pl   <= b_gradient;
@@ -307,16 +305,20 @@ module fc0_layer(
             $display("%04h\t\t\t%04h", b_kern_grad[it], weights[it]);
         end        
         $display("OUTPUT");
-        $display("Mode: %01b", kern_bp_mode_o);
         $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
         for (it = 0; it < 10; it=it+1) begin
             $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3][it], 
                     b_act_id[3], b_kern_valid_o[it]);
         end
         $display("--- GBRAM ---");
-        $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\twe: %01b", fc0_weight_grad_addr[0], b_weight_we);
         $display("addr_b: %02d\t\twe: %01b", fc0_weight_grad_addr[1], b_weight_we);
+        if (b_weight_we) begin
+            $display("WEIGHT GRADS");
+            for (it = 0; it < 16; it=it+1) begin
+                $display("%02d: %04h", it, b_kern_grad_o[it]);
+            end
+        end
 
    
    /*     $display("\n--- SCHEDULER ---");

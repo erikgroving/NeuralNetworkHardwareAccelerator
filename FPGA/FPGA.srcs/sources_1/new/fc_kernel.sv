@@ -48,7 +48,7 @@ module fc_kernel #(
             last    <= cnt == FAN_IN - 1;
         end
         else begin
-            cnt     <= cnt;
+            cnt     <= 0;
             last    <= cnt == FAN_IN - 1;
         end
     end

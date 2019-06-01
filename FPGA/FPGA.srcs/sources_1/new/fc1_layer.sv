@@ -318,9 +318,7 @@ module fc1_layer(
             b_kern_valid    <= 0;            
         end
         else begin
-            $display("neur_id\t\tsign\t\tgradient");
             for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
-                $display("%02d\t\t\t%01b\t\t\t%04h", b_neuron_id_i[q], act_o_sign[b_neuron_id_i[q]], b_gradient_i[q]);
                 b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
             end
             b_gradient_pl   <= b_gradient;
@@ -370,13 +368,13 @@ module fc1_layer(
         $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc1_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc1_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
-
+*/
         $display("\n--- NEURON GRADIENTS1 ---");
         $display("pl_grad_valid: %01b", pl_grad_valid);
         for (it = 0; it < `FC0_NEURONS; it=it+1) begin
             $display("%02d:\t%04h", it, pl_gradients[it]);
         end
-  */
+  
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);
