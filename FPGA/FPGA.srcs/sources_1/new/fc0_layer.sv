@@ -17,7 +17,8 @@ module fc0_layer(
         output logic [`FC0_NEURONS - 1: 0][15: 0]   activation_o,
         output logic [`FC0_NEURONS - 1: 0][6: 0]    neuron_id_o,
         output logic                                valid_act_o,
-        output logic                                fc0_busy
+        output logic                                fc0_busy,
+        output logic                                bp_done
     );
     
     logic   [`FC0_PORT_WIDTH - 1: 0][15: 0]         data_in_a;
@@ -159,6 +160,7 @@ module fc0_layer(
     assign fc0_weight_grad_addr[0]          = fc0_weight_grad_addr_offset[0] + b_act_id[3];
     assign fc0_weight_grad_addr[1]          = fc0_weight_grad_addr_offset[1] + b_act_id[3];
 
+    assign bp_done = fc0_weight_grad_addr[1] == `FC0_FAN_IN - 1'b1;
     
     fc0_weight_gradients fc0_weight_gradients_i (
         .addra(fc0_weight_grad_addr[0]),

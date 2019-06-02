@@ -62,7 +62,8 @@ module neural_net_top(
     logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_gradients_i;
     logic                                   fc0_gradients_rdy;
     logic [6: 0]                            fc0_n_loop_offset;
-           
+    logic                                   fc0_bp_done;
+          
 
    
     logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_b_gradient_i;
@@ -98,6 +99,7 @@ module neural_net_top(
     logic [3: 0]                            fc2_n_offset;
     logic                                   fc2_bp_mode; 
     logic                                   fc2_update;
+    logic                                   fc2_update_done;
     
     // Layer States
     logic [2: 0]    fc0_state;
@@ -120,26 +122,17 @@ module neural_net_top(
     localparam UPDATE   = 4;
     localparam IDLE     = 5;
 
-
+    logic all_idle;
     
         
     logic [9: 0]        input_addr;
     logic [15: 0]       input_data_a;
     logic [15: 0]       input_data_b;
     
-    logic backward;
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            backward    <= 1'b0;
-        end
-        else if (fc2_buf_valid) begin
-            backward    <= 1'b1;
-        end
-    end
     
-    assign forward = ~backward;
-    
-    
+    assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
+    assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
+        
     assign fc0_buff_rdy = 1'b1;
     always_ff @(posedge clk) begin
         prev_reset  <= reset;
@@ -200,7 +193,7 @@ module neural_net_top(
     assign fc0_b_activation_i   = {{`FC0_NEURONS{input_data_b}}, {`FC0_NEURONS{input_data_a}}};
     assign fc0_gradients_rdy    = fc0_grad_valid;    
     // Start when backward is good and gradients are ready. Only do backprop once   
-    assign fc0_b_start = next_fc0_state == BACKWARD;
+    assign fc0_b_start = fc0_state == BACKWARD;
     bit [7: 0] q, r;
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -214,12 +207,18 @@ module neural_net_top(
         if (reset) begin
             fc0_loops   <= 0;
         end
+        else if (fc0_state != BACKWARD) begin
+            fc0_loops   <= 0;
+        end
         else if (fc0_b_activation_id_i == (`FC0_KERNEL_FAN_IN - 1)) begin
             fc0_loops   <= fc0_loops + 1'b1;
         end
         
         if (reset) begin
             fc0_b_activation_id_i <= 0;       
+        end
+        else if (fc0_state != BACKWARD) begin
+            fc0_b_activation_id_i <= 0;
         end
         else if (fc0_b_start) begin
             fc0_b_activation_id_i <= (fc0_b_activation_id_i == (`FC0_KERNEL_FAN_IN - 1'b1)) ? 
@@ -244,11 +243,11 @@ module neural_net_top(
             WAITING:
                 next_fc0_state  = (fc0_gradients_rdy)                       ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc0_state  = (fc0_loops == `FC0_LOOPS)                 ? IDLE      : BACKWARD;
+                next_fc0_state  = (fc0_bp_done)                             ? IDLE      : BACKWARD;
             UPDATE:
                 next_fc0_state  = FORWARD;
             IDLE:
-                next_fc0_state  = IDLE;
+                next_fc0_state  = (all_idle)                                ? FORWARD   : IDLE ;
             default:
                 next_fc0_state  = IDLE;
         endcase     
@@ -284,7 +283,8 @@ module neural_net_top(
         .activation_o(fc0_activation_o),
         .neuron_id_o(fc0_neuron_id_o),
         .valid_act_o(fc0_valid_act_o),
-        .fc0_busy(fc0_busy)
+        .fc0_busy(fc0_busy),
+        .bp_done(fc0_bp_done)
     );
     
     always_ff @(posedge clk) begin
@@ -326,7 +326,7 @@ module neural_net_top(
     assign fc1_gradients_rdy    = fc1_grad_valid;    
     assign fc1_n_offset         = (fc1_loops >= `FC1_MODE_SWITCH) ? fc1_loops - 4 : fc1_loops;
     // Start when backward is good and gradients are ready. Only do backprop once   
-    assign fc1_b_start = next_fc1_state == BACKWARD;
+    assign fc1_b_start = fc1_state == BACKWARD;
     bit [5: 0] o, p;
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -342,12 +342,18 @@ module neural_net_top(
         if (reset) begin
             fc1_loops   <= 0;
         end
+        else if (fc1_state != BACKWARD) begin
+            fc1_loops   <= 0;
+        end
         else if (fc1_b_activation_id_i == (`FC0_NEURONS - 1)) begin
             fc1_loops   <= fc1_loops + 1'b1;
         end
         
         if (reset) begin
             fc1_b_activation_id_i <= 0;       
+        end
+        else if (fc1_state != BACKWARD) begin
+            fc1_b_activation_id_i <= 0;
         end
         else if (fc1_b_start) begin
             fc1_b_activation_id_i <= (fc1_b_activation_id_i == (`FC1_FAN_IN - 1'b1)) ? 
@@ -372,11 +378,11 @@ module neural_net_top(
             WAITING:
                 next_fc1_state  = (fc1_gradients_rdy)       ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc1_state  = (fc1_loops == `FC1_LOOPS) ? IDLE      : BACKWARD;
+                next_fc1_state  = (fc0_grad_valid)          ? IDLE      : BACKWARD;
             UPDATE:
                 next_fc1_state  = FORWARD;
             IDLE:
-                next_fc1_state  = IDLE;
+                next_fc1_state  = (all_idle)                ? FORWARD   : IDLE ;
             default:
                 next_fc1_state  = IDLE;
         endcase     
@@ -467,11 +473,11 @@ module neural_net_top(
             WAITING:
                 next_fc2_state  = (fc2_gradients_rdy)       ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc2_state  = (fc2_loops == `FC2_LOOPS) ? UPDATE    : BACKWARD;
+                next_fc2_state  = (fc1_grad_valid)          ? UPDATE    : BACKWARD;
             UPDATE:
-                next_fc2_state  = UPDATE;
+                next_fc2_state  = (fc2_update_done)         ? IDLE      : UPDATE;
             IDLE:
-                next_fc2_state  = IDLE;
+                next_fc2_state  = (all_idle)                ? FORWARD   : IDLE;
             default:
                 next_fc2_state  = IDLE;
         endcase     
@@ -481,7 +487,6 @@ module neural_net_top(
             fc2_state   <= INIT;
         end
         else begin
-            $display("fc2 state: %01d", fc2_state);
             fc2_state   <= next_fc2_state;           
         end
     end    
@@ -494,7 +499,7 @@ module neural_net_top(
     assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
 
     // Start when backward is good and gradients are ready. Only do backprop once   
-    assign fc2_b_start = next_fc2_state == BACKWARD;
+    assign fc2_b_start = fc2_state == BACKWARD;
     always_ff @(posedge clk) begin
         if (reset) begin
             fc2_b_start_r   <= 1'b0;
@@ -509,6 +514,9 @@ module neural_net_top(
         if (reset) begin
             fc2_loops   <= 0;
         end
+        else if (fc2_state != BACKWARD) begin
+            fc2_loops   <= 0;
+        end
         else if (fc2_b_activation_id_i == (`FC1_NEURONS - 1)) begin
             fc2_loops   <= fc2_loops + 1'b1;
         end
@@ -516,6 +524,9 @@ module neural_net_top(
         
         if (reset) begin
             fc2_b_activation_id_i <= 0;       
+        end
+        else if (fc2_state != BACKWARD) begin
+            fc2_b_activation_id_i <= 0;
         end
         else if (fc2_b_start) begin
             fc2_b_activation_id_i <= fc2_b_activation_id_i + 1'b1;
@@ -578,6 +589,9 @@ module neural_net_top(
         end
         else if (fc2_valid_o) begin
             fc2_buf_valid   <= fc2_neuron_id_o[`FC2_N_KERNELS - 1] == `FC2_NEURONS - 1;
+        end
+        else if (fc2_state == IDLE) begin
+            fc2_buf_valid   <= 1'b0;
         end
     end
     

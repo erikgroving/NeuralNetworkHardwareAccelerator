@@ -146,8 +146,7 @@ module fc2_layer(
         end
     end
    
-    logic [9: 0]    update_ptr; 
-    logic           update_w;
+    logic [10: 0]   update_ptr; 
     logic [9: 0]    update_addr_a;
     logic [9: 0]    update_addr_b;
     logic [9: 0]    w_addr_a;
@@ -162,19 +161,12 @@ module fc2_layer(
     always_ff @(posedge clk) begin
         if (rst) begin
             update_ptr  <= 0;
-            update_w    <= 0;
         end
-        else if (update && !update_w) begin 
-            update_w    <= ~update_w;
-            update_ptr  <= update_ptr;
-        end
-        else if (update) begin
-            update_w    <= ~update_w;
+        else if (update) begin 
             update_ptr  <= update_ptr + 1'b1;
         end
         else begin
             update_ptr  <= 0;
-            update_w    <= 0;
         end
     end
     
@@ -182,7 +174,7 @@ module fc2_layer(
     assign w_addr_b     = (update) ? update_addr_b : mid_ptr;
     assign wg_addr_a    = (update) ? update_addr_a : fc2_weight_grad_addr[0];
     assign wg_addr_b    = (update) ? update_addr_b : fc2_weight_grad_addr[1];
-    assign we           = 
+    //assign w_we         = (update & update_w) ?
     
     
     // BRAM for the weights of the fully connected layer
@@ -242,7 +234,7 @@ module fc2_layer(
     
        
         // Calculating gradients for the neurons of the previous layer
-        if (rst) begin
+        if (rst || forward) begin
             pl_gradients    <= 0;
         end
         else if (&b_kern_valid_o & kern_bp_mode_o == NEURON_MODE) begin
@@ -250,6 +242,7 @@ module fc2_layer(
                                             $signed(b_kern_grad_o[0]) + 
                                             $signed(b_kern_grad_o[1]);
         end
+
         
         if (rst) begin
             pl_grad_valid   <= 0;
@@ -364,8 +357,8 @@ module fc2_layer(
     `ifdef DEBUG
     integer it, it2;
     always_ff @(posedge clk) begin
-/*
-        $display("\n--- BACKWARD PASS ---");
+
+        $display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
         $display("Gradient\t\tNeuronID\t\tAct_I");
@@ -389,11 +382,13 @@ module fc2_layer(
         $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc2_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc2_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
-*/
+
+        if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
                 $display("%02d:\t%04h", it, pl_gradients[it]);
             end
+        end
            /* $display("\n--- WEIGHT GRADIENTS2 ---");
             for (it = 0; it < `FC2_NEURONS; it=it+1) begin
                 $display("Neuron %01d", it);

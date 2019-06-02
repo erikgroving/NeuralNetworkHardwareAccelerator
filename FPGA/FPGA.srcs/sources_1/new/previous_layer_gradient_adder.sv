@@ -111,7 +111,7 @@ module previous_layer_gradient_adder (
 
         
         // Stage 5
-        if (rst) begin
+        if (rst || forward) begin
             pl_gradients    <= 0;
         end
         else if (stage4_valid & stage4_bp_mode == NEURON_MODE) begin
