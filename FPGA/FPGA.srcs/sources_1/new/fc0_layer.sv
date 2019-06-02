@@ -75,7 +75,7 @@ module fc0_layer(
     logic [`FC0_N_KERNELS - 1: 0][15: 0]            kern_mult1;
     logic [`FC0_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
     logic [`FC0_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
-    logic [`FC0_N_KERNELS - 1: 0][9: 0]             fc0_weight_grad_addr;    
+    logic [1: 0][9: 0]                              fc0_weight_grad_addr;    
     logic [1: 0][9: 0]                              fc0_weight_grad_addr_offset;
     logic [`FC0_NEURONS - 1: 0]                     act_o_sign;
   
