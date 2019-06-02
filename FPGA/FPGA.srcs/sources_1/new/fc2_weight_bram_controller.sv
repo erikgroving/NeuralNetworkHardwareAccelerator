@@ -7,12 +7,12 @@ module fc2_weight_bram_controller (
     input                                               rst,
 
     input  [`FC2_ADDR - 1: 0]                           addr_a,
-    input  [`FC2_BRAM - 1: 0][15: 0]                    data_in_a,
+    input  [15: 0]                                      data_in_a,
     input                                               en_a,
     input                                               we_a,
     
     input  [`FC2_ADDR - 1: 0]                           addr_b,
-    input  [`FC2_BRAM - 1: 0][15: 0]                    data_in_b,
+    input  [15: 0]                                      data_in_b,
     input                                               en_b,
     input                                               we_b,
     
@@ -42,14 +42,14 @@ module fc2_weight_bram_controller (
     fc2_weights_bram fc2_weights_bram_i (
         .addra(addr_a),
         .clka(clk),
-        .dina(data_in_a[0]),
+        .dina(data_in_a),
         .douta(data_out_a[0]),
         .ena(en_a),
         .wea(we_a),     
         
         .addrb(addr_b),
         .clkb(clk),
-        .dinb(data_in_b[0]),
+        .dinb(data_in_b),
         .doutb(data_out_b[0]),
         .enb(en_b),
         .web(we_b)

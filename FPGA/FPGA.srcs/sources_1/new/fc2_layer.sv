@@ -21,6 +21,8 @@ module fc2_layer(
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
         output logic                                valid_act_o,
         output logic                                fc2_busy,
+        output logic                                bp_done,
+        output logic                                update_done,
         
         output logic [`FC1_NEURONS - 1: 0][15: 0]   pl_gradients,
         output logic                                pl_grad_valid
@@ -78,7 +80,9 @@ module fc2_layer(
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult1;
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
-    logic [`FC2_N_KERNELS - 1: 0][9: 0]             fc2_weight_grad_addr;    
+    logic [`FC2_N_KERNELS - 1: 0][9: 0]             fc2_weight_grad_addr;
+    
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]            update_weights;
    
     logic                                           prev_b_kern_valid; 
    
@@ -156,13 +160,12 @@ module fc2_layer(
     logic           w_we;
     logic           wg_we;
     
-    assign update_addr_a = update_ptr << 1;
-    assign update_addr_b = update_addr_a + 1'b1;
+
     always_ff @(posedge clk) begin
         if (rst) begin
             update_ptr  <= 0;
         end
-        else if (update) begin 
+        else if (update && update_ptr[10: 1] != 10'd639) begin 
             update_ptr  <= update_ptr + 1'b1;
         end
         else begin
@@ -170,11 +173,21 @@ module fc2_layer(
         end
     end
     
-    assign w_addr_a     = (update) ? update_addr_a : head_ptr;
-    assign w_addr_b     = (update) ? update_addr_b : mid_ptr;
-    assign wg_addr_a    = (update) ? update_addr_a : fc2_weight_grad_addr[0];
-    assign wg_addr_b    = (update) ? update_addr_b : fc2_weight_grad_addr[1];
-    //assign w_we         = (update & update_w) ?
+    
+    assign update_done      = update_ptr == 10'd639;
+    assign update_addr_a    = update_ptr[10: 1] << 1;
+    assign update_addr_b    = update_addr_a + 1'b1;
+    assign w_addr_a         = (update) ? update_addr_a  : head_ptr;
+    assign w_addr_b         = (update) ? update_addr_b  : mid_ptr;
+    assign wg_addr_a        = (update) ? update_addr_a  : fc2_weight_grad_addr[0];
+    assign wg_addr_b        = (update) ? update_addr_b  : fc2_weight_grad_addr[1];
+    assign w_we             = (update) ? update_ptr[0]  : 1'b0;  // write when odd
+    assign wg_we            = (update) ? 1'b0           : b_weight_we; 
+    
+    always_comb begin
+        update_weights[0]   = data_out[0] + weight_grad_o[0];
+        update_weights[1]   = data_out[1] + weight_grad_o[1]; 
+    end
     
     
     // BRAM for the weights of the fully connected layer
@@ -184,14 +197,14 @@ module fc2_layer(
         .rst(rst),
         
         .addr_a(w_addr_a),
-        .data_in_a(16'b0),
+        .data_in_a(update_weights[0]),
         .en_a(1'b1),
-        .we_a(1'b0),
+        .we_a(w_we),
         
         .addr_b(w_addr_b),
-        .data_in_b(16'b0),
+        .data_in_b(update_weights[1]),
         .en_b(1'b1),
-        .we_b(1'b0),
+        .we_b(w_we),
         
         // outputs
         .data_out(data_out),        
@@ -218,14 +231,14 @@ module fc2_layer(
         .dina(b_kern_grad_o[0]),
         .douta(weight_grad_o[0]),
         .ena(1'b1),
-        .wea(b_weight_we),
+        .wea(wg_we),
         
         .addrb(wg_addr_b),
         .clkb(clk),
         .dinb(b_kern_grad_o[1]),
         .doutb(weight_grad_o[1]),
         .enb(1'b1),
-        .web(b_weight_we)
+        .web(wg_we)
     );
     
     
@@ -243,7 +256,6 @@ module fc2_layer(
                                             $signed(b_kern_grad_o[1]);
         end
 
-        
         if (rst) begin
             pl_grad_valid   <= 0;
         end
@@ -316,7 +328,7 @@ module fc2_layer(
             );
         end
     endgenerate    
-     
+    assign bp_done = wg_we && wg_addr_a == `FC2_MID_PTR_OFFSET - 1;
     assign valid_act_o = &valid;
    
 
@@ -350,13 +362,10 @@ module fc2_layer(
             b_valid         <= {b_valid[1: 0], b_valid_i};
         end
     end
-    
 
-    
-    
     `ifdef DEBUG
     integer it, it2;
-    always_ff @(posedge clk) begin
+    always_ff @(negedge clk) begin
 
         $display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
@@ -383,6 +392,20 @@ module fc2_layer(
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc2_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc2_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
 
+        $display("--- UPDATE ---");
+        $display("update: %01b", update);
+        $display("u_addr_a: %03d\t\tu_addr_b: %03d", update_addr_a, update_addr_b);
+        $display("w_addr_a: %03d\t\tw_addr_b: %03d", w_addr_a, w_addr_b);
+        $display("wg_addr_a: %03d\t\twg_addr_b: %03d", wg_addr_a, wg_addr_b);
+        $display("w_we: %01b\t\twg_we: %01b", w_we, wg_we);
+        $display("wr_grad[0]: %04h\t\twr_grad[1]: %04h", b_kern_grad_o[0], b_kern_grad_o[1]);
+        $display("data_out[0]: %04h\t\tweight_grad_o[0]: %04h", data_out[0], weight_grad_o[0]);
+        $display("data_out[1]: %04h\t\tweight_grad_o[1]: %04h", data_out[1], weight_grad_o[1]);
+        $display("update_weights[0]: %04h", update_weights[0]);
+        $display("update_weights[1]: %04h", update_weights[1]);
+    
+
+    
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin

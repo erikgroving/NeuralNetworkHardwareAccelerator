@@ -293,7 +293,7 @@ module fc0_layer(
     `ifdef DEBUG
     integer it;
     always_ff @(posedge clk) begin
-        $display("\n--- BACKWARD PASS0 ---");
+       /* $display("\n--- BACKWARD PASS0 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
         $display("Gradient\t\tNeuronID\t\tAct_I");
@@ -322,7 +322,7 @@ module fc0_layer(
             end
         end
 
-   
+   */
    /*     $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);    
         $display("Addr_a: %03d Addr_b: %03d", addr_a, addr_b);

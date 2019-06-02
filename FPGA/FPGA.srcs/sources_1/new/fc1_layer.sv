@@ -369,7 +369,7 @@ module fc1_layer(
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc1_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc1_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
 */
-        $display("\n--- NEURON GRADIENTS1 ---");
+       /* $display("\n--- NEURON GRADIENTS1 ---");
         $display("pl_grad_valid: %01b", pl_grad_valid);
         for (it = 0; it < `FC0_NEURONS; it=it+1) begin
             $display("%02d:\t%04h", it, pl_gradients[it]);
@@ -379,7 +379,7 @@ module fc1_layer(
             for (it = 0; it < 16; it=it+1) begin
                 $display("%02d: %04h", it, b_kern_grad_o[it]);
             end
-        end
+        end*/
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);

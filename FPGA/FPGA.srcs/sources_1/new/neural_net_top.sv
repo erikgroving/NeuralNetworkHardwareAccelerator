@@ -98,6 +98,7 @@ module neural_net_top(
     logic                                   fc2_gradients_rdy;
     logic [3: 0]                            fc2_n_offset;
     logic                                   fc2_bp_mode; 
+    logic                                   fc2_bp_done;
     logic                                   fc2_update;
     logic                                   fc2_update_done;
     
@@ -473,7 +474,7 @@ module neural_net_top(
             WAITING:
                 next_fc2_state  = (fc2_gradients_rdy)       ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc2_state  = (fc1_grad_valid)          ? UPDATE    : BACKWARD;
+                next_fc2_state  = (fc2_bp_done)             ? UPDATE    : BACKWARD;
             UPDATE:
                 next_fc2_state  = (fc2_update_done)         ? IDLE      : UPDATE;
             IDLE:
@@ -560,6 +561,8 @@ module neural_net_top(
         .neuron_id_o(fc2_neuron_id_o),
         .valid_act_o(fc2_valid_o),
         .fc2_busy(fc2_busy),
+        .bp_done(fc2_bp_done),
+        .update_done(fc2_update_done),
         
         // backward pass outputs
         .pl_gradients(fc1_gradients),
