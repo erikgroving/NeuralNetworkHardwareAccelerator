@@ -185,8 +185,8 @@ module fc2_layer(
     assign wg_we            = (update) ? 1'b0           : b_weight_we; 
     
     always_comb begin
-        update_weights[0]   = data_out[0] + weight_grad_o[0];
-        update_weights[1]   = data_out[1] + weight_grad_o[1]; 
+        update_weights[0]   = $signed(data_out[0]) - $signed({{3{weight_grad_o[0][15]}}, weight_grad_o[0][15:3]});
+        update_weights[1]   = $signed(data_out[1]) - $signed({{3{weight_grad_o[1][15]}}, weight_grad_o[1][15:3]}); 
     end
     
     
@@ -366,7 +366,7 @@ module fc2_layer(
     `ifdef DEBUG
     integer it, it2;
     always_ff @(negedge clk) begin
-
+/*
         $display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
@@ -391,7 +391,7 @@ module fc2_layer(
         $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc2_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc2_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
-
+*/
         $display("--- UPDATE ---");
         $display("update: %01b", update);
         $display("u_addr_a: %03d\t\tu_addr_b: %03d", update_addr_a, update_addr_b);
@@ -405,13 +405,13 @@ module fc2_layer(
         $display("update_weights[1]: %04h", update_weights[1]);
     
 
-    
+   /* 
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
                 $display("%02d:\t%04h", it, pl_gradients[it]);
             end
-        end
+        end*/
            /* $display("\n--- WEIGHT GRADIENTS2 ---");
             for (it = 0; it < `FC2_NEURONS; it=it+1) begin
                 $display("Neuron %01d", it);

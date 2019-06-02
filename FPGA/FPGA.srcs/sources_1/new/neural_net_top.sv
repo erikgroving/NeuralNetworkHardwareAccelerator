@@ -493,8 +493,9 @@ module neural_net_top(
     end    
 
     
-    assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
-                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};
+    /*assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
+                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};*/
+    assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
     assign fc2_gradients_rdy    = 1'b1;
     
     assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
@@ -658,7 +659,7 @@ module neural_net_top(
             clk_cycle   <=  clk_cycle + 1'b1;
         end
         $display("\n\n------ CYCLE %04d ------", clk_cycle);
-  
+  /*
         $display("\n--- FC0 ---");
         $display("FC0_act_i: %04h\t\tFC0_valid_i: %01b", fc0_activation_i[0], fc0_valid_i);
         $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
@@ -679,7 +680,7 @@ module neural_net_top(
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%04d\t\t%01b", fc2_activation_o[it], fc2_neuron_id_o[it], fc2_valid_o);
         end
-        
+        */
         $display("--- FC2 OUT ---");        
         $display("fc2_buf_valid: %01b" , fc2_buf_valid);
         for (it= 0; it < `FC2_NEURONS; it=it+1) begin

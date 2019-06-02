@@ -104,12 +104,12 @@ module interlayer_activation_buffer #(
     `ifdef DEBUG       
     integer it;
     always_ff @(posedge clk) begin
-        $display("\n---INTERLAYER ACTIVATION BUFFER %01d---", ID_WIDTH);
+        /*$display("\n---INTERLAYER ACTIVATION BUFFER %01d---", ID_WIDTH);
         $display("buff_ptr: %02d\t\tbuff_rdy: %01b\t\tstart: %01b\t\tread_o: %01b", buff_ptr, buff_rdy, start, read_o);
         $display("Neuron\t\tActivation");
         for (it = 0; it < BUFF_SIZE; it=it+1) begin
             $display("%02d\t\t\t%04h", it, buffer[it]);
-        end
+        end*/
     end
     `endif
     
