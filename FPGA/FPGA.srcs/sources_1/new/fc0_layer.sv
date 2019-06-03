@@ -372,7 +372,7 @@ module fc0_layer(
         $display("data_out[1]: %04h\t\tweight_grad_o[1]: %04h", data_out_a[1], weight_grad_o[1]);
         $display("update_weights[0]: %04h", update_weights[0]);
         $display("update_weights[1]: %04h", update_weights[1]);*/
-        if (wg_we) begin
+        /*if (wg_we) begin
             $display("WEIGHT GRADS0");
             $display("Activation ID: %03d", fc0_weight_grad_addr[0]);
             for (it = 0; it < 98; it=it+1) begin
@@ -382,7 +382,7 @@ module fc0_layer(
             for (it = 98; it < 196; it=it+1) begin
                 $display("%02d: %04h", it - 98, b_kern_grad_o[it]);
             end
-        end
+        end*/
 
    
    /*     $display("\n--- SCHEDULER ---");

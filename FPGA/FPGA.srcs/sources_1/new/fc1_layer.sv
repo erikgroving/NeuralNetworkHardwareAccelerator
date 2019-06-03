@@ -391,7 +391,7 @@ module fc1_layer(
     `ifdef DEBUG
     integer it;
     always_ff @(posedge clk) begin
-    
+    /*
         $display("\n--- BACKWARD PASS1 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
@@ -411,12 +411,12 @@ module fc1_layer(
         for (it = 0; it < `FC1_N_KERNELS; it=it+1) begin
             $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3][it], 
                     b_act_id[3], b_kern_valid_o[it]);
-        end
+        end*/
 /*        $display("--- GBRAM ---");
         $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc1_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc1_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
-*/
+*//*
         $display("--- UPDATE1 ---");
         $display("update: %01b", update);
         $display("u_addr_a: %03d\t\tu_addr_b: %03d", update_addr_a, update_addr_b);
@@ -447,7 +447,7 @@ module fc1_layer(
             for (it = 8; it < 16; it=it+1) begin
                 $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
             end
-        end
+        end*/
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);

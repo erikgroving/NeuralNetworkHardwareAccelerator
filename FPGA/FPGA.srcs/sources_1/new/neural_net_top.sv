@@ -503,9 +503,9 @@ module neural_net_top(
     end    
 
     
-    assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
-                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};
-    /*assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};*/
+   /* assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
+                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};*/
+    assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
     assign fc2_gradients_rdy    = 1'b1;
     
     assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
