@@ -53,7 +53,7 @@ module neural_net_top(
     logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_b_gradient_i;
     logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_b_activation_i;
     logic [9: 0]                            fc0_b_activation_id_i;
-    logic [1: 0][9: 0]                      fc0_b_activation_id_o;
+    logic [9: 0]                            fc0_b_activation_id_o;
     logic [`FC0_N_KERNELS - 1: 0][6: 0]     fc0_b_neuron_id_i;
     logic                                   fc0_b_valid_i;
     logic                                   fc0_b_start;
@@ -63,6 +63,8 @@ module neural_net_top(
     logic                                   fc0_gradients_rdy;
     logic [6: 0]                            fc0_n_loop_offset;
     logic                                   fc0_bp_done;
+    logic                                   fc0_update;
+    logic                                   fc0_update_done;
           
 
    
@@ -82,7 +84,9 @@ module neural_net_top(
     logic [5: 0]                            fc1_n_loop_offset;
     logic                                   fc1_bp_mode;   
     logic                                   fc1_bp_done;    
-           
+    logic                                   fc1_update;
+    logic                                   fc1_update_done;
+          
 
    
     logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_b_gradient_i;
@@ -233,23 +237,22 @@ module neural_net_top(
             fc0_b_neuron_id_i[q]    <= q;      
             fc0_b_neuron_id_i[r]    <= q;
         end
-        fc0_b_activation_id_o[0]    <= fc0_b_activation_id_i << 1;
-        fc0_b_activation_id_o[1]    <= fc0_b_activation_id_o[0] + 1'b1;
+        fc0_b_activation_id_o       <= fc0_b_activation_id_i << 1;
     end
     always_comb begin
         case(fc0_state)
             INIT:
                 next_fc0_state  = FORWARD;
             FORWARD:
-                next_fc0_state  = (input_addr == `FC0_KERNEL_FAN_IN - 1)    ? WAITING   : FORWARD;                                     
+                next_fc0_state  = fc1_buff_rdy          ? WAITING   : FORWARD;                                     
             WAITING:
-                next_fc0_state  = (fc0_gradients_rdy)                       ? BACKWARD  : WAITING;              
+                next_fc0_state  = (fc0_gradients_rdy)   ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc0_state  = (fc0_bp_done)                             ? IDLE      : BACKWARD;
+                next_fc0_state  = (fc0_bp_done)         ? UPDATE    : BACKWARD;
             UPDATE:
-                next_fc0_state  = FORWARD;
+                next_fc0_state  = (fc0_update_done)     ? IDLE      : UPDATE;
             IDLE:
-                next_fc0_state  = (all_idle)                                ? FORWARD   : IDLE ;
+                next_fc0_state  = (all_idle)            ? FORWARD   : IDLE ;
             default:
                 next_fc0_state  = IDLE;
         endcase     
@@ -264,13 +267,14 @@ module neural_net_top(
         end
     end
     
-
+    assign fc0_update = fc0_state == UPDATE;
     // FC0  
     fc0_layer fc0_layer_i (
         // inputs
         .clk(clk),
         .rst(reset),    
-        .forward(forward), 
+        .forward(forward),
+        .update(fc0_update),
         .activations_i(fc0_activation_i),
         .valid_i(fc0_valid_i & forward),
          
@@ -286,7 +290,8 @@ module neural_net_top(
         .neuron_id_o(fc0_neuron_id_o),
         .valid_act_o(fc0_valid_act_o),
         .fc0_busy(fc0_busy),
-        .bp_done(fc0_bp_done)
+        .bp_done(fc0_bp_done),
+        .update_done(fc0_update_done)
     );
     
     always_ff @(posedge clk) begin
@@ -376,15 +381,15 @@ module neural_net_top(
             INIT:
                 next_fc1_state  = FORWARD;
             FORWARD:
-                next_fc1_state  = (fc2_buff_rdy)            ? WAITING   : FORWARD;                                     
+                next_fc1_state  = (fc2_buff_rdy)        ? WAITING   : FORWARD;                                     
             WAITING:
-                next_fc1_state  = (fc1_gradients_rdy)       ? BACKWARD  : WAITING;              
+                next_fc1_state  = (fc1_gradients_rdy)   ? BACKWARD  : WAITING;              
             BACKWARD:
-                next_fc1_state  = (fc1_bp_done)             ? IDLE      : BACKWARD;
+                next_fc1_state  = (fc1_bp_done)         ? UPDATE    : BACKWARD;
             UPDATE:
-                next_fc1_state  = FORWARD;
+                next_fc1_state  = (fc1_update_done)     ? IDLE      : UPDATE;
             IDLE:
-                next_fc1_state  = (all_idle)                ? FORWARD   : IDLE ;
+                next_fc1_state  = (all_idle)            ? FORWARD   : IDLE ;
             default:
                 next_fc1_state  = IDLE;
         endcase     
@@ -398,13 +403,15 @@ module neural_net_top(
             fc1_state   <= next_fc1_state;           
         end
     end
-
+    
+    assign fc1_update = fc1_state == UPDATE;
     // FC1   
     fc1_layer fc1_layer_i (
         // inputs
         .clk(clk),
         .rst(reset),    
         .forward(forward), 
+        .update(fc1_update),
         .activations_i(fc1_activation_i),
         .valid_i(fc1_valid_i & forward),        
         
@@ -422,6 +429,7 @@ module neural_net_top(
         .valid_act_o(fc1_valid_act_o),
         .fc1_busy(fc1_busy), 
         .bp_done(fc1_bp_done),
+        .update_done(fc1_update_done),
         
         // backward pass outputs
         .pl_gradients(fc0_gradients),

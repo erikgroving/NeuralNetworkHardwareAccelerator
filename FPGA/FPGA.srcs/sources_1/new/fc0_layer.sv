@@ -5,6 +5,7 @@ module fc0_layer(
         input                                       clk,
         input                                       rst,
         input                                       forward,
+        input                                       update,
         input  [`FC0_N_KERNELS - 1: 0][15: 0]       activations_i,
         input                                       valid_i,        
 
@@ -18,7 +19,8 @@ module fc0_layer(
         output logic [`FC0_NEURONS - 1: 0][6: 0]    neuron_id_o,
         output logic                                valid_act_o,
         output logic                                fc0_busy,
-        output logic                                bp_done
+        output logic                                bp_done,
+        output logic                                update_done
     );
     
     logic   [`FC0_PORT_WIDTH - 1: 0][15: 0]         data_in_a;
@@ -78,6 +80,7 @@ module fc0_layer(
     logic [1: 0][9: 0]                              fc0_weight_grad_addr;    
     logic [1: 0][9: 0]                              fc0_weight_grad_addr_offset;
     logic [`FC0_NEURONS - 1: 0]                     act_o_sign;
+    logic [`FC0_N_KERNELS - 1: 0][15: 0]            update_weights;
   
     logic                                           sch_valid_i; 
     
@@ -127,23 +130,66 @@ module fc0_layer(
         end
     end
     
-    assign addr_a = (head_ptr << 1);
-    assign addr_b = (head_ptr << 1) + 1'b1;
+    
+    logic [10: 0]   update_ptr; 
+    logic [9: 0]    update_addr_a;
+    logic [9: 0]    update_addr_b;
+    logic [9: 0]    w_addr_a;
+    logic [9: 0]    w_addr_b;
+    logic [9: 0]    wg_addr_a;
+    logic [9: 0]    wg_addr_b;
+    logic           w_we;
+    logic           wg_we;
+    
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            update_ptr  <= 0;
+        end
+        else if (update) begin 
+            update_ptr  <= update_ptr + 1'b1;
+        end
+        else begin
+            update_ptr  <= 0;
+        end
+    end
+    
+    
+    assign update_done      = update_ptr == 11'd783;
+    assign update_addr_a    = update_ptr[10: 1] << 1;
+    assign update_addr_b    = update_addr_a + 1'b1;
+    assign w_addr_a         = (update) ? update_addr_a  : addr_a;
+    assign w_addr_b         = (update) ? update_addr_b  : addr_b;
+    assign wg_addr_a        = (update) ? update_addr_a  : fc0_weight_grad_addr[0];
+    assign wg_addr_b        = (update) ? update_addr_b  : fc0_weight_grad_addr[1];
+    assign w_we             = (update) ? update_ptr[0]  : 1'b0;  // write when odd
+    assign wg_we            = (update) ? 1'b0           : b_weight_we; 
+    assign addr_a           = (head_ptr << 1);
+    assign addr_b           = (head_ptr << 1) + 1'b1;    
+    bit [7: 0] a,c;
+    always_comb begin
+        for (a = 0, c =`FC0_PORT_WIDTH; a < `FC0_PORT_WIDTH; a = a + 1, c=c+1) begin
+            update_weights[a]   = $signed(data_out_a[a]) - $signed({{3{weight_grad_o[a][15]}}, weight_grad_o[a][15:3]});
+            update_weights[c]   = $signed(data_out_b[a]) - $signed({{3{weight_grad_o[c][15]}}, weight_grad_o[c][15:3]});
+        end 
+    end    
+    
+
     // BRAM for the weights of the fully connected layer
     fc0_weight_bram_controller fc0_weight_bram_controller_i (
         // inputs
         .clk(clk),
         .rst(rst),
         
-        .addr_a(addr_a),
-        .data_in_a(1568'b0),
+        .addr_a(w_addr_a),
+        .data_in_a(update_weights[97: 0]),
         .en_a(1'b1),
-        .we_a(1'b0),
+        .we_a(w_we),
         
-        .addr_b(addr_b),
-        .data_in_b(1568'b0),
+        .addr_b(w_addr_b),
+        .data_in_b(update_weights[195: 98]),
         .en_b(1'b1),
-        .we_b(1'b0),
+        .we_b(w_we),
         
         // outputs
         .data_out_a(data_out_a),
@@ -163,19 +209,19 @@ module fc0_layer(
     assign bp_done = fc0_weight_grad_addr[1] == `FC0_FAN_IN - 1'b1;
     
     fc0_weight_gradients fc0_weight_gradients_i (
-        .addra(fc0_weight_grad_addr[0]),
+        .addra(wg_addr_a),
         .clka(clk),
         .dina(b_kern_grad_o[97: 0]),
         .douta(weight_grad_o[97: 0]),
         .ena(1'b1),
-        .wea(b_weight_we),
+        .wea(wg_we),
         
-        .addrb(fc0_weight_grad_addr[1]),
+        .addrb(wg_addr_b),
         .clkb(clk),
         .dinb(b_kern_grad_o[195: 98]),
         .doutb(weight_grad_o[195: 98]),
         .enb(1'b1),
-        .web(b_weight_we)
+        .web(wg_we)
     );  
     
     assign bias = 0;
@@ -314,15 +360,31 @@ module fc0_layer(
         end
         $display("--- GBRAM ---");
         $display("addr_a: %02d\t\twe: %01b", fc0_weight_grad_addr[0], b_weight_we);
-        $display("addr_b: %02d\t\twe: %01b", fc0_weight_grad_addr[1], b_weight_we);
-        if (b_weight_we) begin
+        $display("addr_b: %02d\t\twe: %01b", fc0_weight_grad_addr[1], b_weight_we);*/
+        /*$display("--- UPDATE0 ---");
+        $display("update: %01b", update);
+        $display("u_addr_a: %03d\t\tu_addr_b: %03d", update_addr_a, update_addr_b);
+        $display("w_addr_a: %03d\t\tw_addr_b: %03d", w_addr_a, w_addr_b);
+        $display("wg_addr_a: %03d\t\twg_addr_b: %03d", wg_addr_a, wg_addr_b);
+        $display("w_we: %01b\t\twg_we: %01b", w_we, wg_we);
+        $display("wr_grad[0]: %04h\t\twr_grad[1]: %04h", b_kern_grad_o[0], b_kern_grad_o[1]);
+        $display("data_out[0]: %04h\t\tweight_grad_o[0]: %04h", data_out_a[0], weight_grad_o[0]);
+        $display("data_out[1]: %04h\t\tweight_grad_o[1]: %04h", data_out_a[1], weight_grad_o[1]);
+        $display("update_weights[0]: %04h", update_weights[0]);
+        $display("update_weights[1]: %04h", update_weights[1]);*/
+        if (wg_we) begin
             $display("WEIGHT GRADS0");
-            for (it = 0; it < 16; it=it+1) begin
+            $display("Activation ID: %03d", fc0_weight_grad_addr[0]);
+            for (it = 0; it < 98; it=it+1) begin
                 $display("%02d: %04h", it, b_kern_grad_o[it]);
+            end
+            $display("Activation ID: %03d", fc0_weight_grad_addr[1]);
+            for (it = 98; it < 196; it=it+1) begin
+                $display("%02d: %04h", it - 98, b_kern_grad_o[it]);
             end
         end
 
-   */
+   
    /*     $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);    
         $display("Addr_a: %03d Addr_b: %03d", addr_a, addr_b);

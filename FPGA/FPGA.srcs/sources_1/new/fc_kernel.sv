@@ -125,10 +125,10 @@ module fc_kernel #(
     
     `ifdef DEBUG
     always_ff @(posedge clk) begin
-        if (neuron_id_i == 7'd84) begin
+        /*if (neuron_id_i == 7'd84) begin
         $display("--- INTERNAL KERNEL ---");
         $display("neuron_id: %02d\t\tweight: %04h\t\tactivation_i: %04h\t\tkernel_in: %06h\t\tdsp_o:%06h\t\tvalid_i: %01b, _o: %01b cnt: %03d", neuron_id_i, weight, activation_i, kernel_in, dsp_o, valid_i, valid_o, cnt);
-        end
+        end*/
     end
     `endif
 

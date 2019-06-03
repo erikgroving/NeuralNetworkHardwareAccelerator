@@ -165,7 +165,7 @@ module fc2_layer(
         if (rst) begin
             update_ptr  <= 0;
         end
-        else if (update && update_ptr[10: 1] != 10'd639) begin 
+        else if (update) begin 
             update_ptr  <= update_ptr + 1'b1;
         end
         else begin
@@ -174,7 +174,7 @@ module fc2_layer(
     end
     
     
-    assign update_done      = update_ptr == 10'd639;
+    assign update_done      = update_ptr == 11'd639;
     assign update_addr_a    = update_ptr[10: 1] << 1;
     assign update_addr_b    = update_addr_a + 1'b1;
     assign w_addr_a         = (update) ? update_addr_a  : head_ptr;
@@ -391,7 +391,7 @@ module fc2_layer(
         $display("kern_bram_bp_mode_o: %01b", kern_bp_mode_o);
         $display("addr_a: %02d\t\tgrad_a: %04h\t\twe: %01b", fc2_weight_grad_addr[0], b_kern_grad_o[0], b_weight_we);
         $display("addr_b: %02d\t\tgrad_b: %04h\t\twe: %01b", fc2_weight_grad_addr[1], b_kern_grad_o[1], b_weight_we);
-*/
+*//*
         $display("--- UPDATE ---");
         $display("update: %01b", update);
         $display("u_addr_a: %03d\t\tu_addr_b: %03d", update_addr_a, update_addr_b);
@@ -405,20 +405,24 @@ module fc2_layer(
         $display("update_weights[1]: %04h", update_weights[1]);
     
 
-   /* 
+    */
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
                 $display("%02d:\t%04h", it, pl_gradients[it]);
             end
-        end*/
-           /* $display("\n--- WEIGHT GRADIENTS2 ---");
-            for (it = 0; it < `FC2_NEURONS; it=it+1) begin
-                $display("Neuron %01d", it);
-                for (it2 = 0; it2 < `FC2_FAN_IN; it2=it2+1) begin
-                    $display("%02d:\t%04h", it2, weight_gradients[it][it2]);
-                end
-            end*/
+        end
+        if (wg_we) begin
+            $display("WEIGHT GRADS2");
+            $display("Activation ID: %03d", fc2_weight_grad_addr[0]);
+            for (it = 0; it < 1; it=it+1) begin
+                $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
+            end
+            $display("Activation ID: %03d", fc2_weight_grad_addr[1]);
+            for (it = 1; it < 2; it=it+1) begin
+                $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
+            end
+        end
         /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d\t\tsch_valid_i: %01b", head_ptr, mid_ptr, bias_ptr, sch_valid_i);
