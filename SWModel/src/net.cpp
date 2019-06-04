@@ -82,7 +82,7 @@ double Net::computeLossAndGradients(std::vector<int> labeled) {
         for (size_t j = 0; j < output_size; j++) {
             if (j == label) {
                 //gradient[j] = batch_output[i][j] * (1 - batch_output[i][j]);
-                gradient[j] = batch_output[i][j]  - 1;
+                gradient[j] = batch_output[i][j] - 1;
             }
             else {
                 //gradient[j] = -batch_output[i][j] * batch_output[i][label];

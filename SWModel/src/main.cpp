@@ -64,7 +64,7 @@ int main () {
     net.addLayer(fc2);
     net.addLayer(fc3);
 
-    trainNet(net, trainX, trainY, testX, testY, n_epochs, 13, .1);
+    trainNet(net, trainX, trainY, testX, testY, n_epochs, 12, .1);
 
     printAccuracy(net, testX, testY);   
 }
@@ -103,8 +103,9 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             ub += batch_size;
         }
         std::cout << "Epoch: " << i << std::endl;
+        train_loss = printAccuracy(net, in, out);
+        std::cout << "Training Loss: " << train_loss / (double)in.size() << std::endl;        
         double test_loss = printAccuracy(net, in_test, out_test);
-        std::cout << "Training Loss: " << train_loss / (double)in.size() << std::endl;
         std::cout << "Test Loss: " << test_loss / (double)in_test.size() << std::endl << std::endl;
         if ( (i + 1) % epochs_per_change == 0) {
             std::cout << "Learning rate changed from " << net.getLearningRate();
