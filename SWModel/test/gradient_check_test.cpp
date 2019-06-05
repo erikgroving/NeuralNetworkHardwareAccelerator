@@ -93,10 +93,10 @@ TEST(GradientTest, FCGradientCheck) {
         fc->setNeurons(neurons);
 
         double num_grad = (loss_plus - loss_minus) / (2 * sigma);
-        /*std::cout << "Original Loss: " << orig_loss;
+ /*       std::cout << "Layer: " << l_idx << ", Neuron: " << n_idx << ", Weight: " << w_idx;
         std::cout << "\tCalculated Gradient: " << grad;
-        std::cout << "\tNumerical Gradient: " << num_grad << std::endl;*/
-
+        std::cout << "\tNumerical Gradient: " << num_grad << std::endl;
+*/
 
         double rel = std::max(num_grad > 0 ? num_grad : -num_grad, grad > 0 ? grad : -grad);
         rel = rel == 0. ? 1 : rel;

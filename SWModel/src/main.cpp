@@ -17,13 +17,6 @@ int main () {
 
     std::cout << "Running software model...\n";
 
-    int input_size = 28*28;
-    int output_size = 10;
-    int batch_size = 200;
-    double momentum = 0.9;
-    double lr = 0.01; 
-    int n_epochs = 50;
-
     std::vector< std::vector<double> > trainX;
     std::vector<int> trainY;
     std::vector< std::vector<double> > testX;
@@ -32,6 +25,13 @@ int main () {
     trainY = readLabels("data/train-labels.idx1-ubyte");
     testX = readImages("data/t10k-images.idx3-ubyte");
     testY = readLabels("data/t10k-labels.idx1-ubyte");
+
+    int input_size = 28*28;
+    int output_size = 10;
+    int batch_size = 200;
+    double momentum = 0.9;
+    double lr = 0.01; 
+    int n_epochs = 50;
     Net net(input_size, output_size, batch_size, lr, momentum);
 
     trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 60000);
@@ -92,7 +92,7 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             std::vector< std::vector<double> > in_batch(startX, endX);
             std::vector<int> out_batch(startY, endY);
             /* Train by batch size! */
-            auto result = net(in_batch);
+            net(in_batch);
             train_loss += net.computeLossAndGradients(out_batch);
 
             net.backpropLoss();
