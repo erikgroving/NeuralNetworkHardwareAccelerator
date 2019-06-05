@@ -97,9 +97,12 @@ TEST(GradientTest, FCGradientCheck) {
         std::cout << "\tCalculated Gradient: " << grad;
         std::cout << "\tNumerical Gradient: " << num_grad << std::endl;*/
 
-        double diff = num_grad - grad;
+
+        double rel = std::max(num_grad > 0 ? num_grad : -num_grad, grad > 0 ? grad : -grad);
+        rel = rel == 0. ? 1 : rel;
+        double diff = (num_grad - grad) / rel;
         diff = (diff > 0) ? diff : -diff;
-        ASSERT_LE(diff, 1e-6);
+        ASSERT_LE(diff, 1e-7);
     }
 }
 
@@ -188,8 +191,10 @@ TEST(GradientTest, ConvGradientCheck) {
         std::cout << "Calculated Gradient: " << grad;
         std::cout << "\tNumerical Gradient: " << num_grad << std::endl;*/
 
-        double diff = num_grad - grad;
+        double rel = std::max(num_grad > 0 ? num_grad : -num_grad, grad > 0 ? grad : -grad);
+        rel = rel == 0. ? 1 : rel;
+        double diff = (num_grad - grad) / rel;
         diff = (diff > 0) ? diff : -diff;
-        ASSERT_LE(diff, 1e-6);
+        ASSERT_LE(diff, 1e-7);
     }
 }

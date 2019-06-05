@@ -103,10 +103,12 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             ub += batch_size;
         }
         std::cout << "Epoch: " << i << std::endl;
+        std::cout << "\n--- Training Stats ---\n";    
         train_loss = printAccuracy(net, in, out);
-        std::cout << "Training Loss: " << train_loss / (double)in.size() << std::endl;        
+        std::cout << "Loss: " << train_loss / (double)in.size() << std::endl;    
+        std::cout << "\n--- Test Stats ---\n";    
         double test_loss = printAccuracy(net, in_test, out_test);
-        std::cout << "Test Loss: " << test_loss / (double)in_test.size() << std::endl << std::endl;
+        std::cout << "Loss: " << test_loss / (double)in_test.size() << std::endl << std::endl;
         if ( (i + 1) % epochs_per_change == 0) {
             std::cout << "Learning rate changed from " << net.getLearningRate();
             net.setLearningRate(net.getLearningRate() * geometric_rate);
