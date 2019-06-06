@@ -24,7 +24,7 @@ std::vector< std::vector<double> > readImages(std::string s) {
     f.read((char*)&buf, 4);  // number of cols
     cols = buf[3] + (buf[2] << 8) + (buf[1] << 16) + (buf[0] << 24);
 
-    std::cout << res << " " << images << " " <<rows <<" "<< cols << std::endl;
+    //std::cout << res << " " << images << " " <<rows <<" "<< cols << std::endl;
 
     while(!f.eof()) {
         // read an image

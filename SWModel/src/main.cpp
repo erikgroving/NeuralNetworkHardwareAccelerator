@@ -25,13 +25,13 @@ int main () {
     trainY = readLabels("data/train-labels.idx1-ubyte");
     testX = readImages("data/t10k-images.idx3-ubyte");
     testY = readLabels("data/t10k-labels.idx1-ubyte");
+    int n_epochs = 50;
 
     int input_size = 28*28;
     int output_size = 10;
     int batch_size = 200;
     double momentum = 0.9;
     double lr = 0.01; 
-    int n_epochs = 50;
     Net net(input_size, output_size, batch_size, lr, momentum);
 
     trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 60000);
