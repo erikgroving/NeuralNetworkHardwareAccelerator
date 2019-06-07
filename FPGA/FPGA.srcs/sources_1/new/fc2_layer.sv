@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "sys_defs.vh"
 
 module fc2_layer(
         input                                       clk,
@@ -185,8 +186,8 @@ module fc2_layer(
     assign wg_we            = (update) ? 1'b0           : b_weight_we; 
     
     always_comb begin
-        update_weights[0]   = $signed(data_out[0]) - $signed({{3{weight_grad_o[0][15]}}, weight_grad_o[0][15:3]});
-        update_weights[1]   = $signed(data_out[1]) - $signed({{3{weight_grad_o[1][15]}}, weight_grad_o[1][15:3]}); 
+        update_weights[0]   = $signed(data_out[0]) - $signed({{6{weight_grad_o[0][15]}}, weight_grad_o[0][15:6]});
+        update_weights[1]   = $signed(data_out[1]) - $signed({{6{weight_grad_o[1][15]}}, weight_grad_o[1][15:6]}); 
     end
     
     

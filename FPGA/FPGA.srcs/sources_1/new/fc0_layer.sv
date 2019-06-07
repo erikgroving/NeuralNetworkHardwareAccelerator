@@ -169,8 +169,8 @@ module fc0_layer(
     bit [7: 0] a,c;
     always_comb begin
         for (a = 0, c =`FC0_PORT_WIDTH; a < `FC0_PORT_WIDTH; a = a + 1, c=c+1) begin
-            update_weights[a]   = $signed(data_out_a[a]) - $signed({{3{weight_grad_o[a][15]}}, weight_grad_o[a][15:3]});
-            update_weights[c]   = $signed(data_out_b[a]) - $signed({{3{weight_grad_o[c][15]}}, weight_grad_o[c][15:3]});
+            update_weights[a]   = $signed(data_out_a[a]) - $signed({{6{weight_grad_o[a][15]}}, weight_grad_o[a][15:6]});
+            update_weights[c]   = $signed(data_out_b[a]) - $signed({{6{weight_grad_o[c][15]}}, weight_grad_o[c][15:6]});
         end 
     end    
     
