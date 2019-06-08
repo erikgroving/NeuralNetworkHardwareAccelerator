@@ -34,17 +34,17 @@ module interlayer_activation_buffer #(
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            buffer      <= 0;
             buff_rdy    <= 0;
         end
         else if (valid_act_i) begin
+            if (!read_o && neuron_id_i[N_KERNELS_I - 1] == BUFF_SIZE - 1) begin
+                buff_rdy    <= 1'b1;
+            end         
+        end
+        if (valid_act_i) begin
             for (i = 0; i < N_KERNELS_I; i=i+1) begin
                 buffer[neuron_id_i[i]]  <= activation_i[i];
             end
-            
-            if (!read_o && neuron_id_i[N_KERNELS_I - 1] == BUFF_SIZE - 1) begin
-                buff_rdy    <= 1'b1;
-            end  
         end
         if (read_o) begin
             buff_rdy        <= 1'b0;
@@ -78,27 +78,15 @@ module interlayer_activation_buffer #(
     
     bit [ID_WIDTH - 1: 0] j;
     always_ff @(posedge clk) begin
-        if (rst) begin
-            activation_o    <= 0;
-            neuron_id_o     <= 0;
-            valid_o         <= 0;
+        for (j = 0; j < N_KERNELS_O; j=j+1) begin
+            activation_o[j] <= buffer[buff_ptr];
+            neuron_id_o     <= j;
         end
-        else begin
-            for (j = 0; j < N_KERNELS_O; j=j+1) begin
-                activation_o[j] <= buffer[buff_ptr];
-                neuron_id_o     <= j;
-            end
-            valid_o <= read_o;
-        end
+        valid_o <= read_o;
     end
     
     always_ff @(posedge clk) begin
-        if (rst) begin
-            b_act_o <= 0;
-        end
-        else begin
-            b_act_o <= buffer[b_ptr];
-        end
+        b_act_o <= buffer[b_ptr];
     end
     
     `ifdef DEBUG       

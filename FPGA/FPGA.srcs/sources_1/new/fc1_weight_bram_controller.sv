@@ -24,27 +24,22 @@ module fc1_weight_bram_controller (
     
     bit [`FC1_PORT_WIDTH - 1: 0]  i, j;
     always_ff @(posedge clk) begin
-        if (rst) begin 
-            neuron_id       <= 0;
-        end
-        else begin 
-            for (i = 0, j = 8; i < `FC1_PORT_WIDTH; i=i+1, j=j+1) begin 
-                if (addr_a < `FC1_FAN_IN) begin
-                    neuron_id[i]    <= i;
-                    neuron_id[j]    <= i + `FC1_HALF_NEURONS;
-                end
-                else if (addr_a < `FC1_STEP2) begin
-                    neuron_id[i]    <= i + `FC1_PORT_WIDTH;
-                    neuron_id[j]    <= i + `FC1_PORT_WIDTH + `FC1_HALF_NEURONS;
-                end
-                else if (addr_a < `FC1_STEP3) begin
-                    neuron_id[i]    <= i + `FC1_PORT_WIDTH_TIMES2;
-                    neuron_id[j]    <= i + `FC1_PORT_WIDTH_TIMES2 + `FC1_HALF_NEURONS;                   
-                end
-                else begin 
-                    neuron_id[i]    <= i + `FC1_PORT_WIDTH_TIMES3;
-                    neuron_id[j]    <= i + `FC1_HALF_NEURONS + `FC1_PORT_WIDTH_TIMES3;
-                end
+        for (i = 0, j = 8; i < `FC1_PORT_WIDTH; i=i+1, j=j+1) begin 
+            if (addr_a < `FC1_FAN_IN) begin
+                neuron_id[i]    <= i;
+                neuron_id[j]    <= i + `FC1_HALF_NEURONS;
+            end
+            else if (addr_a < `FC1_STEP2) begin
+                neuron_id[i]    <= i + `FC1_PORT_WIDTH;
+                neuron_id[j]    <= i + `FC1_PORT_WIDTH + `FC1_HALF_NEURONS;
+            end
+            else if (addr_a < `FC1_STEP3) begin
+                neuron_id[i]    <= i + `FC1_PORT_WIDTH_TIMES2;
+                neuron_id[j]    <= i + `FC1_PORT_WIDTH_TIMES2 + `FC1_HALF_NEURONS;                   
+            end
+            else begin 
+                neuron_id[i]    <= i + `FC1_PORT_WIDTH_TIMES3;
+                neuron_id[j]    <= i + `FC1_HALF_NEURONS + `FC1_PORT_WIDTH_TIMES3;
             end
         end
     end

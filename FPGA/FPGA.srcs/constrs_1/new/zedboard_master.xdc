@@ -79,8 +79,8 @@
 # ----------------------------------------------------------------------------
 # Clock Source - Bank 13
 # ---------------------------------------------------------------------------- 
-set_property PACKAGE_PIN Y9 [get_ports {clock}];  # "GCLK"
-create_clock -name clock -period 10 [get_ports clock]
+set_property PACKAGE_PIN Y9 [get_ports {clock_in}];  # "GCLK"
+create_clock -name clock_in -period 10 [get_ports clock_in]
 # ----------------------------------------------------------------------------
 # JA Pmod - Bank 13 
 # ---------------------------------------------------------------------------- 
@@ -202,7 +202,8 @@ set_property PACKAGE_PIN U14 [get_ports {led_o[7]}];  # "LD7"
 # ----------------------------------------------------------------------------
 # User Push Buttons - Bank 34
 # ---------------------------------------------------------------------------- 
-set_property PACKAGE_PIN P16 [get_ports {reset}];  # "BTNC"
+set_property PACKAGE_PIN P16 [get_ports {rst}];  # "BTNC"
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets reset_IBUF]
 #set_property PACKAGE_PIN R16 [get_ports {BTND}];  # "BTND"
 #set_property PACKAGE_PIN N15 [get_ports {BTNL}];  # "BTNL"
 #set_property PACKAGE_PIN R18 [get_ports {BTNR}];  # "BTNR"

@@ -24,13 +24,8 @@ module fc0_weight_bram_controller (
     
     bit [6: 0]  i, j;
     always_ff @(posedge clk) begin
-        if (rst) begin 
-            neuron_id       <= 0;
-        end
-        else begin 
-            for (i = 0; i < `FC0_PORT_WIDTH; i=i+1) begin
-                neuron_id[i]    <= i; 
-            end
+        for (i = 0; i < `FC0_PORT_WIDTH; i=i+1) begin
+            neuron_id[i]    <= i; 
         end
     end
 

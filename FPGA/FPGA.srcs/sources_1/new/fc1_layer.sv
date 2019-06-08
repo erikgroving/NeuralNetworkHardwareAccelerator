@@ -212,7 +212,7 @@ module fc1_layer(
     ); 
     
     
-    
+    /*
     biases_fc1_blk_mem_gen_1 biases_fc1_blk_mem_gen_1_i (
         .addra(bias_ptr),
         .clka(clk),
@@ -220,8 +220,8 @@ module fc1_layer(
         .douta(bias),
         .ena(1'b1),
         .wea(1'b0)
-    );
-    
+    );*/
+    assign bias = 0;
     assign b_weight_we = &b_kern_valid_o & kern_bp_mode_o == WEIGHT_MODE;
     
     assign fc1_weight_grad_addr_offset[0] = ({6'b0, b_neuron_id[3][0][5:3]} << 6) +
@@ -311,7 +311,7 @@ module fc1_layer(
                 .rst(rst),
                 .activation_i(kern_mult2[i]),
                 .weight(kern_mult1[i]),
-                .bias(kern_bias[i]),
+                .bias(0/*kern_bias[i]*/),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),

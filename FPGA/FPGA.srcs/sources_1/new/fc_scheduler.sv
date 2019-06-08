@@ -40,16 +40,9 @@ module fc_scheduler #(
     
     
     always_ff @(posedge clk) begin
-        if (rst) begin
-            head_ptr    <= 0;
-            mid_ptr     <= MID_PTR_OFFSET;
-            prev_forw   <= 0;
-        end
-        else begin
-            head_ptr    <= next_head_ptr;
-            mid_ptr     <= next_mid_ptr;
-            prev_forw   <= forward;
-        end
+        head_ptr    <= next_head_ptr;
+        mid_ptr     <= next_mid_ptr;
+        prev_forw   <= forward;
     end
 
     logic [ADDR - 1: 0] bias_cntr;

@@ -71,7 +71,6 @@ module fc0_layer(
     logic [3: 0][9: 0]                              b_act_id;
     logic [3: 0][6: 0]                              b_neuron_id;     
    
-    logic                                           b_kern_valid;
     logic                                           b_weight_we;
     
     logic [`FC0_N_KERNELS - 1: 0][15: 0]            kern_mult1;
@@ -228,22 +227,12 @@ module fc0_layer(
 
 
     always_ff @(posedge clk) begin
-        if (rst) begin
-            kern_activations    <= 0;
-            kern_valid          <= 0;
-            kern_has_bias       <= 0;
-            kern_bias           <= 0;
-            kern_neuron_id      <= 0;
-            weights             <= 0;
-        end
-        else begin
-            kern_activations    <= bram_activations;
-            kern_valid          <= bram_valid;
-            kern_has_bias       <= bram_has_bias;
-            kern_bias           <= 0;//bias;
-            kern_neuron_id      <= {2{neuron_id}};
-            weights             <= {data_out_b, data_out_a};
-        end
+        kern_activations    <= bram_activations;
+        kern_valid          <= bram_valid;
+        kern_has_bias       <= bram_has_bias;
+        kern_bias           <= 0;//bias;
+        kern_neuron_id      <= {2{neuron_id}};
+        weights             <= {data_out_b, data_out_a};
     end
     
      
@@ -261,7 +250,7 @@ module fc0_layer(
                 .rst(rst),
                 .activation_i(kern_mult2[i]),
                 .weight(kern_mult1[i]),
-                .bias(kern_bias[i]),
+                .bias(0/*kern_bias[i]*/),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
@@ -278,10 +267,7 @@ module fc0_layer(
     
     bit [7: 0] b;
     always_ff @(posedge clk) begin
-        if (rst) begin
-            act_o_sign  <= 0;
-        end
-        else if (&valid) begin
+        if (&valid) begin
             for (b = 0; b < `FC0_NEURONS; b = b + 1) begin
                 act_o_sign[neuron_id_o[b]]   <= activation_o_rel[b][15];
             end
@@ -304,35 +290,20 @@ module fc0_layer(
      bit [7: 0] q;
     // Backward pass logic
     always_ff @(posedge clk) begin
-        if (rst) begin
-            b_gradient      <= 0;
-            b_gradient_pl   <= 0;
-            
-            b_act           <= 0;
-            b_act_pl        <= 0;
-           
-            b_kern_grad     <= 0;
-            b_kern_act      <= 0;
-            b_act_id        <= 0;
-            b_neuron_id     <= 0;            
-            b_kern_valid    <= 0;            
+        for (q = 0; q < `FC0_N_KERNELS; q = q + 1) begin
+            b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
         end
-        else begin
-            for (q = 0; q < `FC0_N_KERNELS; q = q + 1) begin
-                b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
-            end
-            b_gradient_pl   <= b_gradient;
-            b_kern_grad     <= b_gradient_pl;            
-            
-            b_act           <= b_activation_i;
-            b_act_pl        <= b_act;
-            b_kern_act      <= b_act_pl;            
-            
-            
-            b_act_id        <= {b_act_id[2:0], b_activation_id};
-            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i[0]};
-            b_valid         <= {b_valid[1: 0], b_valid_i};
-        end
+        b_gradient_pl   <= b_gradient;
+        b_kern_grad     <= b_gradient_pl;            
+        
+        b_act           <= b_activation_i;
+        b_act_pl        <= b_act;
+        b_kern_act      <= b_act_pl;            
+        
+        
+        b_act_id        <= {b_act_id[2:0], b_activation_id};
+        b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i[0]};
+        b_valid         <= {b_valid[1: 0], b_valid_i};
     end
            
         
