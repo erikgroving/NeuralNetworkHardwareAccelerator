@@ -11,7 +11,7 @@
 #define UPDATE      4
 #define IDLE        5
     
-typedef struct dma_data {
+typedef struct ddr_data {
     uint32_t    fpga_img_id;            // written to by fpga
     uint32_t    fpga_buff_sel;          // written to by fpga
     uint32_t    epoch;                  // written to by fpga
@@ -26,13 +26,15 @@ typedef struct dma_data {
     
     uint32_t    status_block;           // written to by fpga
     uint32_t    img_cntr;               // written to by fpga;
-} dma_data_t;
+} ddr_data_t;
 
-void state_enc_to_str (uint32_t state, char* enc); 
+void state_enc_to_str(uint32_t state, char* enc); 
+void parse_mnist_data(char* filename, uint32_t** mnist_images);
 
 int main() {
     
     uint32_t magic_number;
+    uint32_t epoch, corr_tr, corr_test;
     uint32_t start, img_cntr, fpga_img_id, img1_id, img1_label;
     uint32_t status;
     uint32_t led_o_r, fc0_state, fc1_state, fc2_state, forward, fc0_start, fc1_start;
@@ -42,11 +44,11 @@ int main() {
     char fc2_state_str[40];
 
     int handle          = open("/dev/mem", O_RDWR | O_SYNC); 
-    dma_data_t* dma_ptr = mmap(NULL, 134217728, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0x40000000);
-    uint32_t* ptr = (uint32_t*)dma_ptr;
+    ddr_data_t* ddr_ptr = mmap(NULL, 134217728, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0x40000000);
+    uint32_t* ptr = (uint32_t*)ddr_ptr;
     
-    dma_ptr->n_epochs   = 10;
-    dma_ptr->img1_id    = 0;
+    ddr_ptr->n_epochs   = 10;
+    ddr_ptr->img1_id    = 0;
     
     magic_number = ptr[1024];
     printf("@@@ Checking Magic Number\n");
@@ -60,20 +62,21 @@ int main() {
 
 
     // Start training!
-    dma_ptr->start      = 1;
-    dma_ptr->img1[0]    = 0;
+    ddr_ptr->start      = 1;
+    ddr_ptr->img1_label = 4;
 
     
     while (1) {
-        img_cntr    = dma_ptr->img_cntr;
-        fpga_img_id = dma_ptr->fpga_img_id;
-        img1_id     = dma_ptr->img1_id;
-        img1_label  = dma_ptr->img1_label;
-        start       = dma_ptr->start;
+        epoch       = ddr_ptr->epoch;
+        corr_tr     = ddr_ptr->num_correct_train;
+        corr_test   = ddr_ptr->num_correct_test;
+        img_cntr    = ddr_ptr->img_cntr;
+        fpga_img_id = ddr_ptr->fpga_img_id;
+        img1_id     = ddr_ptr->img1_id;
+        img1_label  = ddr_ptr->img1_label;
+        start       = ddr_ptr->start;
         // parse the status data
-        status      = dma_ptr->status_block;
-        status      = ptr[517];
-        img_cntr    = ptr[518];
+        status      = ddr_ptr->status_block;
         img_valid   = status & 0x1;
         all_idle    = (status >> 1) & 0x1;
         new_img     = (status >> 2) & 0x1;
@@ -94,17 +97,18 @@ int main() {
         state_enc_to_str(fc2_state, fc2_state_str);
                 
         printf("\n@@@ CURRENT STATE \n");
+        printf("epoch: %d\t\tCorrect_Train: %d\tCorrect_Test: %d\n", epoch, corr_tr, corr_test);
         printf("img_cntr: %d\t\tfpga_img_id: %d\t\timg1_id: %d\n", img_cntr, fpga_img_id, img1_id);
-        printf("img1_label: %d\tled_o: %02x\n", img1_label, led_o_r);
+        printf("img1_label: %d\t\tled_o: %02x\n", img1_label, led_o_r);
         printf("start: %d\t\tforward: %d\t\tall_idle: %d\n", start, forward, all_idle);
         printf("img_valid: %d\t\tnew_img: %d\n", img_valid, new_img);
         printf("fc0_busy: %d\t\tfc1_busy: %d\t\tfc2_busy: %d\n", fc0_busy, fc1_busy, fc2_busy);
         printf("fc0_start: %d\t\tfc1_start: %d\t\tfc2_start: %d\n", fc0_start, fc1_start, fc2_start);
         printf("fc0_state: %d\t\tfc1_state: %d\t\tfc2_state: %d\n", fc0_state, fc1_state, fc2_state);
-        printf("fc0_state: %s\t\tfc1_state: %s\t\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);
+        printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);
         
         
-        dma_ptr->img1_id = (dma_ptr->fpga_img_id + 1) % 60000;
+        ddr_ptr->img1_id = (ddr_ptr->fpga_img_id + 1) % 60000;
         usleep(2e6);
     }
 }

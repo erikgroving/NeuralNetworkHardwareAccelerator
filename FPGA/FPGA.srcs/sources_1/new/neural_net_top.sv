@@ -34,7 +34,7 @@ module neural_net_top(
 
     
     logic                                   forward;
-    logic                                   update;
+    logic                                   updating;
     // Logics for the fc0 layer
     logic                                   fc0_start;
     logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_activation_i;
@@ -144,8 +144,8 @@ module neural_net_top(
   logic [16:0] img_cntr;
 
   logic [16:0]img1_id;
-  logic [9:0]img1_label;
-  logic [9:0]n_epochs;
+  logic [9:0] img1_label;
+  logic [9:0] n_epochs;
   logic [16:0]num_correct_test;
   logic [16:0]num_correct_train;
   logic start;
@@ -178,13 +178,14 @@ module neural_net_top(
     logic [15: 0]       input_data_b;
     logic               img_valid;
     logic [9: 0]        img_label;
+    logic               in_prog;
     
     mmcm_50_mhz mmcm_50_mhz_i (
         .clk_in1(fab_clk),
         .clk_out1(clk)
     );
     
-    assign img_valid    = (img_id == img_cntr);
+    assign img_valid    = in_prog;
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
     assign updating     = fc0_state == UPDATE || fc1_state == UPDATE || fc2_state == UPDATE;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
@@ -231,7 +232,6 @@ module neural_net_top(
  
     
     logic [16: 0] prev_img_id;
-    logic         in_prog;
     always_ff @(posedge clk) begin
         if (reset) begin
             prev_img_id <= 17'd59999;
@@ -241,14 +241,12 @@ module neural_net_top(
         end
         
         if (reset) begin
-            img_cntr    <= 17'd0;
             in_prog     <= 1'b0;
         end
-        else if (updating) begin
+        else if (forward) begin
             in_prog     <= 1'b1;
         end
         else if (all_idle & in_prog) begin
-            img_cntr    <= img_cntr == (17'd59999) ? 0 : img_cntr + 1'b1;
             in_prog     <= 1'b0;        
         end
               
