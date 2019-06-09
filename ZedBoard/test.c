@@ -64,8 +64,8 @@ int main() {
     printf("@@@ Loading MNIST images...\n");
     uint8_t** train_images;
     uint8_t* train_labels;
-    parse_mnist_images("data/train-images.idx3-ubyte", train_images);
-    parse_mnist_labels("data/train-labels.idx1-ubyte", train_labels);
+    train_images = parse_mnist_images("data/train-images.idx3-ubyte");
+    train_labels = parse_mnist_labels("data/train-labels.idx1-ubyte");
     printf("@@@ Loading complete!\n");
 
     // Start training!
@@ -113,8 +113,13 @@ int main() {
         printf("fc0_start: %d\t\tfc1_start: %d\t\tfc2_start: %d\n", fc0_start, fc1_start, fc2_start);
         printf("fc0_state: %d\t\tfc1_state: %d\t\tfc2_state: %d\n", fc0_state, fc1_state, fc2_state);
         printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);
-        
-        
+        uint32_t id   = (ddr_ptr->fpga_img_id + 1) % 60000;
+        for (int i = 0; i < 196; i++) {       
+
+            ddr_ptr->img1[i] = train_images[id][i];
+        }
+
+        ddr_ptr->img1_label = train_labels[id];
         ddr_ptr->img1_id = (ddr_ptr->fpga_img_id + 1) % 60000;
         usleep(2e6);
     }

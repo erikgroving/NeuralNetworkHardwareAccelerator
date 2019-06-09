@@ -6,9 +6,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-void parse_mnist_images(char* filename, uint8_t** images) {
+uint8_t** parse_mnist_images(char* filename) {
     FILE* f;
     uint8_t* u8;
+    uint8_t** images;
     uint32_t magic_number;
     uint32_t n_items;
     uint32_t rows;
@@ -38,10 +39,12 @@ void parse_mnist_images(char* filename, uint8_t** images) {
     }
 
     fclose(f);
+    return images;
 }
 
-void parse_mnist_labels(char* filename, uint8_t* labels) {
+uint8_t* parse_mnist_labels(char* filename) {
     uint8_t* ptr;
+    uint8_t* labels;
     uint32_t magic_number;
     uint32_t n_items;
     uint8_t label;
@@ -61,5 +64,6 @@ void parse_mnist_labels(char* filename, uint8_t* labels) {
     }
     
     fclose(f);
+    return labels;
 }
 

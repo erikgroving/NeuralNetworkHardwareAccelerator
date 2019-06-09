@@ -186,8 +186,8 @@ module neural_net_top(
     logic               in_prog;
     
     mmcm_50_mhz mmcm_50_mhz_i (
-        //.clk_in1(fab_clk),
-        .clk_in1(clock_in),
+        .clk_in1(fab_clk),
+        //.clk_in1(clock_in),
         .clk_out1(clk)
     );
     
@@ -212,7 +212,7 @@ module neural_net_top(
         if (reset) begin
             input_addr  <= 0;
         end
-        else if (fc0_state == FORWARD & !fc0_start /*&& img_valid && epoch != n_epochs*/) begin
+        else if (fc0_state == FORWARD & !fc0_start && img_valid && epoch != n_epochs) begin
             fc0_start   <= 1'b1;
             input_addr  <= 0;
         end
