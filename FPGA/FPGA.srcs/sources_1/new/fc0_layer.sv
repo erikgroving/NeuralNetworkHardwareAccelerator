@@ -7,7 +7,8 @@ module fc0_layer(
         input                                       forward,
         input                                       update,
         input  [`FC0_N_KERNELS - 1: 0][15: 0]       activations_i,
-        input                                       valid_i,        
+        input                                       valid_i,    
+        input  [4: 0]                               lrate_shifts,    
 
         input [`FC0_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
         input [`FC0_N_KERNELS - 1: 0][15: 0]        b_activation_i,
@@ -227,9 +228,15 @@ module fc0_layer(
 
 
     always_ff @(posedge clk) begin
+        if (rst) begin
+            kern_valid      <= 0;
+            kern_has_bias   <= 0;
+        end
+        else begin
+            kern_valid      <= bram_valid;
+            kern_has_bias   <= bram_has_bias;
+        end
         kern_activations    <= bram_activations;
-        kern_valid          <= bram_valid;
-        kern_has_bias       <= bram_has_bias;
         kern_bias           <= 0;//bias;
         kern_neuron_id      <= {2{neuron_id}};
         weights             <= {data_out_b, data_out_a};
@@ -309,7 +316,7 @@ module fc0_layer(
         
     `ifdef DEBUG
     integer it;
-    always_ff @(posedge clk) begin
+    //always_ff @(posedge clk) begin
        /* $display("\n--- BACKWARD PASS0 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
@@ -355,8 +362,8 @@ module fc0_layer(
             end
         end*/
 
-   
-   /*     $display("\n--- SCHEDULER ---");
+   /*
+        $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);    
         $display("Addr_a: %03d Addr_b: %03d", addr_a, addr_b);
         $display("\n--- MEMORY CONTROLLER ---");
@@ -364,13 +371,9 @@ module fc0_layer(
         for (it = 0; it < 5; it = it + 1) begin
             $display("%04h\t\t\t%04h", data_out_a[it], data_out_b[it]);       
         end
-        $display("\nBias");
-        for (it = 0; it < `FC0_N_KERNELS; it = it + 1) begin
-            $display("%04h", bias[it]);
-        end
  
         $display("\n--- KERNELS---");
-        $display("has_bias: %01b", bram_has_bias);
+        $display("has_bias: %01b", kern_has_bias);
         $display("ACT_I\t\tWEIGHT\t\tBIAS\t\tKERN_VALID");
         for (it = 0; it < 10; it=it+1) begin
             $display("%04h\t\t%04h\t\t%04h\t\t\t%01b",
@@ -378,10 +381,10 @@ module fc0_layer(
         end
             
         $display("\nACT_O\t\tNEURON_ID_O\t\tVALID_ACT_O");
-        for (it = 0; it < `FC0_NEURONS; it=it+1) begin
+        for (it = 0; it < 10; it=it+1) begin
             $display("%04h\t\t%02d\t\t\t\t%01b",
             activation_o[it], neuron_id_o[it], valid_act_o);
-        end    */    
-     end
+        end        
+     end*/
     `endif 
 endmodule

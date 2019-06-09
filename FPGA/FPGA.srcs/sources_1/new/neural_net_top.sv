@@ -142,13 +142,15 @@ module neural_net_top(
   logic fpga_buff_sel;
   logic [16:0] img_id;
   logic [16:0] img_cntr;
+  logic [4: 0] lrate_shifts;
 
-  logic [16:0]img1_id;
-  logic [9:0] img1_label;
-  logic [9:0] n_epochs;
-  logic [16:0]num_correct_test;
-  logic [16:0]num_correct_train;
-  logic start;
+    logic [16:0]img1_id;
+    logic [9:0] img1_label;
+    logic [9:0] n_epochs;
+    logic [16:0]num_correct_test;
+    logic [16:0]num_correct_train;
+    logic start;
+    logic start_bus;
     
     // Layer States
     logic [2: 0]    fc0_state;
@@ -158,6 +160,7 @@ module neural_net_top(
     logic [2: 0]    fc2_state;
     logic [2: 0]    next_fc2_state;
     
+    localparam sf = 2.0**-13.0;  
     
     // Backward pass states
     localparam WEIGHT_MODE = 0;
@@ -174,6 +177,8 @@ module neural_net_top(
     
         
     logic [9: 0]        input_addr;
+    logic [15: 0]       net_input_bram_dout_a;
+    logic [15: 0]       net_input_bram_dout_b;
     logic [15: 0]       input_data_a;
     logic [15: 0]       input_data_b;
     logic               img_valid;
@@ -181,11 +186,13 @@ module neural_net_top(
     logic               in_prog;
     
     mmcm_50_mhz mmcm_50_mhz_i (
-        .clk_in1(fab_clk),
+        //.clk_in1(fab_clk),
+        .clk_in1(clock_in),
         .clk_out1(clk)
     );
     
-    assign img_valid    = (img_id == img_cntr);
+    assign img_valid    = sw_i[0] ? 1'b1 : (img_id == img_cntr);
+    assign start        = sw_i[0] ? 1'b1 : start_bus;
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
     assign updating     = fc0_state == UPDATE || fc1_state == UPDATE || fc2_state == UPDATE;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
@@ -205,7 +212,7 @@ module neural_net_top(
         if (reset) begin
             input_addr  <= 0;
         end
-        else if (fc0_state == FORWARD & !fc0_start && img_valid && epoch != n_epochs) begin
+        else if (fc0_state == FORWARD & !fc0_start /*&& img_valid && epoch != n_epochs*/) begin
             fc0_start   <= 1'b1;
             input_addr  <= 0;
         end
@@ -229,6 +236,21 @@ module neural_net_top(
     assign fc0_addr_b = fc0_addr_a + 1'b1;
     
     
+    net_input_bram net_input_bram_i (
+        .addra(fc0_addr_a),
+        .clka(clk),
+        .dina(16'b0),
+        .douta(net_input_bram_dout_a),
+        .ena(1'b1),
+        .wea(1'b0),
+        
+        .addrb(fc0_addr_b),
+        .clkb(clk),
+        .dinb(16'b0),
+        .doutb(net_input_bram_dout_b),
+        .enb(1'b1),
+        .web(1'b0)
+    );    
  
     
     logic [16: 0] prev_img_id;
@@ -269,34 +291,12 @@ module neural_net_top(
     end
     
     
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            input_data_a    <= 0;
-            input_data_b    <= 0;
-        end
-        else begin
-            input_data_a    <= {3'b0, img1_unpacked[fc0_addr_a], 5'b0};
-            input_data_b    <= {3'b0, img1_unpacked[fc0_addr_b], 5'b0};
-        end
+    always_comb begin
+        input_data_a    <= sw_i[0] ? net_input_bram_dout_a : {3'b0, img1_unpacked[fc0_addr_a], 5'b0};
+        input_data_b    <= sw_i[0] ? net_input_bram_dout_b : {3'b0, img1_unpacked[fc0_addr_b], 5'b0};
     end
-    
-    
-    net_input_bram net_input_bram_i (
-        .addra(fc0_addr_a),
-        .clka(clk),
-        .dina(16'b0),
-        .douta(/*input_data_a*/),
-        .ena(1'b1),
-        .wea(1'b0),
-        
-        .addrb(fc0_addr_b),
-        .clkb(clk),
-        .dinb(16'b0),
-        .doutb(/*input_data_b*/),
-        .enb(1'b1),
-        .web(1'b0)
-    );
-    
+
+   
     always_ff @(posedge clk) begin
         if (reset) begin
             fc0_activation_i    <= 0;
@@ -312,7 +312,7 @@ module neural_net_top(
     
     
     assign fc0_b_activation_i   = {{`FC0_NEURONS{input_data_b}}, {`FC0_NEURONS{input_data_a}}};
-    assign fc0_gradients_rdy    = fc0_grad_valid;    
+    assign fc0_gradients_rdy    = fc0_grad_valid; 
     // Start when backward is good and gradients are ready. Only do backprop once   
     assign fc0_b_start = fc0_state == BACKWARD;
     bit [7: 0] q, r;
@@ -390,6 +390,7 @@ module neural_net_top(
         .update(fc0_update),
         .activations_i(fc0_activation_i),
         .valid_i(fc0_valid_i & forward),
+        .lrate_shifts(lrate_shifts),
          
         // backward pass inputs
         .b_gradient_i(fc0_gradients_i),
@@ -612,27 +613,7 @@ module neural_net_top(
     end    
 
     
-   /* assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
-                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};*/
-           
-    bit [9: 0] hk;                                
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            fc2_gradients       <= 0;
-            fc2_gradients_rdy   <= 0;
-        end
-        else if (all_idle) begin
-            fc2_gradients_rdy   <= 1'b0;
-        end
-        else begin
-            for (hk = 0; hk < `FC2_NEURONS; hk = hk + 1) begin
-                fc2_gradients[hk]   <= (hk == img_label) ? 16'hE000 : 16'h2000;
-            end
-            fc2_gradients_rdy   <= 1'b1;
-        end
-    end
-    /*assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
-    assign fc2_gradients_rdy    = 1'b1;*/
+
     
     assign fc2_n_offset = (fc2_loops >= `FC2_MODE_SWITCH) ? fc2_loops - 5 : fc2_loops;
 
@@ -757,12 +738,12 @@ module neural_net_top(
             max         <= 0;
             max_valid   <= 0;
         end
-        else if ({fc2_buf_valid, ~prev_fc2_buf_valid} == 2'b10) begin 
+        else if ({fc2_buf_valid, prev_fc2_buf_valid} == 2'b10) begin 
             for (k = 0; k < 5; k=k+1) begin
                 max1[k] <= $signed(fc2_act_o_buf[2*k]) > $signed(fc2_act_o_buf[2*k+1]) ? 
                             fc2_act_o_buf[2*k] : fc2_act_o_buf[2*k + 1];
             end
-            max_valid       <= {max_valid[4: 1], 1'b1};
+            max_valid       <= {max_valid[3: 0], 1'b1};
         end
         else begin
             max_valid[0]    <= 1'b0;
@@ -784,7 +765,9 @@ module neural_net_top(
                
 
         end  
-           
+        $display("---MAX CIRCUIT---");  
+        $display("max_valid: %05b", max_valid);
+        $display("max: %0.4f", $itor($signed(max)) * sf);
         if (reset) begin
             led_o_r     <= 0;
             corr_train  <= 1'b0;
@@ -804,6 +787,40 @@ module neural_net_top(
         led_o[7]    <= img1_unpacked[0][0];
     end
     
+    logic                               sm_valid_o;
+    logic [`FC2_NEURONS - 1: 0][15: 0]  sm_grad_o;
+    softmax softmax_i (
+        .clk(clk),
+        .reset(reset),
+        .start(max_valid[4]),
+        .max(max),
+        .act_in(fc2_act_o_buf),
+        
+        .valid_o(sm_valid_o),
+        .grad_o(sm_grad_o)
+    );
+    
+   /* assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
+                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};*/   
+    bit [3: 0] u;                                        
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            fc2_gradients_rdy       <= 0;
+        end
+        else if (all_idle) begin
+            fc2_gradients_rdy       <= 1'b0;
+        end
+        else if (sm_valid_o) begin
+            fc2_gradients_rdy       <= 1'b1;
+        end
+        
+        if (sm_valid_o) begin
+            fc2_gradients               <= sm_grad_o;
+            fc2_gradients[img_label]    <= $signed(sm_grad_o[img_label]) - $signed(16'h2000);
+        end
+    end
+    /*assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
+    assign fc2_gradients_rdy    = 1'b1;*/    
     
     `ifdef DEBUG
      integer clk_cycle;
@@ -839,10 +856,15 @@ module neural_net_top(
             $display("%04h\t\t%04d\t\t%01b", fc2_activation_o[it], fc2_neuron_id_o[it], fc2_valid_o);
         end
         */
+        $display("---FC2 GRADIENTS---");    
+        $display("img_label: %d", img_label);    
+        for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
+            $display("%02d:\t%f", it, $itor($signed(fc2_gradients[it])) * sf);
+        end
         $display("--- FC2 OUT ---");        
         $display("fc2_buf_valid: %01b" , fc2_buf_valid);
         for (it= 0; it < `FC2_NEURONS; it=it+1) begin
-            $display("%02d: %04h", it, fc2_act_o_buf[it]); 
+            $display("%02d: %f", it, $itor($signed(fc2_act_o_buf[it])) * sf); 
         end
         $display("LEDS: %08b", led_o);
      end 
@@ -1276,10 +1298,11 @@ system_wrapper system_wrapper_i
     img1_id,
     img1_label,
     img_cntr,
+    lrate_shifts,
     n_epochs,
     num_correct_test,
     num_correct_train,
-    start,
+    start_bus,
     status_block);
 
     bit [9: 0] ii;

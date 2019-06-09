@@ -7,8 +7,8 @@ std::vector< std::vector<double> > readImages(std::string s) {
 
     std::vector< std::vector<double> > data;
     uint8_t pixel;
-    int res;
-    uint32_t images;
+    //int res;
+    //uint32_t images;
     uint32_t rows;
     uint32_t cols;
 
@@ -16,9 +16,9 @@ std::vector< std::vector<double> > readImages(std::string s) {
 
 
     f.read((char*)&buf, 4);  // magic number
-    res = buf[3] + (buf[2] << 8) + (buf[1] << 16) + (buf[0] << 24);
+    /*res = buf[3] + (buf[2] << 8) + (buf[1] << 16) + (buf[0] << 24);*/
     f.read((char*)&buf, 4);  // number of images
-    images = buf[3] + (buf[2] << 8) + (buf[1] << 16) + (buf[0] << 24);
+    /*images = buf[3] + (buf[2] << 8) + (buf[1] << 16) + (buf[0] << 24);*/
     f.read((char*)&buf, 4);  // number of rows
     rows = buf[3] + (buf[2] << 8) + (buf[1] << 16) + (buf[0] << 24);
     f.read((char*)&buf, 4);  // number of cols

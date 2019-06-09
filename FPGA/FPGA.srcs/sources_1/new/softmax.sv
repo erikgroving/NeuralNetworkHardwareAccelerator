@@ -136,7 +136,7 @@ module softmax(
             grad_o[grad_ptr]    <= div_o[15: 0];
         end
         
-        valid_o <= grad_ptr == `FC2_NEURONS;
+        valid_o <= ((grad_ptr == `FC2_NEURONS) & in_prog);
 
     end
        
@@ -153,18 +153,12 @@ module softmax(
     end
     
     `ifdef DEBUG       
-    localparam sf = 2.0**-13.0;  // Q4.4 scaling factor is 2^-4
+    localparam sf = 2.0**-13.0;
 
-    integer it, cycle;
+    integer it;
     always_ff @(posedge clk) begin
-        if(reset) begin
-            cycle   <= 0;
-        end
-        else begin
-            cycle   <= cycle + 1'b1;
-        end
+
         
-        $display("--- CYCLE %04d ---", cycle);
         $display("in_prog: %01b\t", in_prog);
         $display("valid_o: %01b", valid_o);
         $display("fp_in_ptr: %02d, fp_in_valid: %01b, float_valid_o: %01b", fp_in_ptr, in_prog & fp_in_ptr != `FC2_NEURONS, float_valid_o);

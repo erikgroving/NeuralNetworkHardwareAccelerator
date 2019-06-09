@@ -58,7 +58,7 @@ module softmax_tb(
         start = 1'b1;
         @(negedge clock);
         start = 1'b0;
-
+        
         
         #100000;
         $finish;

@@ -89,16 +89,18 @@ module interlayer_activation_buffer #(
         b_act_o <= buffer[b_ptr];
     end
     
-    `ifdef DEBUG       
+    `ifdef DEBUG  /*     
     integer it;
-    always_ff @(posedge clk) begin/*
+    localparam sf = 2**-13.0;
+    always_ff @(posedge clk) begin
+    
         $display("\n---INTERLAYER ACTIVATION BUFFER %01d---", ID_WIDTH);
         $display("buff_ptr: %02d\t\tbuff_rdy: %01b\t\tstart: %01b\t\tread_o: %01b", buff_ptr, buff_rdy, start, read_o);
         $display("Neuron\t\tActivation");
         for (it = 0; it < BUFF_SIZE; it=it+1) begin
-            $display("%02d\t\t\t%04h", it, buffer[it]);
-        end*/
-    end
+            $display("%02d\t\t\t%f", it, $itor($signed(buffer[it])) * sf);
+        end
+    end*/
     `endif
     
 endmodule

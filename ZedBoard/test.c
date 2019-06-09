@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <sys/mman.h>
 #include <stdint.h>
+#include "parse_mnist.h"
 
 #define FORWARD     1
 #define WAITING     2
@@ -50,16 +51,22 @@ int main() {
     ddr_ptr->n_epochs   = 10;
     ddr_ptr->img1_id    = 0;
     
-    magic_number = ptr[1024];
+    magic_number = ptr[400];
     printf("@@@ Checking Magic Number\n");
-    if (magic_number != 0xFEEDFADE) {
+    if (magic_number != 0xFADEDBEE) {
         printf("Memory was read incorrectly.\n");
+        return -1;
     }
     printf("Magic number: %08x\n", magic_number);
     printf("Magic number successfully read.\n");
     
     // Load MNIST images into memory
-
+    printf("@@@ Loading MNIST images...\n");
+    uint8_t** train_images;
+    uint8_t* train_labels;
+    parse_mnist_images("data/train-images.idx3-ubyte", train_images);
+    parse_mnist_labels("data/train-labels.idx1-ubyte", train_labels);
+    printf("@@@ Loading complete!\n");
 
     // Start training!
     ddr_ptr->start      = 1;

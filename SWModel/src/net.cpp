@@ -80,13 +80,17 @@ double Net::computeLossAndGradients(std::vector<int> labeled) {
         unsigned short label = labeled[i];
 
         for (size_t j = 0; j < output_size; j++) {
+            //double f_out = (tanh(batch_output[i][j] / 2.))/2. + 0.5;
             if (j == label) {
                 //gradient[j] = batch_output[i][j] * (1 - batch_output[i][j]);
                 gradient[j] = batch_output[i][j] - 1;
+
+                //gradient[j] = (f_out - 1) * (f_out*(1-f_out));
             }
             else {
                 //gradient[j] = -batch_output[i][j] * batch_output[i][label];
                 gradient[j] = batch_output[i][j];
+                //gradient[j] = (f_out) * (f_out*(1-f_out));
             }
         }
         loss += -log(batch_output[i][label]);

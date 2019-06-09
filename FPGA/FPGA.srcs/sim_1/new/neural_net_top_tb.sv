@@ -1,19 +1,18 @@
 `timescale 1ns / 1ps
 
 module neural_net_top_tb(
-
     );
     
     logic clock;
     logic reset;
     
     neural_net_top neural_net_top_i (
-        .clk(clock),
-        .reset(reset),
+        .clock_in(clock),
+        .rst(reset),
         .sw_i(8'h01),
         .led_o()
     );
-    
+ 
     
     always begin
         #5
@@ -25,6 +24,10 @@ module neural_net_top_tb(
         reset = 1'b1;
         @(negedge clock);
         reset = 1'b1;
+        @(negedge clock);
+        @(negedge clock);
+        @(negedge clock);
+        @(negedge clock);
         @(negedge clock);
         reset = 1'b0;
         

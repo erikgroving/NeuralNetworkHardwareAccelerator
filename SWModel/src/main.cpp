@@ -29,9 +29,9 @@ int main () {
 
     int input_size = 28*28;
     int output_size = 10;
-    int batch_size = 200;
+    int batch_size = 1;
     double momentum = 0.9;
-    double lr = 0.01; 
+    double lr = 0.001; 
     Net net(input_size, output_size, batch_size, lr, momentum);
 
     trainX = std::vector< std::vector<double> > (trainX.begin(), trainX.begin() + 60000);
