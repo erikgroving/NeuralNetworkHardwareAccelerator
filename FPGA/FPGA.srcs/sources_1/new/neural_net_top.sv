@@ -185,12 +185,12 @@ module neural_net_top(
         .clk_out1(clk)
     );
     
-    assign img_valid    = in_prog;
+    assign img_valid    = (img_id == img_cntr);
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
     assign updating     = fc0_state == UPDATE || fc1_state == UPDATE || fc2_state == UPDATE;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
   
-    assign new_img      = all_idle & ((img1_id == (img_id + 1'b1)) | (img1_id == 0));
+    assign new_img      = all_idle & ((img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == 17'd59999));
     assign fpga_buff_sel = 1'b1;
     
     logic reset_i;
@@ -242,12 +242,14 @@ module neural_net_top(
         
         if (reset) begin
             in_prog     <= 1'b0;
+            img_cntr    <= 0;
         end
         else if (forward) begin
             in_prog     <= 1'b1;
         end
         else if (all_idle & in_prog) begin
-            in_prog     <= 1'b0;        
+            in_prog     <= 1'b0;
+            img_cntr    <= img_cntr + 1'b1;
         end
               
         if (reset || (img_id == 0 && prev_img_id != 0)) begin
