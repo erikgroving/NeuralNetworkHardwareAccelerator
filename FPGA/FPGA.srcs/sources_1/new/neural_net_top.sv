@@ -34,7 +34,6 @@ module neural_net_top(
 
     
     logic                                   forward;
-    logic                                   updating;
     // Logics for the fc0 layer
     logic                                   fc0_start;
     logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_activation_i;
@@ -181,23 +180,22 @@ module neural_net_top(
     logic [15: 0]       net_input_bram_dout_b;
     logic [15: 0]       input_data_a;
     logic [15: 0]       input_data_b;
-    logic               img_valid;
     logic [9: 0]        img_label;
-    logic               in_prog;
-    
+    logic               img_rdy;  
+    logic               epoch_fin;
     mmcm_50_mhz mmcm_50_mhz_i (
         .clk_in1(fab_clk),
         //.clk_in1(clock_in),
         .clk_out1(clk)
     );
     
-    assign img_valid    = sw_i[0] ? 1'b1 : (img_id == img_cntr);
+    
     assign start        = sw_i[0] ? 1'b1 : start_bus;
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
-    assign updating     = fc0_state == UPDATE || fc1_state == UPDATE || fc2_state == UPDATE;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
-  
-    assign new_img      = all_idle & ((img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == 17'd59999));
+    assign img_rdy      = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == 17'd59999);
+    assign new_img      = start & all_idle & img_rdy;
+    assign epoch_fin    = sw_i[0] ? 1'b0 : epoch == n_epochs;
     assign fpga_buff_sel = 1'b1;
     
     logic reset_i;
@@ -211,8 +209,9 @@ module neural_net_top(
     always_ff @(posedge clk) begin
         if (reset) begin
             input_addr  <= 0;
+            fc0_start   <= 0;
         end
-        else if (fc0_state == FORWARD & !fc0_start && img_valid && epoch != n_epochs) begin
+        else if (fc0_state == FORWARD & !fc0_start && ~epoch_fin) begin
             fc0_start   <= 1'b1;
             input_addr  <= 0;
         end
@@ -261,18 +260,7 @@ module neural_net_top(
         else begin
             prev_img_id <= img_id;
         end
-        
-        if (reset) begin
-            in_prog     <= 1'b0;
-            img_cntr    <= 0;
-        end
-        else if (forward) begin
-            in_prog     <= 1'b1;
-        end
-        else if (all_idle & in_prog) begin
-            in_prog     <= 1'b0;
-            img_cntr    <= img_cntr + 1'b1;
-        end
+
               
         if (reset || (img_id == 0 && prev_img_id != 0)) begin
             num_correct_train <= 0;
@@ -365,7 +353,7 @@ module neural_net_top(
             UPDATE:
                 next_fc0_state  = (fc0_update_done)     ? IDLE      : UPDATE;
             IDLE:
-                next_fc0_state  = (all_idle & start)    ? FORWARD   : IDLE ;
+                next_fc0_state  = (new_img | sw_i[0])   ? FORWARD   : IDLE ;
             default:
                 next_fc0_state  = IDLE;
         endcase     
@@ -501,7 +489,7 @@ module neural_net_top(
             UPDATE:
                 next_fc1_state  = (fc1_update_done)     ? IDLE      : UPDATE;
             IDLE:
-                next_fc1_state  = (all_idle & start)    ? FORWARD   : IDLE ;
+                next_fc1_state  = (new_img | sw_i[0])   ? FORWARD   : IDLE ;
             default:
                 next_fc1_state  = IDLE;
         endcase     
@@ -598,7 +586,7 @@ module neural_net_top(
             UPDATE:
                 next_fc2_state  = (fc2_update_done)     ? IDLE      : UPDATE;
             IDLE:
-                next_fc2_state  = (all_idle & start)    ? FORWARD   : IDLE;
+                next_fc2_state  = (new_img | sw_i[0])   ? FORWARD   : IDLE;
             default:
                 next_fc2_state  = IDLE;
         endcase     
@@ -873,7 +861,7 @@ module neural_net_top(
   logic [31: 0] status_block;
   assign status_block = {5'b0, led_o_r, fc0_state, fc1_state, fc2_state, forward, fc0_start,
                          fc1_start, fc2_start, fc0_busy, fc1_busy, fc2_busy, new_img, 
-                         all_idle, img_valid};
+                         all_idle, img_rdy};
                          
     
   logic [31:0]img1_blk0_0;
@@ -1305,7 +1293,6 @@ system_wrapper system_wrapper_i
     start_bus,
     status_block);
 
-    bit [9: 0] ii;
     always_ff @(posedge clk) begin
         if (reset) begin
             img_id      <= 17'd59999;
@@ -2103,5 +2090,6 @@ system_wrapper system_wrapper_i
 
         end
     end
+    assign img_cntr     = img1_blk0_0[16: 0];
     
 endmodule

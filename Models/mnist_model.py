@@ -63,7 +63,7 @@ def finalTrainAndTest():
     for i in range(n_epochs):
         running_loss = 0.0
 
-        batch_s = 200
+        batch_s = 20
         lb = 0
         ub = batch_s
         

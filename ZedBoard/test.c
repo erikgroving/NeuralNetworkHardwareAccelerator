@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <sys/mman.h>
 #include <stdint.h>
+#include <string.h>
 #include "parse_mnist.h"
 
 #define FORWARD     1
@@ -48,8 +49,7 @@ int main() {
     ddr_data_t* ddr_ptr = mmap(NULL, 134217728, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0x40000000);
     uint32_t* ptr = (uint32_t*)ddr_ptr;
     
-    ddr_ptr->n_epochs   = 10;
-    ddr_ptr->img1_id    = 0;
+
     
     magic_number = ptr[400];
     printf("@@@ Checking Magic Number\n");
@@ -72,56 +72,64 @@ int main() {
     ddr_ptr->start      = 1;
     ddr_ptr->img1_label = 4;
 
+    ddr_ptr->n_epochs   = 10;
+    ddr_ptr->img1_id    = 0;   
     
     while (1) {
-        epoch       = ddr_ptr->epoch;
-        corr_tr     = ddr_ptr->num_correct_train;
-        corr_test   = ddr_ptr->num_correct_test;
-        img_cntr    = ddr_ptr->img_cntr;
-        fpga_img_id = ddr_ptr->fpga_img_id;
-        img1_id     = ddr_ptr->img1_id;
-        img1_label  = ddr_ptr->img1_label;
-        start       = ddr_ptr->start;
-        // parse the status data
-        status      = ddr_ptr->status_block;
-        img_valid   = status & 0x1;
-        all_idle    = (status >> 1) & 0x1;
-        new_img     = (status >> 2) & 0x1;
-        fc2_busy    = (status >> 3) & 0x1;
-        fc1_busy    = (status >> 4) & 0x1;
-        fc0_busy    = (status >> 5) & 0x1;
-        fc2_start   = (status >> 6) & 0x1;
-        fc1_start   = (status >> 7) & 0x1;
-        fc0_start   = (status >> 8) & 0x1;
-        forward     = (status >> 9) & 0x1;
-        fc2_state   = (status >> 10) & 0x7;
-        fc1_state   = (status >> 13) & 0x7;
-        fc0_state   = (status >> 16) & 0x7;
-        led_o_r     = (status >> 19) & 0xFF;   
+
         
-        state_enc_to_str(fc0_state, fc0_state_str);
-        state_enc_to_str(fc1_state, fc1_state_str);
-        state_enc_to_str(fc2_state, fc2_state_str);
-                
-        printf("\n@@@ CURRENT STATE \n");
-        printf("epoch: %d\t\tCorrect_Train: %d\tCorrect_Test: %d\n", epoch, corr_tr, corr_test);
-        printf("img_cntr: %d\t\tfpga_img_id: %d\t\timg1_id: %d\n", img_cntr, fpga_img_id, img1_id);
-        printf("img1_label: %d\t\tled_o: %02x\n", img1_label, led_o_r);
-        printf("start: %d\t\tforward: %d\t\tall_idle: %d\n", start, forward, all_idle);
-        printf("img_valid: %d\t\tnew_img: %d\n", img_valid, new_img);
-        printf("fc0_busy: %d\t\tfc1_busy: %d\t\tfc2_busy: %d\n", fc0_busy, fc1_busy, fc2_busy);
-        printf("fc0_start: %d\t\tfc1_start: %d\t\tfc2_start: %d\n", fc0_start, fc1_start, fc2_start);
-        printf("fc0_state: %d\t\tfc1_state: %d\t\tfc2_state: %d\n", fc0_state, fc1_state, fc2_state);
-        printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);
         uint32_t id   = (ddr_ptr->fpga_img_id + 1) % 60000;
-        for (int i = 0; i < 196; i++) {       
+        memcpy(&(ddr_ptr->img1), train_images[id], sizeof(uint8_t) * 784);
+        /*for (int i = 0; i < 196; i++) {
 
             ddr_ptr->img1[i] = train_images[id][i];
-        }
+        }*/
 
         ddr_ptr->img1_label = train_labels[id];
         ddr_ptr->img1_id = (ddr_ptr->fpga_img_id + 1) % 60000;
-        usleep(2e6);
+        
+        if (id == 0) {       
+            epoch       = ddr_ptr->epoch;
+            corr_tr     = ddr_ptr->num_correct_train;
+            corr_test   = ddr_ptr->num_correct_test;
+            /*img_cntr    = ddr_ptr->img_cntr;
+            fpga_img_id = ddr_ptr->fpga_img_id;
+            img1_id     = ddr_ptr->img1_id;
+            img1_label  = ddr_ptr->img1_label;
+            start       = ddr_ptr->start;
+            // parse the status data
+            status      = ddr_ptr->status_block;
+            img_valid   = status & 0x1;
+            all_idle    = (status >> 1) & 0x1;
+            new_img     = (status >> 2) & 0x1;
+            fc2_busy    = (status >> 3) & 0x1;
+            fc1_busy    = (status >> 4) & 0x1;
+            fc0_busy    = (status >> 5) & 0x1;
+            fc2_start   = (status >> 6) & 0x1;
+            fc1_start   = (status >> 7) & 0x1;
+            fc0_start   = (status >> 8) & 0x1;
+            forward     = (status >> 9) & 0x1;
+            fc2_state   = (status >> 10) & 0x7;
+            fc1_state   = (status >> 13) & 0x7;
+            fc0_state   = (status >> 16) & 0x7;
+            led_o_r     = (status >> 19) & 0xFF;   
+            
+            state_enc_to_str(fc0_state, fc0_state_str);
+            state_enc_to_str(fc1_state, fc1_state_str);
+            state_enc_to_str(fc2_state, fc2_state_str);
+              
+            printf("\n@@@ CURRENT STATE \n");
+            */
+            printf("epoch: %d\t\tCorrect_Train: %d\tCorrect_Test: %d\n", epoch, corr_tr, corr_test);
+            /*printf("img_cntr: %d\t\tfpga_img_id: %d\t\timg1_id: %d\n", img_cntr, fpga_img_id, img1_id);
+            printf("img1_label: %d\t\tled_o: %02x\n", img1_label, led_o_r);
+            printf("start: %d\t\tforward: %d\t\tall_idle: %d\n", start, forward, all_idle);
+            printf("img_valid: %d\t\tnew_img: %d\n", img_valid, new_img);
+            printf("fc0_busy: %d\t\tfc1_busy: %d\t\tfc2_busy: %d\n", fc0_busy, fc1_busy, fc2_busy);
+            printf("fc0_start: %d\t\tfc1_start: %d\t\tfc2_start: %d\n", fc0_start, fc1_start, fc2_start);
+            printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);*/
+            usleep(2e6);
+        }
     }
 }
 
