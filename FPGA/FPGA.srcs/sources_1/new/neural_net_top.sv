@@ -285,7 +285,7 @@ module neural_net_top(
             num_correct_test  <= 0;
         end
         else if (correct) begin
-            num_correct_train <= (training_mode) ?
+            num_correct_train <= (~training_mode) ?
                                     num_correct_train : num_correct_train + 1'b1;
             num_correct_test  <= (training_mode) ? 
                                     num_correct_test : num_correct_test + 1'b1;

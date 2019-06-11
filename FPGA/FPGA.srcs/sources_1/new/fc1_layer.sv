@@ -100,15 +100,14 @@ module fc1_layer(
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            sch_activations <= 0;
             sch_valid       <= 0;
             sch_bp_mode     <= 0;
         end
         else begin
-            sch_activations <= activations_i;
             sch_valid       <= valid_i;
             sch_bp_mode     <= bp_mode;
         end
+        sch_activations     <= activations_i;
     end
     
     
@@ -308,25 +307,19 @@ module fc1_layer(
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            kern_activations    <= 0;
             kern_valid          <= 0;
             kern_has_bias       <= 0;
-            kern_bias           <= 0;
-            kern_neuron_id      <= 0;
-            kern_bp_mode        <= 0;
-            kern_bp_mode_o      <= 0;
-            weights             <= 0;
         end
         else begin
-            kern_activations    <= bram_activations;
             kern_valid          <= bram_valid;
             kern_has_bias       <= bram_has_bias;
-            kern_bias           <= 0;//bias;
-            kern_neuron_id      <= neuron_id;
-            kern_bp_mode        <= bram_bp_mode;
-            kern_bp_mode_o      <= kern_bp_mode;
-            weights             <= {data_out_b, data_out_a};
         end
+        kern_activations    <= bram_activations;
+        kern_bias           <= 0;//bias;
+        kern_neuron_id      <= neuron_id;
+        kern_bp_mode        <= bram_bp_mode;
+        kern_bp_mode_o      <= kern_bp_mode;
+        weights             <= {data_out_b, data_out_a};
     end
     
     
@@ -392,35 +385,20 @@ module fc1_layer(
     bit [5: 0] q;
     // Backward pass logic
     always_ff @(posedge clk) begin
-        if (rst) begin
-            b_gradient      <= 0;
-            b_gradient_pl   <= 0;
-            
-            b_act           <= 0;
-            b_act_pl        <= 0;
-           
-            b_kern_grad     <= 0;
-            b_kern_act      <= 0;
-            b_act_id        <= 0;
-            b_neuron_id     <= 0;            
-            b_kern_valid    <= 0;            
+        for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
+            b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
         end
-        else begin
-            for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
-                b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
-            end
-            b_gradient_pl   <= b_gradient;
-            b_kern_grad     <= b_gradient_pl;            
-            
-            b_act           <= b_activation_i;
-            b_act_pl        <= b_act;
-            b_kern_act      <= b_act_pl;            
-            
-            
-            b_act_id        <= {b_act_id[2:0], b_activation_id};
-            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
-            b_valid         <= {b_valid[1: 0], b_valid_i};
-        end
+        b_gradient_pl   <= b_gradient;
+        b_kern_grad     <= b_gradient_pl;            
+        
+        b_act           <= b_activation_i;
+        b_act_pl        <= b_act;
+        b_kern_act      <= b_act_pl;            
+        
+        
+        b_act_id        <= {b_act_id[2:0], b_activation_id};
+        b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
+        b_valid         <= {b_valid[1: 0], b_valid_i};
     end
         
     

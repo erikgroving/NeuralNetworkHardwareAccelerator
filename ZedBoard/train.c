@@ -12,6 +12,8 @@
 #define UPDATE      4
 #define IDLE        5
 
+#define TRAIN_SIZE  100
+
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
     uint32_t    fpga_img_id;            // 0        fpga image ptr
@@ -77,11 +79,11 @@ int main() {
     ddr_ptr->start = 1;
     ddr_ptr->n_epochs = 5;
     ddr_ptr->learning_rate = 9;
-    ddr_ptr->training_mode = 0;  
-    ddr_ptr->img_set_size = 999;
+    ddr_ptr->training_mode = 1;  
+    ddr_ptr->img_set_size = TRAIN_SIZE - 1;
     do {
         print_debug_data(ddr_ptr);
-        id      = (ddr_ptr->fpga_img_id + 1) % 1000;
+        id      = (ddr_ptr->fpga_img_id + 1) % TRAIN_SIZE;
         epoch   = ddr_ptr->epoch;        
         // Print data if epoch just finished
         if (id == 0 && epoch != 0) {
@@ -106,7 +108,7 @@ int main() {
         }
         ddr_ptr->img_label  = train_labels[id];
         ddr_ptr->img_id     = id;
-        usleep(1e6);
+        usleep(2e6);
     } while (epoch < ddr_ptr->n_epochs);
 }
 
@@ -168,7 +170,7 @@ void print_debug_data(volatile ddr_data_t* ddr_ptr) {
     state_enc_to_str(fc1_state, fc1_state_str);
     state_enc_to_str(fc2_state, fc2_state_str);
     printf("fpga_img_id: %d\t\timg1_id: %d\n", fpga_img_id, img_id);
-    printf("img1_label: %d\t\tled_o: %02x\n", img_label, led_o_r);
+    printf("img1_label: %d\t\tled_o: %08x\n", img_label, led_o_r);
     printf("Corr Test: %d\tCorr Train: %d\n", corr_test, corr_tr);
     printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);
     printf("Output:\n");

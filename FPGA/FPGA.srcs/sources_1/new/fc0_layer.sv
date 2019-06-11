@@ -88,13 +88,12 @@ module fc0_layer(
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            sch_activations <= 0;
             sch_valid       <= 0;
         end
         else begin
-            sch_activations <= activations_i;
             sch_valid       <= valid_i;
         end
+        sch_activations <= activations_i;
     end
     
     assign sch_valid_i = (forward) ? valid_i : b_valid_i;
@@ -119,17 +118,16 @@ module fc0_layer(
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            bram_activations    <= 0;
-            bram_valid          <= 0;
-            bram_has_bias       <= 0;
-            fc0_busy            <= 0;
+            bram_valid      <= 0;
+            bram_has_bias   <= 0;
+            fc0_busy        <= 0;
         end
         else begin
-            bram_activations    <= sch_activations;
-            bram_valid          <= sch_valid;
-            bram_has_bias       <= sch_has_bias;
-            fc0_busy            <= valid_i;
+            bram_valid      <= sch_valid;
+            bram_has_bias   <= sch_has_bias;
+            fc0_busy        <= valid_i;
         end
+        bram_activations    <= sch_activations;
     end
     
     

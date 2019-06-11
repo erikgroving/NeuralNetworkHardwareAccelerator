@@ -311,25 +311,19 @@ module fc2_layer(
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            kern_activations    <= 0;
             kern_valid          <= 0;
             kern_has_bias       <= 0;
-            kern_bias           <= 0;
-            kern_neuron_id      <= 0;
-            kern_bp_mode        <= 0;
-            kern_bp_mode_o      <= 0;
-            weights             <= 0;
         end
         else begin
-            kern_activations    <= bram_activations;
             kern_valid          <= bram_valid;
             kern_has_bias       <= bram_has_bias;
-            kern_bias           <= 0;//bias;
-            kern_neuron_id      <= neuron_id;
-            kern_bp_mode        <= bram_bp_mode;
-            kern_bp_mode_o      <= kern_bp_mode;
-            weights             <= data_out;
-        end
+        end            
+        kern_activations    <= bram_activations;
+        kern_bias           <= 0;//bias;
+        kern_neuron_id      <= neuron_id;
+        kern_bp_mode        <= bram_bp_mode;
+        kern_bp_mode_o      <= kern_bp_mode;
+        weights             <= data_out;
     end
 
     
@@ -374,33 +368,18 @@ module fc2_layer(
 
    // Backward pass logic
     always_ff @(posedge clk) begin
-        if (rst) begin
-            b_gradient      <= 0;
-            b_gradient_pl   <= 0;
-            
-            b_act           <= 0;
-            b_act_pl        <= 0;
-           
-            b_kern_grad     <= 0;
-            b_kern_act      <= 0;
-            b_act_id        <= 0;
-            b_neuron_id     <= 0;            
-            b_kern_valid    <= 0;            
-        end
-        else begin
-            b_gradient      <= b_gradient_i;
-            b_gradient_pl   <= b_gradient;
-            b_kern_grad     <= b_gradient_pl;            
-            
-            b_act           <= b_activation_i;
-            b_act_pl        <= b_act;
-            b_kern_act      <= b_act_pl;            
-            
-            
-            b_act_id        <= {b_act_id[2:0], b_activation_id};
-            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
-            b_valid         <= {b_valid[1: 0], b_valid_i};
-        end
+        b_gradient      <= b_gradient_i;
+        b_gradient_pl   <= b_gradient;
+        b_kern_grad     <= b_gradient_pl;            
+        
+        b_act           <= b_activation_i;
+        b_act_pl        <= b_act;
+        b_kern_act      <= b_act_pl;            
+        
+        
+        b_act_id        <= {b_act_id[2:0], b_activation_id};
+        b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
+        b_valid         <= {b_valid[1: 0], b_valid_i};
     end
 
     `ifdef DEBUG
