@@ -29,10 +29,11 @@ module neural_net_top(
     input                       clock_in,
     output  logic   [7: 0]      led_o
     );
+    
     logic                                   fab_clk;
     logic                                   clk;
 
-    
+
     logic                                   forward;
     // Logics for the fc0 layer
     logic                                   fc0_start;
@@ -137,11 +138,15 @@ module neural_net_top(
 
 
     
-  logic [9:0]epoch;
-  logic fpga_buff_sel;
-  logic [16:0] img_id;
-  logic [16:0] img_cntr;
-  logic [4: 0] lrate_shifts;
+    logic [9:0]epoch;
+    logic [16:0] img_id;
+    logic [4: 0] lrate_shifts;
+    logic [4: 0] lrate_shifts_bus;
+    logic [31: 0] active_cycles;
+    logic [31: 0] idle_cycles;
+    logic         training_mode;
+    logic         training_mode_bus;
+    logic [16:0]  img_set_size;
 
     logic [16:0]img1_id;
     logic [9:0] img1_label;
@@ -189,19 +194,32 @@ module neural_net_top(
         .clk_out1(clk)
     );
     
+    logic sim;
+
     
     assign start        = sw_i[0] ? 1'b1 : start_bus;
+    assign training_mode = sw_i[0] ? 1'b1 : training_mode_bus;
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
-    assign img_rdy      = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == 17'd59999);
+    assign img_rdy      = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == img_set_size);
     assign new_img      = start & all_idle & img_rdy;
     assign epoch_fin    = sw_i[0] ? 1'b0 : epoch == n_epochs;
-    assign fpga_buff_sel = 1'b1;
     
     logic reset_i;
     logic reset;
     always_ff @(posedge clk) begin
         reset_i   <= rst;
+    end
+    
+    always_ff @(posedge clk) begin
+        if (reset || !start) begin
+            idle_cycles     <= 0;
+            active_cycles   <= 0;            
+        end
+        else begin
+            idle_cycles     <= idle_cycles + all_idle;
+            active_cycles   <= all_idle ? active_cycles : active_cycles + 1'b1;
+        end
     end
     
     BUFG BUFG_reset(.I(reset_i), .O(reset));
@@ -226,7 +244,7 @@ module neural_net_top(
     
     
 
-    logic corr_train;
+    logic correct;
     logic [12: 0] fc0_ptr_a;
     logic [12: 0] fc0_ptr_b;
     logic [9: 0] fc0_addr_a;
@@ -255,7 +273,7 @@ module neural_net_top(
     logic [16: 0] prev_img_id;
     always_ff @(posedge clk) begin
         if (reset) begin
-            prev_img_id <= 17'd59999;
+            prev_img_id <= img_set_size;
         end
         else begin
             prev_img_id <= img_id;
@@ -266,8 +284,11 @@ module neural_net_top(
             num_correct_train <= 0;
             num_correct_test  <= 0;
         end
-        else if (corr_train) begin
-            num_correct_train <= num_correct_train + 1'b1;
+        else if (correct) begin
+            num_correct_train <= (training_mode) ?
+                                    num_correct_train : num_correct_train + 1'b1;
+            num_correct_test  <= (training_mode) ? 
+                                    num_correct_test : num_correct_test + 1'b1;
         end
         
         if (reset) begin
@@ -345,7 +366,10 @@ module neural_net_top(
     always_comb begin
         case(fc0_state)
             FORWARD:
-                next_fc0_state  = fc1_buff_rdy          ? WAITING   : FORWARD;                                     
+                next_fc0_state  = fc1_buff_rdy & training_mode 
+                                                        ? WAITING   :  
+                                  fc1_buff_rdy & ~training_mode
+                                                        ? IDLE      : FORWARD;                                     
             WAITING:
                 next_fc0_state  = (fc0_gradients_rdy)   ? BACKWARD  : WAITING;              
             BACKWARD:
@@ -364,6 +388,8 @@ module neural_net_top(
         end
         else begin
             $display("fc0 state: %01d", fc0_state);
+            $display("fc1 state: %01d", fc1_state);
+            $display("fc2 state: %01d", fc2_state);
             fc0_state   <= next_fc0_state;           
         end
     end
@@ -481,7 +507,10 @@ module neural_net_top(
     always_comb begin
         case(fc1_state)
             FORWARD:
-                next_fc1_state  = (fc2_buff_rdy)        ? WAITING   : FORWARD;                                     
+                next_fc1_state  = fc2_buff_rdy & training_mode 
+                                                        ? WAITING   :  
+                                  fc2_buff_rdy & ~training_mode
+                                                        ? IDLE      : FORWARD;                                       
             WAITING:
                 next_fc1_state  = (fc1_gradients_rdy)   ? BACKWARD  : WAITING;              
             BACKWARD:
@@ -514,6 +543,7 @@ module neural_net_top(
         .update(fc1_update),
         .activations_i(fc1_activation_i),
         .valid_i(fc1_valid_i & forward),        
+        .lrate_shifts(lrate_shifts),
         
         // backward pass inputs
         .b_gradient_i(fc1_gradients_i),
@@ -578,7 +608,10 @@ module neural_net_top(
     always_comb begin
         case(fc2_state)
             FORWARD:
-                next_fc2_state  = (fc2_buf_valid)       ? WAITING   : FORWARD;                                     
+                next_fc2_state  = fc2_buf_valid & training_mode 
+                                                        ? WAITING   :  
+                                  fc2_buf_valid & ~training_mode
+                                                        ? IDLE      : FORWARD;                             
             WAITING:
                 next_fc2_state  = (fc2_gradients_rdy)   ? BACKWARD  : WAITING;              
             BACKWARD:
@@ -653,7 +686,8 @@ module neural_net_top(
         .update(fc2_update),
         .activations_i(fc2_activation_i),
         .valid_i(fc2_valid_i & forward),
-        
+        .lrate_shifts(lrate_shifts),
+       
         // backward pass inputs
         .b_gradient_i(fc2_gradients_i),
         .b_activation_i({fc2_b_activation_i, fc2_b_activation_i}),
@@ -704,6 +738,13 @@ module neural_net_top(
         end
         else if (fc2_state == IDLE) begin
             fc2_buf_valid   <= 1'b0;
+        end
+    end
+    
+    logic [`FC2_NEURONS - 1: 0][15: 0] fc2_out;
+    always @(posedge clk) begin
+        if (fc2_buf_valid) begin
+            fc2_out <= fc2_act_o_buf;
         end
     end
     
@@ -758,21 +799,18 @@ module neural_net_top(
         $display("max: %0.4f", $itor($signed(max)) * sf);
         if (reset) begin
             led_o_r     <= 0;
-            corr_train  <= 1'b0;
+            correct     <= 1'b0;
         end       
         else if (max_valid[4]) begin
-            corr_train  <= fc2_act_o_buf[img_label] == max;
+            correct    <= fc2_act_o_buf[img_label] == max;
             for (j = 0; j < 8; j=j+1) begin
                 led_o_r[j] <= fc2_act_o_buf[j] == max;
             end
         end
         else begin
-            corr_train  <= 1'b0;
+            correct  <= 1'b0;
         end
-        led_o[4:0]  <= led_o_r[4: 0];
-        led_o[5]    <= all_idle;
-        led_o[6]    <= start;
-        led_o[7]    <= img1_unpacked[0][0];
+        led_o[7:0]  <= led_o_r[7: 0];
     end
     
     logic                               sm_valid_o;
@@ -1061,6 +1099,7 @@ module neural_net_top(
   logic [31:0]img1_blk99_0;
   logic [31:0]img1_blk9_0;
   
+  
 system_wrapper system_wrapper_i
    (DDR_addr,
     DDR_ba,
@@ -1084,9 +1123,10 @@ system_wrapper system_wrapper_i
     FIXED_IO_ps_clk,
     FIXED_IO_ps_porb,
     FIXED_IO_ps_srstb,
+    active_cycles,
     epoch,
-    fpga_buff_sel,
     img_id,
+    idle_cycles,
     img1_blk0_0,
     img1_blk100_0,
     img1_blk101_0,
@@ -1285,22 +1325,30 @@ system_wrapper system_wrapper_i
     img1_blk9_0,
     img1_id,
     img1_label,
-    img_cntr,
-    lrate_shifts,
+    img_set_size,
+    lrate_shifts_bus,
     n_epochs,
     num_correct_test,
     num_correct_train,
+    {fc2_out[1], fc2_out[0]},
+    {fc2_out[3], fc2_out[2]},
+    {fc2_out[5], fc2_out[4]},
+    {fc2_out[7], fc2_out[6]},
+    {fc2_out[9], fc2_out[8]},
     start_bus,
-    status_block);
+    status_block,
+    training_mode_bus);
 
     always_ff @(posedge clk) begin
         if (reset) begin
-            img_id      <= 17'd59999;
-            img_label   <= 0;
+            img_id          <= img_set_size;
+            img_label       <= 0;
+            lrate_shifts    <= 0;
         end
         else if (new_img) begin
-            img_id      <= img1_id;
-            img_label   <= img1_label;
+            img_id          <= img1_id;
+            img_label       <= img1_label;
+            lrate_shifts    <= lrate_shifts_bus;
         end
         if (new_img) begin
             img1_unpacked[0]	<= img1_blk0_0[7:0];
@@ -2090,6 +2138,5 @@ system_wrapper system_wrapper_i
 
         end
     end
-    assign img_cntr     = img1_blk0_0[16: 0];
     
 endmodule

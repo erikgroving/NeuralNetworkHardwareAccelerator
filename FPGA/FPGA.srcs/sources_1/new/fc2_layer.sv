@@ -8,6 +8,7 @@ module fc2_layer(
         input                                       update,
         input  [`FC2_N_KERNELS - 1: 0][15: 0]       activations_i,
         input                                       valid_i,
+        input  [4: 0]                               lrate_shifts,    
 
    
         input [`FC2_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
@@ -80,9 +81,11 @@ module fc2_layer(
     
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult1;
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
+    logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad;
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
     logic [`FC2_N_KERNELS - 1: 0][9: 0]             fc2_weight_grad_addr;
     
+    logic [`FC2_N_KERNELS - 1: 0][16: 0]            update_weights_sat;
     logic [`FC2_N_KERNELS - 1: 0][15: 0]            update_weights;
    
     logic                                           prev_b_kern_valid; 
@@ -186,10 +189,46 @@ module fc2_layer(
     assign wg_we            = (update) ? 1'b0           : b_weight_we; 
     
     always_comb begin
-        update_weights[0]   = $signed(data_out[0]) - $signed({{6{weight_grad_o[0][15]}}, weight_grad_o[0][15:6]});
-        update_weights[1]   = $signed(data_out[1]) - $signed({{6{weight_grad_o[1][15]}}, weight_grad_o[1][15:6]}); 
+        case(lrate_shifts)
+            5'd9: begin
+                weight_grad[0]  = {{9{weight_grad_o[0][15]}}, weight_grad_o[0][15:9]};
+                weight_grad[1]  = {{9{weight_grad_o[1][15]}}, weight_grad_o[1][15:9]};
+            end
+            5'd10: begin
+                weight_grad[0]  = {{10{weight_grad_o[0][15]}}, weight_grad_o[0][15:10]};
+                weight_grad[1]  = {{10{weight_grad_o[1][15]}}, weight_grad_o[1][15:10]};
+            end
+            5'd11: begin
+                weight_grad[0]  = {{11{weight_grad_o[0][15]}}, weight_grad_o[0][15:11]};
+                weight_grad[1]  = {{11{weight_grad_o[1][15]}}, weight_grad_o[1][15:11]};
+            end
+            5'd12: begin
+                weight_grad[0]  = {{12{weight_grad_o[0][15]}}, weight_grad_o[0][15:12]};
+                weight_grad[1]  = {{12{weight_grad_o[1][15]}}, weight_grad_o[1][15:12]};
+            end
+            default: begin
+                weight_grad[0]  = {{8{weight_grad_o[0][15]}}, weight_grad_o[0][15:8]};
+                weight_grad[1]  = {{8{weight_grad_o[1][15]}}, weight_grad_o[1][15:8]};
+            end
+        endcase
+        update_weights_sat[0]   = $signed(data_out[0]) - $signed(weight_grad[0]);
+        update_weights_sat[1]   = $signed(data_out[1]) - $signed(weight_grad[1]);
     end
     
+    bit [7: 0] d;
+    always_comb begin
+        for (d = 0; d < `FC2_N_KERNELS; d=d+1) begin
+            if (update_weights_sat[d][16:15] == 2'b01) begin
+                update_weights[d]   = 16'h7FFF;
+            end
+            else if (update_weights_sat[d][16:15] == 2'b10) begin
+                update_weights[d]   = 16'h8000;
+            end
+            else begin
+                update_weights[d]   = update_weights_sat[d][15: 0];
+            end
+        end
+    end       
     
     // BRAM for the weights of the fully connected layer
     fc2_weight_bram_controller fc2_weight_bram_controller_i (
@@ -367,14 +406,16 @@ module fc2_layer(
     `ifdef DEBUG
     integer it, it2;
     always_ff @(negedge clk) begin
-/*
+        localparam sf = 2.0**-13.0; 
         $display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
         $display("Gradient\t\tNeuronID\t\tAct_I");
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
-            $display("%04h\t\t\t%01d\t\t\t\t%04h", b_gradient_i[it], b_neuron_id_i[it], b_activation_i[it]) ;
+            $display("%f\t\t\t%01d\t\t\t\t%f", $itor($signed(b_gradient_i[it])), 
+            b_neuron_id_i[it], $itor($signed(b_activation_i[it]))) ;
         end
+        /*
         $display("KERNEL INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_act_id[2], b_valid[2]);
         $display("Gradient\t\tWeight");
@@ -406,24 +447,26 @@ module fc2_layer(
         $display("update_weights[1]: %04h", update_weights[1]);
     
 
-    */
-       /* if (pl_grad_valid) begin
+    */    
+ 
+
+        if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
-                $display("%02d:\t%04h", it, pl_gradients[it]);
+                $display("%02d:\t%f", it, $itor($signed(pl_gradients[it])) * sf);
             end
         end
         if (wg_we) begin
             $display("WEIGHT GRADS2");
             $display("Activation ID: %03d", fc2_weight_grad_addr[0]);
             for (it = 0; it < 1; it=it+1) begin
-                $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
+                $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
             $display("Activation ID: %03d", fc2_weight_grad_addr[1]);
             for (it = 1; it < 2; it=it+1) begin
-                $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
+                $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
-        end*/
+        end
         /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d\t\tsch_valid_i: %01b", head_ptr, mid_ptr, bias_ptr, sch_valid_i);
