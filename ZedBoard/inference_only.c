@@ -13,7 +13,7 @@
 #define UPDATE      4
 #define IDLE        5
 #define SET_SIZE    70000
-#define TRAIN_SIZE  60000
+#define TRAIN_SIZE  70000
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -76,11 +76,11 @@ int main() {
 
     // Start training! 
     ddr_ptr->start = 0;
-    usleep(100);
+    usleep(10);
     ddr_ptr->start = 1;
     ddr_ptr->n_epochs = 5;
-    ddr_ptr->learning_rate = 8;
-    ddr_ptr->training_mode = 1;  
+    ddr_ptr->learning_rate = 4;
+    ddr_ptr->training_mode = 0;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
     gettimeofday(&start, NULL);
@@ -89,17 +89,13 @@ int main() {
         epoch   = ddr_ptr->epoch;        
         // Print data if epoch just finished
         if ((id == 0) && epoch != 0) {        
-            gettimeofday(&end, NULL);
-            
+            gettimeofday(&end, NULL);           
             
             corr_tr     = ddr_ptr->num_correct_train;
             corr_test   = ddr_ptr->num_correct_test;
-            printf("\n\n@@@ EPOCH %d\n@@@ Training Images"
-                    ": %d/%d\nAccuracy: %f%%\n"
-                    "@@@Test Images: %d/%d\n"
-                    "Accuracy: %f%%\n", epoch, corr_tr, TRAIN_SIZE, 
-                    (float)(corr_tr/(float)TRAIN_SIZE) * 100., corr_test, 10000, 
-                    ((float)corr_test/10000.) * 100.);
+            printf("\n\n@@@ EPOCH %d\n@@@ Images"
+                    ": %d/%d\nAccuracy: %f%%\n", epoch, corr_test, 70000, 
+                    ((float)corr_test/70000.) * 100.);
      
                    
             uint32_t active = ddr_ptr->active_cycles;
@@ -111,9 +107,6 @@ int main() {
             gettimeofday(&start, NULL);
         }
              
-        ddr_ptr->training_mode = (id < 60000);  
-       
-        
         if (id < 60000) {
             #pragma unroll
             for (int i = 0; i < 196; i++) {

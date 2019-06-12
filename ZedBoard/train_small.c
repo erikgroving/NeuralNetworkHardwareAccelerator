@@ -12,8 +12,8 @@
 #define BACKWARD    3
 #define UPDATE      4
 #define IDLE        5
-#define SET_SIZE    70000
-#define TRAIN_SIZE  60000
+#define SET_SIZE    100
+#define TRAIN_SIZE  100
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -78,8 +78,8 @@ int main() {
     ddr_ptr->start = 0;
     usleep(100);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 5;
-    ddr_ptr->learning_rate = 8;
+    ddr_ptr->n_epochs = 30;
+    ddr_ptr->learning_rate = 9;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
@@ -95,40 +95,27 @@ int main() {
             corr_tr     = ddr_ptr->num_correct_train;
             corr_test   = ddr_ptr->num_correct_test;
             printf("\n\n@@@ EPOCH %d\n@@@ Training Images"
-                    ": %d/%d\nAccuracy: %f%%\n"
-                    "@@@Test Images: %d/%d\n"
-                    "Accuracy: %f%%\n", epoch, corr_tr, TRAIN_SIZE, 
-                    (float)(corr_tr/(float)TRAIN_SIZE) * 100., corr_test, 10000, 
-                    ((float)corr_test/10000.) * 100.);
+                    ": %d/%d\nAccuracy: %f%%\n", epoch, corr_tr, TRAIN_SIZE, 
+                    (float)(corr_tr/(float)TRAIN_SIZE) * 100.);
      
                    
             uint32_t active = ddr_ptr->active_cycles;
             uint32_t idle = ddr_ptr->idle_cycles;
             printf("Active Cycles: %d\t Idle Cycles: %d\n", active, idle);
             printf("Active Cycle Percentage: %f%%\n", (float)active / ((float)idle + (float)active));      
-            //print_debug_data(ddr_ptr);            
+            print_debug_data(ddr_ptr);            
             printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
+            usleep(3e6);
             gettimeofday(&start, NULL);
         }
-             
-        ddr_ptr->training_mode = (id < 60000);  
-       
         
-        if (id < 60000) {
-            #pragma unroll
-            for (int i = 0; i < 196; i++) {
-                ddr_ptr->img[i] = train_images[id][i];
-            }
-            ddr_ptr->img_label  = train_labels[id];
+
+        #pragma unroll
+        for (int i = 0; i < 196; i++) {
+            ddr_ptr->img[i] = train_images[id][i];
         }
-        else {
-            test_idx = id - 60000;            
-            #pragma unroll
-            for (int i = 0; i < 196; i++) {
-                ddr_ptr->img[i] = test_images[test_idx][i];
-            }
-            ddr_ptr->img_label  = test_labels[test_idx];
-        }
+        ddr_ptr->img_label  = train_labels[id];
+
         ddr_ptr->img_id     = id;            
 
     } while (epoch < ddr_ptr->n_epochs);
