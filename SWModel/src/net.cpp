@@ -59,8 +59,8 @@ std::vector< std::vector<double> > Net::inference(std::vector< std::vector<doubl
         //std::vector<double> output = in;
         batch_output.push_back(output);
     }
-
-    return batch_output;
+    return activations[layers.size()];
+    //return batch_output;
 }
 
 double Net::computeLossAndGradients(std::vector<int> labeled) {

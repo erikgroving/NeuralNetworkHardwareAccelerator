@@ -3,16 +3,6 @@
 
 `define DEBUG
 
-// FC0 defines
-`define FC0_N_KERNELS           196
-`define FC0_PORT_WIDTH          98
-`define FC0_NEURONS             98
-`define FC0_FAN_IN              10'd784
-`define FC0_KERNEL_FAN_IN       10'd392
-`define FC0_MID_PTR_OFFSET      10'd784 // don't use since all neurons used at once
-`define FC0_ADDR                10
-`define FC0_BIAS_ADDR           1
-
 
 // FC1 defines
 `define FC1_N_KERNELS           16
