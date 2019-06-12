@@ -5,6 +5,7 @@
 #include "parse_mnist.h"
 #include <unistd.h>
 #include <math.h> 
+#include <sys/time.h>
 
 #define FORWARD     1
 #define WAITING     2
@@ -12,7 +13,7 @@
 #define UPDATE      4
 #define IDLE        5
 
-#define TRAIN_SIZE  100
+#define TRAIN_SIZE  60000
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -77,29 +78,40 @@ int main() {
     ddr_ptr->start = 0;
     usleep(1e3);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 5;
-    ddr_ptr->learning_rate = 9;
-    ddr_ptr->training_mode = 1;  
+    ddr_ptr->n_epochs = 10;
+    ddr_ptr->learning_rate = 8;
+    ddr_ptr->training_mode = 0;  
     ddr_ptr->img_set_size = TRAIN_SIZE - 1;
-    do {
-        print_debug_data(ddr_ptr);
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+    do {            
+        //print_debug_data(ddr_ptr);
+
         id      = (ddr_ptr->fpga_img_id + 1) % TRAIN_SIZE;
         epoch   = ddr_ptr->epoch;        
         // Print data if epoch just finished
-        if (id == 0 && epoch != 0) {
+        if ((id == 0) && epoch != 0) {        
+            gettimeofday(&end, NULL);
+            
+            
             corr_tr     = ddr_ptr->num_correct_train;
             corr_test   = ddr_ptr->num_correct_test;
             printf("\n\n@@@ EPOCH %d\n@@@ Training Images"
                     ": %d/%d\nAccuracy: %f%%\n"
                     "@@@Test Images: %d/%d\n"
-                    "Accuracy: %f%%\n\n", epoch, corr_tr, 60000, 
-                    (float)(corr_tr/60000.) * 100., corr_test, 10000, 
+                    "Accuracy: %f%%\n\n", epoch, corr_tr, TRAIN_SIZE, 
+                    (float)(corr_tr/(float)TRAIN_SIZE) * 100., corr_test, 10000, 
                     ((float)corr_test/10000.) * 100.);
                     
             uint32_t active = ddr_ptr->active_cycles;
             uint32_t idle = ddr_ptr->idle_cycles;
             printf("Active Cycles: %d\t Idle Cycles: %d\n", active, idle);
-            printf("Active Cycle Percentage: %f%%\n", (float)active / ((float)idle + (float)active));
+            printf("Active Cycle Percentage: %f%%\n", (float)active / ((float)idle + (float)active));      
+            print_debug_data(ddr_ptr);            
+            printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
+
+            usleep(2e6);
+            gettimeofday(&start, NULL);
         }
         
         #pragma unroll
@@ -107,8 +119,8 @@ int main() {
             ddr_ptr->img[i] = train_images[id][i];
         }
         ddr_ptr->img_label  = train_labels[id];
-        ddr_ptr->img_id     = id;
-        usleep(2e6);
+        ddr_ptr->img_id     = id;            
+
     } while (epoch < ddr_ptr->n_epochs);
 }
 
@@ -169,13 +181,26 @@ void print_debug_data(volatile ddr_data_t* ddr_ptr) {
     state_enc_to_str(fc0_state, fc0_state_str);
     state_enc_to_str(fc1_state, fc1_state_str);
     state_enc_to_str(fc2_state, fc2_state_str);
+    
+    float max_out = -100;
+    int max_out_id = 0;
+    for (int i = 0; i < 10; i++) {
+        output[i] = (float)(ddr_ptr->out[i]) / pow(2, 8);
+        if (output[i] > max_out) {
+            max_out = output[i];
+            max_out_id = i;
+        }
+    }
+    
+    
+    
     printf("fpga_img_id: %d\t\timg1_id: %d\n", fpga_img_id, img_id);
-    printf("img1_label: %d\t\tled_o: %08x\n", img_label, led_o_r);
-    printf("Corr Test: %d\tCorr Train: %d\n", corr_test, corr_tr);
-    printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);
+    printf("img1_label: %d\t\tmax_out: %d\t\tled_o: %08x\n", img_label, max_out_id, led_o_r);
+    /*printf("Corr Test: %d\tCorr Train: %d\n", corr_test, corr_tr);
+    printf("fc0_state: %s\tfc1_state: %s\tfc2_state: %s\n", fc0_state_str, fc1_state_str, fc2_state_str);*/
     printf("Output:\n");
     for (int i = 0; i < 10; i++) {
-        printf("%d: %f\n", i, (float)(ddr_ptr->out[i]) / pow(2, 13));
+        printf("%d: %f\n", i, output[i]);
     }
     
 

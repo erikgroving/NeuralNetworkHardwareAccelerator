@@ -7,17 +7,17 @@ module fc1_weight_bram_controller (
     input                                               rst,
 
     input  [`FC1_ADDR - 1: 0]                           addr_a,
-    input  [`FC1_PORT_WIDTH - 1: 0][15: 0]              data_in_a,
+    input  [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]              data_in_a,
     input                                               en_a,
     input                                               we_a,
 
     input  [`FC1_ADDR - 1: 0]                           addr_b,
-    input  [`FC1_PORT_WIDTH - 1: 0][15: 0]              data_in_b,
+    input  [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]              data_in_b,
     input                                               en_b,
     input                                               we_b,
     
-    output logic [`FC1_PORT_WIDTH - 1: 0][15: 0]        data_out_a,
-    output logic [`FC1_PORT_WIDTH - 1: 0][15: 0]        data_out_b,
+    output logic [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]        data_out_a,
+    output logic [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]        data_out_b,
     output logic [`FC1_N_KERNELS - 1: 0][5: 0]          neuron_id
     
     );

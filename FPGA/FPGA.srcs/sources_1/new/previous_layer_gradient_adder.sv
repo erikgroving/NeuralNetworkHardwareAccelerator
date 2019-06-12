@@ -4,34 +4,34 @@ module previous_layer_gradient_adder (
         input                                       clk,
         input                                       rst,
         input                                       forward,
-        input [`FC1_N_KERNELS - 1: 0][15: 0]        grad_i,
+        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        grad_i,
         input [6: 0]                                neuron_id_i,
         input                                       valid_i,
         input                                       bp_mode_i,
         
-        output logic [`FC0_NEURONS - 1: 0][15: 0]   pl_gradients,
+        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   pl_gradients,
         output logic                                pl_grad_valid
 );
     
     localparam WEIGHT_MODE = 0;
     localparam NEURON_MODE = 1;  
     
-    logic [7: 0][15: 0] stage1_grad;
+    logic [7: 0][`PREC - 1: 0] stage1_grad;
     logic               stage1_valid;
     logic [6: 0]        stage1_neuron_id;
     logic               stage1_bp_mode;
     
-    logic [3: 0][15: 0] stage2_grad;
+    logic [3: 0][`PREC - 1: 0] stage2_grad;
     logic               stage2_valid;
     logic [6: 0]        stage2_neuron_id;
     logic               stage2_bp_mode;
     
-    logic [1: 0][15: 0] stage3_grad;
+    logic [1: 0][`PREC - 1: 0] stage3_grad;
     logic               stage3_valid;
     logic [6: 0]        stage3_neuron_id;
     logic               stage3_bp_mode;
     
-    logic [15: 0]       stage4_grad;
+    logic [`PREC - 1: 0]       stage4_grad;
     logic               stage4_valid;
     logic               prev_stage4_valid;
     logic [6: 0]        stage4_neuron_id;
@@ -51,7 +51,7 @@ module previous_layer_gradient_adder (
             stage1_bp_mode      <= 0;
         end
         else begin
-            for (i = 0, n = 0; i < 16; i = i + 2, n = n + 1) begin
+            for (i = 0, n = 0; i < `PREC ; i = i + 2, n = n + 1) begin
                 stage1_grad[n]  <= $signed(grad_i[i]) + $signed(grad_i[i + 1]);
             end
             stage1_valid        <= valid_i & (bp_mode_i == NEURON_MODE);

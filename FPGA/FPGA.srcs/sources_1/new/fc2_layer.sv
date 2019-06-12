@@ -6,48 +6,48 @@ module fc2_layer(
         input                                       rst,
         input                                       forward,
         input                                       update,
-        input  [`FC2_N_KERNELS - 1: 0][15: 0]       activations_i,
+        input  [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]       activations_i,
         input                                       valid_i,
         input  [4: 0]                               lrate_shifts,    
 
    
-        input [`FC2_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
-        input [`FC2_N_KERNELS - 1: 0][15: 0]        b_activation_i,
+        input [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]        b_gradient_i,
+        input [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]        b_activation_i,
         input [5: 0]                                b_activation_id,
         input [`FC2_N_KERNELS - 1: 0][3: 0]         b_neuron_id_i,
         input                                       b_valid_i,
         input                                       bp_mode,
         
         
-        output logic [`FC2_N_KERNELS - 1: 0][15: 0] activation_o,
+        output logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0] activation_o,
         output logic [`FC2_N_KERNELS - 1: 0][3: 0]  neuron_id_o,
         output logic                                valid_act_o,
         output logic                                fc2_busy,
         output logic                                bp_done,
         output logic                                update_done,
         
-        output logic [`FC1_NEURONS - 1: 0][15: 0]   pl_gradients,
+        output logic [`FC1_NEURONS - 1: 0][`PREC - 1: 0]   pl_gradients,
         output logic                                pl_grad_valid
 
     );
     
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          data_in;
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          data_out;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          data_in;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          data_out;
 
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          weights;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          weights;
     logic   [`FC2_ADDR - 1: 0]                      head_ptr;
     logic   [`FC2_ADDR - 1: 0]                      mid_ptr;
     logic   [`FC2_BIAS_ADDR - 1: 0]                 bias_ptr;
    
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          sch_activations;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          sch_activations;
     logic                                           sch_valid;
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bram_activations;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          bram_activations;
     logic                                           bram_valid;
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          kern_activations;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_activations;
     logic                                           kern_valid;
     
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          bias;
-    logic   [`FC2_N_KERNELS - 1: 0][15: 0]          kern_bias;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          bias;
+    logic   [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_bias;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
     logic                                           kern_has_bias;
@@ -58,14 +58,14 @@ module fc2_layer(
     
     logic   [`FC2_N_KERNELS - 1: 0]                 valid;
     
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_gradient;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_gradient_pl;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_kern_grad;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_act;   
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_act_pl;   
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_kern_act;   
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient_pl;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act;   
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act_pl;   
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_act;   
     
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            b_kern_grad_o;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad_o;
     logic [`FC2_N_KERNELS - 1: 0]                   b_kern_valid_o;
     logic [2: 0]                                    b_valid;
     logic [3: 0][5: 0]                              b_act_id;
@@ -79,14 +79,14 @@ module fc2_layer(
     logic                                           kern_bp_mode;
     logic                                           kern_bp_mode_o;
     
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult1;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult1;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult2;   
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad_o;
     logic [`FC2_N_KERNELS - 1: 0][9: 0]             fc2_weight_grad_addr;
     
-    logic [`FC2_N_KERNELS - 1: 0][16: 0]            update_weights_sat;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]            update_weights;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC : 0]            update_weights_sat;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]            update_weights;
    
     logic                                           prev_b_kern_valid; 
    
@@ -191,24 +191,24 @@ module fc2_layer(
     always_comb begin
         case(lrate_shifts)
             5'd9: begin
-                weight_grad[0]  = {{9{weight_grad_o[0][15]}}, weight_grad_o[0][15:9]};
-                weight_grad[1]  = {{9{weight_grad_o[1][15]}}, weight_grad_o[1][15:9]};
+                weight_grad[0]  = {{9{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:9]};
+                weight_grad[1]  = {{9{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:9]};
             end
             5'd10: begin
-                weight_grad[0]  = {{10{weight_grad_o[0][15]}}, weight_grad_o[0][15:10]};
-                weight_grad[1]  = {{10{weight_grad_o[1][15]}}, weight_grad_o[1][15:10]};
+                weight_grad[0]  = {{10{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:10]};
+                weight_grad[1]  = {{10{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:10]};
             end
             5'd11: begin
-                weight_grad[0]  = {{11{weight_grad_o[0][15]}}, weight_grad_o[0][15:11]};
-                weight_grad[1]  = {{11{weight_grad_o[1][15]}}, weight_grad_o[1][15:11]};
+                weight_grad[0]  = {{11{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:11]};
+                weight_grad[1]  = {{11{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:11]};
             end
             5'd12: begin
-                weight_grad[0]  = {{12{weight_grad_o[0][15]}}, weight_grad_o[0][15:12]};
-                weight_grad[1]  = {{12{weight_grad_o[1][15]}}, weight_grad_o[1][15:12]};
+                weight_grad[0]  = {{12{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:12]};
+                weight_grad[1]  = {{12{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:12]};
             end
             default: begin
-                weight_grad[0]  = {{8{weight_grad_o[0][15]}}, weight_grad_o[0][15:8]};
-                weight_grad[1]  = {{8{weight_grad_o[1][15]}}, weight_grad_o[1][15:8]};
+                weight_grad[0]  = {{8{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:8]};
+                weight_grad[1]  = {{8{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:8]};
             end
         endcase
         update_weights_sat[0]   = $signed(data_out[0]) - $signed(weight_grad[0]);
@@ -218,14 +218,14 @@ module fc2_layer(
     bit [7: 0] d;
     always_comb begin
         for (d = 0; d < `FC2_N_KERNELS; d=d+1) begin
-            if (update_weights_sat[d][16:15] == 2'b01) begin
-                update_weights[d]   = 16'h7FFF;
+            if (update_weights_sat[d][`PREC :`PREC - 1] == 2'b01) begin
+                update_weights[d]   = `MAX_VAL;
             end
-            else if (update_weights_sat[d][16:15] == 2'b10) begin
-                update_weights[d]   = 16'h8000;
+            else if (update_weights_sat[d][`PREC :`PREC - 1] == 2'b10) begin
+                update_weights[d]   = `MIN_VAL;
             end
             else begin
-                update_weights[d]   = update_weights_sat[d][15: 0];
+                update_weights[d]   = update_weights_sat[d][`PREC - 1: 0];
             end
         end
     end       

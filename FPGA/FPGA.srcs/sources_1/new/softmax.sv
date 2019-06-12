@@ -4,22 +4,22 @@ module softmax(
     input                                       clk,
     input                                       reset,
     input                                       start,
-    input [15: 0]                               max,
-    input [`FC2_NEURONS - 1: 0][15: 0]          act_in,
+    input [`PREC - 1: 0]                               max,
+    input [`FC2_NEURONS - 1: 0][`PREC - 1: 0]          act_in,
     
     output logic                                valid_o,
-    output logic [`FC2_NEURONS - 1: 0][15: 0]   grad_o
+    output logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   grad_o
     );
     
-    logic [`FC2_NEURONS - 1: 0][15: 0]          act_in_norm;
-    logic [`FC2_NEURONS - 1: 0][15: 0]          fixed_exp_res;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]          act_in_norm;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]          fixed_exp_res;
     logic [`FC2_NEURONS - 1: 0][31: 0]          act_in_norm_float;
     logic [31: 0]                               float_o;
     logic [31: 0]                               float_exp_o;
     logic                                       float_valid_o;
     logic                                       float_exp_valid_o;
-    logic [15: 0]                               fixed_exp_o;
-    logic [17: 0]                               fixed_exp_sum;
+    logic [`PREC - 1: 0]                               fixed_exp_o;
+    logic [`PREC + 1: 0]                               fixed_exp_sum;
     logic                                       fixed_exp_valid_o;
     logic [3: 0]                                fp_in_ptr;
     logic [3: 0]                                fixed_exp_ptr;
@@ -133,7 +133,7 @@ module softmax(
     
     always_ff @(posedge clk) begin
         if (div_valid_o) begin
-            grad_o[grad_ptr]    <= div_o[15: 0];
+            grad_o[grad_ptr]    <= div_o[`PREC - 1: 0];
         end
         
         valid_o <= ((grad_ptr == `FC2_NEURONS) & in_prog);
@@ -153,7 +153,8 @@ module softmax(
     end
     
     `ifdef DEBUG       
-    localparam sf = 2.0**-13.0;
+    localparam sf = 2.0**-8.0;
+    localparam sf2 = 2.0**-13.0;
 
     integer it;
     always_ff @(posedge clk) begin
@@ -177,11 +178,11 @@ module softmax(
         end 
         $display("fixed_exp_res");        
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
-            $display("%02d:\t%f", it, $itor($signed(fixed_exp_res[it])) * sf);
+            $display("%02d:\t%f", it, $itor($signed(fixed_exp_res[it])) * sf2);
         end 
         $display("GRADIENT OUT");        
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
-            $display("%02d:\t%f", it, $itor($signed(grad_o[it])) * sf);
+            $display("%02d:\t%f", it, $itor($signed(grad_o[it])) * sf2);
         end
     end
     `endif

@@ -25,7 +25,7 @@ module neural_net_top(
     inout FIXED_IO_ps_srstb,
 
     input                       rst,
-    input           [7: 0]      sw_i,
+    input           [7: 0]      sw_in,
     input                       clock_in,
     output  logic   [7: 0]      led_o
     );
@@ -37,23 +37,23 @@ module neural_net_top(
     logic                                   forward;
     // Logics for the fc0 layer
     logic                                   fc0_start;
-    logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_activation_i;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_activation_i;
     logic                                   fc0_valid;
     logic                                   fc0_valid_i;    
-    logic [`FC0_NEURONS - 1: 0][15: 0]      fc0_activation_o ;
+    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]      fc0_activation_o ;
     logic [`FC0_NEURONS - 1: 0][6: 0]       fc0_neuron_id_o ;
     logic                                   fc0_valid_act_o; 
     logic                                   fc0_busy;    
-    logic [`FC0_NEURONS - 1: 0][15: 0]      fc0_gradients;
+    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]      fc0_gradients;
     logic                                   fc0_grad_valid; 
 
     
     // Logics for the fc1 layer    
     logic                                   fc1_start;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_activation_i ;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_activation_i ;
     logic                                   fc1_valid_i;    
     logic [`FC1_N_KERNELS - 1: 0][6: 0]     fc1_neuron_id_i; 
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_activation_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_activation_o;
     logic [`FC1_N_KERNELS - 1: 0][5: 0]     fc1_neuron_id_o ;
     logic                                   fc1_valid_act_o;
     logic                                   fc1_buff_rdy; 
@@ -63,20 +63,20 @@ module neural_net_top(
      // Logics for the fc2 layer (the last fc layer)
     logic                                   fc2_start;
     logic                                   fc2_buff_rdy;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_i;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_activation_i;
     logic [`FC2_N_KERNELS - 1: 0][5: 0]     fc2_neuron_id_i;
     logic                                   fc2_valid_i;
     logic                                   fc2_busy;
 
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_activation_o;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_activation_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
     logic                                   fc2_valid_o;       
-    logic [`FC2_NEURONS - 1: 0][15: 0]      fc2_act_o_buf;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]      fc2_act_o_buf;
     logic                                   fc2_buf_valid; 
     
     // Backward pass logics
-    logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_b_gradient_i;
-    logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_b_activation_i;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_b_gradient_i;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_b_activation_i;
     logic [9: 0]                            fc0_b_activation_id_i;
     logic [9: 0]                            fc0_b_activation_id_o;
     logic [`FC0_N_KERNELS - 1: 0][6: 0]     fc0_b_neuron_id_i;
@@ -84,7 +84,7 @@ module neural_net_top(
     logic                                   fc0_b_start;
     logic                                   fc0_b_start_r;
     logic [3: 0]                            fc0_loops;
-    logic [`FC0_N_KERNELS - 1: 0][15: 0]    fc0_gradients_i;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_gradients_i;
     logic                                   fc0_gradients_rdy;
     logic [6: 0]                            fc0_n_loop_offset;
     logic                                   fc0_bp_done;
@@ -93,8 +93,8 @@ module neural_net_top(
           
 
    
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_b_gradient_i;
-    logic [15: 0]                           fc1_b_activation_i;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_b_gradient_i;
+    logic [`PREC - 1: 0]                           fc1_b_activation_i;
     logic [6: 0]                            fc1_b_activation_id_i;
     logic [6: 0]                            fc1_b_activation_id_o;
     logic [`FC1_N_KERNELS - 1: 0][5: 0]     fc1_b_neuron_id_i;
@@ -102,8 +102,8 @@ module neural_net_top(
     logic                                   fc1_b_start;
     logic                                   fc1_b_start_r;
     logic [3: 0]                            fc1_loops;
-    logic [`FC1_NEURONS - 1: 0][15: 0]      fc1_gradients;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]    fc1_gradients_i;
+    logic [`FC1_NEURONS - 1: 0][`PREC - 1: 0]      fc1_gradients;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_gradients_i;
     logic                                   fc1_gradients_rdy;
     logic [5: 0]                            fc1_n_offset;
     logic [5: 0]                            fc1_n_loop_offset;
@@ -114,8 +114,8 @@ module neural_net_top(
           
 
    
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_b_gradient_i;
-    logic [15: 0]                           fc2_b_activation_i;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_b_gradient_i;
+    logic [`PREC - 1: 0]                           fc2_b_activation_i;
     logic [5: 0]                            fc2_b_activation_id_i;
     logic [5: 0]                            fc2_b_activation_id_o;
     logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_b_neuron_id_i;
@@ -123,8 +123,8 @@ module neural_net_top(
     logic                                   fc2_b_start;
     logic                                   fc2_b_start_r;
     logic [3: 0]                            fc2_loops;
-    logic [`FC2_NEURONS - 1: 0][15: 0]      fc2_gradients;
-    logic [`FC2_N_KERNELS - 1: 0][15: 0]    fc2_gradients_i;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]      fc2_gradients;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_gradients_i;
     logic                                   fc2_gradients_rdy;
     logic [3: 0]                            fc2_n_offset;
     logic                                   fc2_bp_mode; 
@@ -164,7 +164,8 @@ module neural_net_top(
     logic [2: 0]    fc2_state;
     logic [2: 0]    next_fc2_state;
     
-    localparam sf = 2.0**-13.0;  
+    localparam sf = 2.0**-8.0;  
+    localparam sf2 = 2.0**-13.0;
     
     // Backward pass states
     localparam WEIGHT_MODE = 0;
@@ -181,10 +182,10 @@ module neural_net_top(
     
         
     logic [9: 0]        input_addr;
-    logic [15: 0]       net_input_bram_dout_a;
-    logic [15: 0]       net_input_bram_dout_b;
-    logic [15: 0]       input_data_a;
-    logic [15: 0]       input_data_b;
+    logic [`PREC - 1: 0]       net_input_bram_dout_a;
+    logic [`PREC - 1: 0]       net_input_bram_dout_b;
+    logic [`PREC - 1: 0]       input_data_a;
+    logic [`PREC - 1: 0]       input_data_b;
     logic [9: 0]        img_label;
     logic               img_rdy;  
     logic               epoch_fin;
@@ -195,6 +196,9 @@ module neural_net_top(
     );
     
     logic sim;
+    logic [7: 0] sw_i;
+    
+    assign sw_i = 0;
 
     
     assign start        = sw_i[0] ? 1'b1 : start_bus;
@@ -301,8 +305,10 @@ module neural_net_top(
     
     
     always_comb begin
-        input_data_a    <= sw_i[0] ? net_input_bram_dout_a : {3'b0, img1_unpacked[fc0_addr_a], 5'b0};
-        input_data_b    <= sw_i[0] ? net_input_bram_dout_b : {3'b0, img1_unpacked[fc0_addr_b], 5'b0};
+        input_data_a    <= sw_i[0] ? {{5{net_input_bram_dout_a[15]}}, net_input_bram_dout_a[15: 5]} : 
+                            {`ACT_INT_BITS'b0, img1_unpacked[fc0_addr_a]};
+        input_data_b    <= sw_i[0] ? {{5{net_input_bram_dout_b[15]}}, net_input_bram_dout_b[15: 5]} : 
+                            {`ACT_INT_BITS'b0, img1_unpacked[fc0_addr_b]};
     end
 
    
@@ -741,7 +747,7 @@ module neural_net_top(
         end
     end
     
-    logic [`FC2_NEURONS - 1: 0][15: 0] fc2_out;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0] fc2_out;
     always @(posedge clk) begin
         if (fc2_buf_valid) begin
             fc2_out <= fc2_act_o_buf;
@@ -752,11 +758,11 @@ module neural_net_top(
     
     
     // LED Logic
-    logic [4: 0][15: 0] max1;
-    logic [2: 0][15: 0] max2;
-    logic [1: 0][15: 0] max3;    
-    logic [15: 0]       max4;   
-    logic [15: 0]       max;
+    logic [4: 0][`PREC - 1: 0] max1;
+    logic [2: 0][`PREC - 1: 0] max2;
+    logic [1: 0][`PREC - 1: 0] max3;    
+    logic [`PREC - 1: 0]       max4;   
+    logic [`PREC - 1: 0]       max;
     logic [4: 0]        max_valid;
     
     bit [3: 0] k;
@@ -814,7 +820,7 @@ module neural_net_top(
     end
     
     logic                               sm_valid_o;
-    logic [`FC2_NEURONS - 1: 0][15: 0]  sm_grad_o;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]  sm_grad_o;
     softmax softmax_i (
         .clk(clk),
         .reset(reset),
@@ -842,7 +848,7 @@ module neural_net_top(
         
         if (sm_valid_o) begin
             fc2_gradients               <= sm_grad_o;
-            fc2_gradients[img_label]    <= $signed(sm_grad_o[img_label]) - $signed(16'h2000);
+            fc2_gradients[img_label]    <= $signed(sm_grad_o[img_label]) - $signed(`ONE);
         end
     end
     /*assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
@@ -881,11 +887,12 @@ module neural_net_top(
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%04d\t\t%01b", fc2_activation_o[it], fc2_neuron_id_o[it], fc2_valid_o);
         end
-        */
+        */    
+
         $display("---FC2 GRADIENTS---");    
         $display("img_label: %d", img_label);    
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
-            $display("%02d:\t%f", it, $itor($signed(fc2_gradients[it])) * sf);
+            $display("%02d:\t%f", it, $itor($signed(fc2_gradients[it])) * sf2);
         end
         $display("--- FC2 OUT ---");        
         $display("fc2_buf_valid: %01b" , fc2_buf_valid);
