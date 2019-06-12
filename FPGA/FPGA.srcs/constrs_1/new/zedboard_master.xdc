@@ -235,14 +235,14 @@ set_property PACKAGE_PIN P16 [get_ports {rst}];  # "BTNC"
 ## ----------------------------------------------------------------------------
 ## User DIP Switches - Bank 35
 ## ---------------------------------------------------------------------------- 
-set_property PACKAGE_PIN F22 [get_ports {sw_i[0]}];  # "SW0"
-set_property PACKAGE_PIN G22 [get_ports {sw_i[1]}];  # "SW1"
-set_property PACKAGE_PIN H22 [get_ports {sw_i[2]}];  # "SW2"
-set_property PACKAGE_PIN F21 [get_ports {sw_i[3]}];  # "SW3"
-set_property PACKAGE_PIN H19 [get_ports {sw_i[4]}];  # "SW4"
-set_property PACKAGE_PIN H18 [get_ports {sw_i[5]}];  # "SW5"
-set_property PACKAGE_PIN H17 [get_ports {sw_i[6]}];  # "SW6"
-set_property PACKAGE_PIN M15 [get_ports {sw_i[7]}];  # "SW7"
+set_property PACKAGE_PIN F22 [get_ports {sw_in[0]}];  # "SW0"
+set_property PACKAGE_PIN G22 [get_ports {sw_in[1]}];  # "SW1"
+set_property PACKAGE_PIN H22 [get_ports {sw_in[2]}];  # "SW2"
+set_property PACKAGE_PIN F21 [get_ports {sw_in[3]}];  # "SW3"
+set_property PACKAGE_PIN H19 [get_ports {sw_in[4]}];  # "SW4"
+set_property PACKAGE_PIN H18 [get_ports {sw_in[5]}];  # "SW5"
+set_property PACKAGE_PIN H17 [get_ports {sw_in[6]}];  # "SW6"
+set_property PACKAGE_PIN M15 [get_ports {sw_in[7]}];  # "SW7"
 
 ## ----------------------------------------------------------------------------
 ## XADC AD Channels - Bank 35

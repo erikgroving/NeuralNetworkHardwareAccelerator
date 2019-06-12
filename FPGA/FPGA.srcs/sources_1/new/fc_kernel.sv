@@ -1,24 +1,23 @@
 `timescale 1ns / 1ps
 `include "sys_defs.vh"
 
-/* Addition kernel */
 module fc_kernel #(
     parameter FAN_IN = 0,
     parameter ID_WIDTH = 0
 )(
     input                           clk,
     input                           rst,
-    input   [15: 0]                 activation_i,
-    input   [15: 0]                 weight,
-    input   [15: 0]                 bias,
+    input   [`PREC - 1: 0]          activation_i,
+    input   [`PREC - 1: 0]          weight,
+    input   [`PREC - 1: 0]          bias,
     input   [ID_WIDTH - 1: 0]       neuron_id_i,
     input                           has_bias,
     input                           valid_i,
     input                           b_valid_i,
     
-    output logic [15: 0]            b_gradient_o,
+    output logic [`PREC - 1: 0]     b_gradient_o,
     output logic                    b_valid_o,
-    output logic [15: 0]            activation_o,
+    output logic [`PREC - 1: 0]     activation_o,
     output logic [ID_WIDTH - 1: 0]  neuron_id_o,
     output logic                    valid_o
 );
@@ -31,8 +30,8 @@ module fc_kernel #(
     logic [27: 0]               kernel_in;
     
     
-    logic [31: 0]               mult_res;
-    logic [30: 0]               mac_res;
+    logic [`MULT_BITS - 1: 0]       mult_res;
+    logic [`INTERNAL_PREC - 1: 0]   mac_res;
     
     logic                       last;
     logic                       prev_valid_i;
@@ -54,14 +53,14 @@ module fc_kernel #(
     end
     
     always_ff @(posedge clk) begin
-        if ({mult_res[31], &mult_res[29:27]} == 2'b10) begin // negative saturation
-            b_gradient_o    <= 16'h8000;
+        if ({mult_res[`MULT_BITS - 1], &mult_res[`MULT_BITS - 2:`GRAD_SAT_BIT]} == 2'b10) begin // negative saturation
+            b_gradient_o    <= `MIN_VAL;
         end
-        else if ({mult_res[31], |mult_res[29:27]} == 2'b01) begin // positive saturation
-            b_gradient_o    <= 16'h7FFF;
+        else if ({mult_res[`MULT_BITS - 1], |mult_res[`MULT_BITS - 2:`GRAD_SAT_BIT]} == 2'b01) begin // positive saturation
+            b_gradient_o    <= `MAX_VAL;
         end
         else begin
-            b_gradient_o    <= mult_res[28: 13];
+            b_gradient_o    <= mult_res[`GRAD_SAT_BIT: `GRAD_SAT_BIT - 15];
         end
 
         b_valid_o       <= b_valid_i;
@@ -71,13 +70,11 @@ module fc_kernel #(
     
     always_ff @(posedge clk) begin
         if (last) begin
-            activation_o    <= dsp_o[27: 12];
+            activation_o    <= dsp_o[`ACT_SAT_BIT: `ACT_SAT_BIT - 15];
             neuron_id_o     <= prev_neuron_id_i;
             valid_o         <= 1'b1;
         end
         else begin
-            activation_o    <= activation_o;
-            neuron_id_o     <= neuron_id_o;
             valid_o         <= 1'b0;
         end
     end
@@ -87,14 +84,14 @@ module fc_kernel #(
     assign mac_res      = $signed(mult_res[31:1]) + $signed(kernel_in);
     
     always_ff @(posedge clk) begin
-        if ({mac_res[30], &mac_res[29:27]} == 2'b10) begin // negative saturation
+        if ({mac_res[`INTERNAL_PREC - 1], &mac_res[`INTERNAL_PREC - 2: `ACT_SAT_BIT]} == 2'b10) begin // negative saturation
             dsp_o   <= 28'h800_0000;
         end
-        else if ({mac_res[30], |mac_res[29:27]} == 2'b01) begin // positive saturation
+        else if ({mac_res[`INTERNAL_PREC - 1], |mac_res[`INTERNAL_PREC - 2: `ACT_SAT_BIT]} == 2'b01) begin // positive saturation
             dsp_o   <= 28'h7FF_FFFF;
         end
         else begin
-            dsp_o   <= mac_res[27: 0]; 
+            dsp_o   <= mac_res[`ACT_SAT_BIT: 0]; 
         end
     end
     

@@ -6,49 +6,50 @@ module fc1_layer(
         input                                       rst,
         input                                       forward,
         input                                       update,
-        input  [`FC1_N_KERNELS - 1: 0][15: 0]       activations_i,
+        input  [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]       activations_i,
         input                                       valid_i,        
+        input  [4: 0]                               lrate_shifts,    
 
 
-        input [`FC1_N_KERNELS - 1: 0][15: 0]        b_gradient_i,
-        input [`FC1_N_KERNELS - 1: 0][15: 0]        b_activation_i,
+        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        b_gradient_i,
+        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        b_activation_i,
         input [6: 0]                                b_activation_id,
         input [`FC1_N_KERNELS - 1: 0][5: 0]         b_neuron_id_i,
         input                                       b_valid_i,
         input                                       bp_mode,
 
         
-        output logic [`FC1_N_KERNELS - 1: 0][15: 0] activation_o,
+        output logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0] activation_o,
         output logic [`FC1_N_KERNELS - 1: 0][5: 0]  neuron_id_o,
         output logic                                valid_act_o,
         output logic                                fc1_busy,
         output logic                                bp_done,
         output logic                                update_done,
         
-        output logic [`FC0_NEURONS - 1: 0][15: 0]   pl_gradients,
+        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   pl_gradients,
         output logic                                pl_grad_valid
 
     );
     
-    logic   [`FC1_PORT_WIDTH - 1: 0][15: 0]         data_in_a;
-    logic   [`FC1_PORT_WIDTH - 1: 0][15: 0]         data_in_b;
-    logic   [`FC1_PORT_WIDTH - 1: 0][15: 0]         data_out_a;
-    logic   [`FC1_PORT_WIDTH - 1: 0][15: 0]         data_out_b;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_in_a;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_in_b;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_out_a;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_out_b;
 
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          weights;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          weights;
     logic   [`FC1_ADDR - 1: 0]                      head_ptr;
     logic   [`FC1_ADDR - 1: 0]                      mid_ptr;
     logic   [`FC1_BIAS_ADDR - 1: 0]                 bias_ptr;
    
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          sch_activations;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          sch_activations;
     logic                                           sch_valid;
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          bram_activations;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          bram_activations;
     logic                                           bram_valid;    
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          kern_activations;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_activations;
     logic                                           kern_valid;
     
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          bias;
-    logic   [`FC1_N_KERNELS - 1: 0][15: 0]          kern_bias;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          bias;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_bias;
     logic   [255: 0]                                bias_container;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
@@ -59,16 +60,16 @@ module fc1_layer(
 
     logic   [`FC1_N_KERNELS - 1: 0]                 valid;
     
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_activation_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_activation_o;
     
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_gradient;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_gradient_pl;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_kern_grad;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_act;   
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_act_pl;   
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_kern_act;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient_pl;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act_pl;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_act;   
     
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            b_kern_grad_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad_o;
     logic [`FC1_N_KERNELS - 1: 0]                   b_kern_valid_o;
     logic [2: 0]                                    b_valid;
     logic [3: 0][6: 0]                              b_act_id;
@@ -82,13 +83,15 @@ module fc1_layer(
     logic                                           kern_bp_mode;
     logic                                           kern_bp_mode_o;
     
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_mult1;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            kern_mult2;   
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            weight_grad_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult1;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult2;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad_o;
     logic [1: 0][9: 0]                              fc1_weight_grad_addr;    
     logic [1: 0][9: 0]                              fc1_weight_grad_addr_offset;
     logic [`FC1_NEURONS - 1: 0]                     act_o_sign;
-    logic [`FC1_N_KERNELS - 1: 0][15: 0]            update_weights;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC: 0]            update_weights_sat;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            update_weights;
   
     logic                                           sch_valid_i;
     
@@ -97,15 +100,14 @@ module fc1_layer(
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            sch_activations <= 0;
             sch_valid       <= 0;
             sch_bp_mode     <= 0;
         end
         else begin
-            sch_activations <= activations_i;
             sch_valid       <= valid_i;
             sch_bp_mode     <= bp_mode;
         end
+        sch_activations     <= activations_i;
     end
     
     
@@ -184,11 +186,48 @@ module fc1_layer(
     bit [4: 0] a,c;
     always_comb begin
         for (a = 0, c =`FC1_PORT_WIDTH; a < `FC1_PORT_WIDTH; a = a + 1, c=c+1) begin
-            update_weights[a]   = $signed(data_out_a[a]) - $signed({{6{weight_grad_o[a][15]}}, weight_grad_o[a][15:6]});
-            update_weights[c]   = $signed(data_out_b[a]) - $signed({{6{weight_grad_o[c][15]}}, weight_grad_o[c][15:6]});
+            case(lrate_shifts)
+                5'd9: begin
+                    weight_grad[a]  = {{9{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:9]};
+                    weight_grad[c]  = {{9{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:9]};
+                end
+                5'd10: begin
+                    weight_grad[a]  = {{10{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:10]};
+                    weight_grad[c]  = {{10{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:10]};
+                end
+                5'd11: begin
+                    weight_grad[a]  = {{11{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:11]};
+                    weight_grad[c]  = {{11{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:11]};
+                end
+                5'd12: begin
+                    weight_grad[a]  = {{12{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:12]};
+                    weight_grad[c]  = {{12{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:12]};
+                end
+                default: begin
+                    weight_grad[a]  = {{8{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:8]};
+                    weight_grad[c]  = {{8{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:8]};
+                end
+            endcase
+            update_weights_sat[a]   = $signed(data_out_a[a]) - $signed(weight_grad[a]);
+            update_weights_sat[c]   = $signed(data_out_b[a]) - $signed(weight_grad[c]);
         end 
     end
-     
+    
+    bit [7: 0] d;
+    always_comb begin
+        for (d = 0; d < `FC1_N_KERNELS; d=d+1) begin
+            if (update_weights_sat[d][`PREC:`PREC - 1] == 2'b01) begin
+                update_weights[d]   = `MAX_VAL;
+            end
+            else if (update_weights_sat[d][`PREC:`PREC - 1] == 2'b10) begin
+                update_weights[d]   = `MIN_VAL;
+            end
+            else begin
+                update_weights[d]   = update_weights_sat[d][`PREC - 1: 0];
+            end
+        end
+    end   
+         
     // BRAM for the weights of the fully connected layer
     fc1_weight_bram_controller fc1_weight_bram_controller_i (
         // inputs
@@ -268,25 +307,19 @@ module fc1_layer(
     
     always_ff @(posedge clk) begin
         if (rst) begin
-            kern_activations    <= 0;
             kern_valid          <= 0;
             kern_has_bias       <= 0;
-            kern_bias           <= 0;
-            kern_neuron_id      <= 0;
-            kern_bp_mode        <= 0;
-            kern_bp_mode_o      <= 0;
-            weights             <= 0;
         end
         else begin
-            kern_activations    <= bram_activations;
             kern_valid          <= bram_valid;
             kern_has_bias       <= bram_has_bias;
-            kern_bias           <= 0;//bias;
-            kern_neuron_id      <= neuron_id;
-            kern_bp_mode        <= bram_bp_mode;
-            kern_bp_mode_o      <= kern_bp_mode;
-            weights             <= {data_out_b, data_out_a};
         end
+        kern_activations    <= bram_activations;
+        kern_bias           <= 0;//bias;
+        kern_neuron_id      <= neuron_id;
+        kern_bp_mode        <= bram_bp_mode;
+        kern_bp_mode_o      <= kern_bp_mode;
+        weights             <= {data_out_b, data_out_a};
     end
     
     
@@ -333,7 +366,7 @@ module fc1_layer(
         end
         else if (&valid) begin
             for (b = 0; b < `FC1_N_KERNELS; b = b + 1) begin
-                act_o_sign[neuron_id_o[b]]   <= kern_activation_o[b][15];
+                act_o_sign[neuron_id_o[b]]   <= kern_activation_o[b][`PREC - 1];
             end
         end
     end
@@ -341,7 +374,7 @@ module fc1_layer(
     bit [10: 0] j;
     always_comb begin
         for (j = 0; j < `FC1_N_KERNELS; j=j+1) begin
-            activation_o[j] = kern_activation_o[j][15] ? 0 : kern_activation_o[j];
+            activation_o[j] = kern_activation_o[j][`PREC - 1] ? 0 : kern_activation_o[j];
         end
     end
     
@@ -352,35 +385,20 @@ module fc1_layer(
     bit [5: 0] q;
     // Backward pass logic
     always_ff @(posedge clk) begin
-        if (rst) begin
-            b_gradient      <= 0;
-            b_gradient_pl   <= 0;
-            
-            b_act           <= 0;
-            b_act_pl        <= 0;
-           
-            b_kern_grad     <= 0;
-            b_kern_act      <= 0;
-            b_act_id        <= 0;
-            b_neuron_id     <= 0;            
-            b_kern_valid    <= 0;            
+        for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
+            b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
         end
-        else begin
-            for (q = 0; q < `FC1_N_KERNELS; q = q + 1) begin
-                b_gradient[q]   <= act_o_sign[b_neuron_id_i[q]] ? 0 : b_gradient_i[q];
-            end
-            b_gradient_pl   <= b_gradient;
-            b_kern_grad     <= b_gradient_pl;            
-            
-            b_act           <= b_activation_i;
-            b_act_pl        <= b_act;
-            b_kern_act      <= b_act_pl;            
-            
-            
-            b_act_id        <= {b_act_id[2:0], b_activation_id};
-            b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
-            b_valid         <= {b_valid[1: 0], b_valid_i};
-        end
+        b_gradient_pl   <= b_gradient;
+        b_kern_grad     <= b_gradient_pl;            
+        
+        b_act           <= b_activation_i;
+        b_act_pl        <= b_act;
+        b_kern_act      <= b_act_pl;            
+        
+        
+        b_act_id        <= {b_act_id[2:0], b_activation_id};
+        b_neuron_id     <= {b_neuron_id[2:0], b_neuron_id_i};
+        b_valid         <= {b_valid[1: 0], b_valid_i};
     end
         
     
@@ -428,12 +446,14 @@ module fc1_layer(
         $display("data_out[1]: %04h\t\tweight_grad_o[1]: %04h", data_out_a[1], weight_grad_o[1]);
         $display("update_weights[0]: %04h", update_weights[0]);
         $display("update_weights[1]: %04h", update_weights[1]);
-        
+        */        
+        localparam sf = 2.0**-13.0;  
+
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS1 ---");
             $display("pl_grad_valid: %01b", pl_grad_valid);
             for (it = 0; it < `FC0_NEURONS; it=it+1) begin
-                $display("%02d:\t%04h", it, pl_gradients[it]);
+                $display("%02d:\t%f", it, $itor($signed(pl_gradients[it])) * sf);
             end
         end
         
@@ -441,13 +461,13 @@ module fc1_layer(
             $display("WEIGHT GRADS1");
             $display("Activation ID: %03d", fc1_weight_grad_addr[0]);
             for (it = 0; it < 8; it=it+1) begin
-                $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
+                $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
             $display("Activation ID: %03d", fc1_weight_grad_addr[1]);
-            for (it = 8; it < 16; it=it+1) begin
-                $display("%02d: %04h", b_neuron_id[3][it], b_kern_grad_o[it]);
+            for (it = 8; it < `PREC; it=it+1) begin
+                $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
-        end*/
+        end
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);

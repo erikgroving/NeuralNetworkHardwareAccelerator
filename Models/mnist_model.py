@@ -58,12 +58,12 @@ def finalTrainAndTest():
     lrate = 0.01
     momen = 0.9
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=lrate, momentum=0.9)
+    optimizer = optim.SGD(net.parameters(), lr=lrate, momentum=0.0)
     #Test for number of epochs we found with above function
     for i in range(n_epochs):
         running_loss = 0.0
 
-        batch_s = 20
+        batch_s = 100
         lb = 0
         ub = batch_s
         
