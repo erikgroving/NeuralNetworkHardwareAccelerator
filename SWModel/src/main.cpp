@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <time.h>
 #include <chrono>
 
 #include "convolutional.h"
@@ -75,6 +76,8 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
     std::cout << "Starting Accuracy" << std::endl;
     printAccuracy(net, in_test, out_test);
     std::cout <<std::endl;
+    clock_t start, end, diff;
+    start = clock();
     for (int i = 0; i <= n_epochs; i++) {
         double train_loss = 0.0;
         int batch_size = net.getBatchSize();
@@ -102,14 +105,16 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
             lb += batch_size;
             ub += batch_size;
         }
+        end = clock();
+        diff = end - start;
         std::cout << "Epoch: " << i << std::endl;
         std::cout << "\n--- Training Stats ---\n";    
         train_loss = printAccuracy(net, in, out);
         std::cout << "Loss: " << train_loss / (double)in.size() << std::endl;    
         std::cout << "\n--- Test Stats ---\n";    
         double test_loss = printAccuracy(net, in_test, out_test);
-
-        net(in_test);
+        std::cout << "Elapsed time: " << (float)diff / CLOCKS_PER_SEC << std::endl;
+        /*net(in_test);
         auto acts = net.getActivations();
         double max = -10;
         double min = 10;
@@ -140,7 +145,7 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
 
         net.clearSavedData();
         
-        
+       */ 
         std::cout << "Loss: " << test_loss / (double)in_test.size() << std::endl << std::endl;
         if ( (i + 1) % epochs_per_change == 0) {
             std::cout << "Learning rate changed from " << net.getLearningRate();

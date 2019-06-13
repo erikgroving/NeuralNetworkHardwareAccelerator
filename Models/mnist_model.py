@@ -38,8 +38,8 @@ class Net(nn.Module):
         return F.log_softmax(x, dim=0)
 
 
-use_cuda = torch.cuda.is_available()
-#use_cuda = False
+#use_cuda = torch.cuda.is_available()
+use_cuda = False
 device = torch.device("cuda:0" if use_cuda else "cpu")
 
 
@@ -54,7 +54,7 @@ def finalTrainAndTest():
     start = timer()
     n_epochs = 100
     net = Net()
-    net.cuda()    
+    #net.cuda()    
     lrate = 0.01
     momen = 0.9
     criterion = nn.CrossEntropyLoss()
@@ -63,7 +63,7 @@ def finalTrainAndTest():
     for i in range(n_epochs):
         running_loss = 0.0
 
-        batch_s = 100
+        batch_s = 1
         lb = 0
         ub = batch_s
         
