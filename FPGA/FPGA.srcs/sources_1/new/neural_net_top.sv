@@ -164,8 +164,8 @@ module neural_net_top(
     logic [2: 0]    fc2_state;
     logic [2: 0]    next_fc2_state;
     
-    localparam sf = 2.0**-8.0;  
-    localparam sf2 = 2.0**-13.0;
+    localparam sf = 2.0**-12.0;
+    localparam sf2 = 2.0**-12.0;
     
     // Backward pass states
     localparam WEIGHT_MODE = 0;
@@ -190,15 +190,15 @@ module neural_net_top(
     logic               img_rdy;  
     logic               epoch_fin;
     mmcm_50_mhz mmcm_50_mhz_i (
-        .clk_in1(fab_clk),
-        //.clk_in1(clock_in),
+        //.clk_in1(fab_clk),
+        .clk_in1(clock_in),
         .clk_out1(clk)
     );
     
     logic sim;
     logic [7: 0] sw_i;
     
-    assign sw_i = 0;
+    assign sw_i = sw_in;
 
     
     assign start        = sw_i[0] ? 1'b1 : start_bus;
@@ -256,24 +256,25 @@ module neural_net_top(
     assign fc0_addr_a = (forward) ? input_addr << 1 : fc0_b_activation_id_i << 1; 
     assign fc0_addr_b = fc0_addr_a + 1'b1;
     
-    
+
     net_input_bram net_input_bram_i (
         .addra(fc0_addr_a),
         .clka(clk),
-        .dina(16'b0),
+        .dina(23'b0),
         .douta(net_input_bram_dout_a),
         .ena(1'b1),
         .wea(1'b0),
         
         .addrb(fc0_addr_b),
         .clkb(clk),
-        .dinb(16'b0),
+        .dinb(23'b0),
         .doutb(net_input_bram_dout_b),
         .enb(1'b1),
         .web(1'b0)
     );    
- 
-    
+
+  
+        
     logic [16: 0] prev_img_id;
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -305,10 +306,10 @@ module neural_net_top(
     
     
     always_comb begin
-        input_data_a    <= sw_i[0] ? {{5{net_input_bram_dout_a[15]}}, net_input_bram_dout_a[15: 5]} : 
-                            {`ACT_INT_BITS'b0, img1_unpacked[fc0_addr_a]};
-        input_data_b    <= sw_i[0] ? {{5{net_input_bram_dout_b[15]}}, net_input_bram_dout_b[15: 5]} : 
-                            {`ACT_INT_BITS'b0, img1_unpacked[fc0_addr_b]};
+        input_data_a    <= sw_i[0] ? net_input_bram_dout_a  : 
+                            {6'b0, img1_unpacked[fc0_addr_a], 9'b0};
+        input_data_b    <= sw_i[0] ? net_input_bram_dout_b : 
+                            {6'b0, img1_unpacked[fc0_addr_b], 9'b0};
     end
 
    
@@ -1337,11 +1338,11 @@ system_wrapper system_wrapper_i
     n_epochs,
     num_correct_test,
     num_correct_train,
-    {fc2_out[1], fc2_out[0]},
-    {fc2_out[3], fc2_out[2]},
-    {fc2_out[5], fc2_out[4]},
-    {fc2_out[7], fc2_out[6]},
-    {fc2_out[9], fc2_out[8]},
+    {9'b0, fc2_out[0]},
+    {9'b0, fc2_out[2]},
+    {9'b0, fc2_out[4]},
+    {9'b0, fc2_out[6]},
+    {9'b0, fc2_out[8]},
     start_bus,
     status_block,
     training_mode_bus);

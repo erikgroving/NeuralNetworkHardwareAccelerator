@@ -22,16 +22,16 @@ module fc_kernel #(
     output logic                    valid_o
 );
     
-    logic [27: 0]               dsp_o;
+    logic [31: 0]               dsp_o;
     
     logic [ID_WIDTH - 1: 0]     neuron_id;
     logic [ID_WIDTH - 1: 0]     prev_neuron_id_i;
     logic                       valids;
-    logic [27: 0]               kernel_in;
+    logic [31: 0]               kernel_in;
     
     
-    logic [`MULT_BITS - 1: 0]       mult_res;
-    logic [`INTERNAL_PREC - 1: 0]   mac_res;
+    logic [45: 0]               mult_res;
+    logic [37: 0]               mac_res;
     
     logic                       last;
     logic                       prev_valid_i;
@@ -53,14 +53,14 @@ module fc_kernel #(
     end
     
     always_ff @(posedge clk) begin
-        if ({mult_res[`MULT_BITS - 1], &mult_res[`MULT_BITS - 2:`GRAD_SAT_BIT]} == 2'b10) begin // negative saturation
+        if ({mult_res[45], &mult_res[44: 39]} == 2'b10) begin // negative saturation
             b_gradient_o    <= `MIN_VAL;
         end
-        else if ({mult_res[`MULT_BITS - 1], |mult_res[`MULT_BITS - 2:`GRAD_SAT_BIT]} == 2'b01) begin // positive saturation
+        else if ({mult_res[45], |mult_res[44: 39]} == 2'b01) begin // positive saturation
             b_gradient_o    <= `MAX_VAL;
         end
         else begin
-            b_gradient_o    <= mult_res[`GRAD_SAT_BIT: `GRAD_SAT_BIT - 15];
+            b_gradient_o    <= mult_res[39: 17];
         end
 
         b_valid_o       <= b_valid_i;
@@ -70,7 +70,7 @@ module fc_kernel #(
     
     always_ff @(posedge clk) begin
         if (last) begin
-            activation_o    <= dsp_o[`ACT_SAT_BIT: `ACT_SAT_BIT - 15];
+            activation_o    <= dsp_o[31: 9];
             neuron_id_o     <= prev_neuron_id_i;
             valid_o         <= 1'b1;
         end
@@ -79,19 +79,19 @@ module fc_kernel #(
         end
     end
     
-    assign kernel_in    = has_bias ? {bias, 12'b0} : dsp_o;
+    assign kernel_in    = has_bias ? {bias, 9'b0} : dsp_o;
     assign mult_res     = $signed(weight) * $signed(activation_i);
-    assign mac_res      = $signed(mult_res[31:1]) + $signed(kernel_in);
+    assign mac_res      = $signed(mult_res[45:8]) + $signed(kernel_in);
     
     always_ff @(posedge clk) begin
-        if ({mac_res[`INTERNAL_PREC - 1], &mac_res[`INTERNAL_PREC - 2: `ACT_SAT_BIT]} == 2'b10) begin // negative saturation
-            dsp_o   <= 28'h800_0000;
+        if ({mac_res[37], &mac_res[36: 31]} == 2'b10) begin // negative saturation
+            dsp_o   <= 32'h8000_0000;
         end
-        else if ({mac_res[`INTERNAL_PREC - 1], |mac_res[`INTERNAL_PREC - 2: `ACT_SAT_BIT]} == 2'b01) begin // positive saturation
-            dsp_o   <= 28'h7FF_FFFF;
+        else if ({mac_res[37], |mac_res[36: 31]} == 2'b01) begin // positive saturation
+            dsp_o   <= 32'h7FFF_FFFF;
         end
         else begin
-            dsp_o   <= mac_res[`ACT_SAT_BIT: 0]; 
+            dsp_o   <= mac_res[31: 0]; 
         end
     end
     

@@ -2,12 +2,12 @@ import glob
 import math
 import random
 
-integer_bits = 3
+integer_bits = 6
 
 # Set activations in
 fc0_fan_in = 28*28
 activations_i = []
-f = open('../FPGA/FPGA.srcs/sources_1/ip/fc0_random_input2.coe')
+f = open('../FPGA/FPGA.srcs/sources_1/ip/rand_input23.coe')
 next(f)
 next(f)
 for line in f:
@@ -34,7 +34,7 @@ n_offset = 0
 
 
 # read fc0
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc0_weights*.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc0_weights23.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -43,8 +43,8 @@ for fname in glob.glob(path):
     for line in f:
         for i in range(fc0_n_neurons):
             curr_neuron = i
-            st_bit = i * 16
-            end_bit = (i + 1) * 16
+            st_bit = i * 23
+            end_bit = (i + 1) * 23
 
             bit_str = line[st_bit: end_bit]
             weight_val = 0
@@ -71,7 +71,7 @@ n_offset = 0
 
 
 # read fc1
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights*.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights23.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -80,8 +80,8 @@ for fname in glob.glob(path):
     for line in f:
         for i in range(8):
             curr_neuron = n_offset + (7 - i)
-            st_bit = i * 16
-            end_bit = (i + 1) * 16     
+            st_bit = i * 23
+            end_bit = (i + 1) * 23
 
             bit_str = line[st_bit: end_bit]
             weight_val = 0
@@ -109,7 +109,7 @@ n_offset = 0
 
 
 # read fc2
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc2_weights*.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc2_weights23.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -168,7 +168,7 @@ for output in fc2_output:
 for output in sm_output:
     gradients.append(output)
     
-
+print(gradients[0])
 gradients[0] -= 1
 loss = -math.log(gradients[0] + 1.)
 
@@ -294,17 +294,17 @@ for i in range(len(fc0_neurons)):
 #    print('Numer grad: ' + str((loss2 - loss3) / (2*eps)) + '\n')
 
 
-#print('\n--- FC0 OUT ---')
-#for i in range(len(fc0_output)):
-#    print("Neuron " + str(i) + ": " + str(fc0_output[i]))
-#
-#print('\n--- FC1 OUT ---')
-#for i in range(len(fc1_output)):
-#    print("Neuron " + str(i) + ": " + str(fc1_output[i]))
-#
-#print('\n--- FC2 OUT ---')
-#for i in range(len(fc2_output)):
-#    print("Neuron " + str(i) + ": " + str(fc2_output[i]))
+print('\n--- FC0 OUT ---')
+for i in range(len(fc0_output)):
+    print("Neuron " + str(i) + ": " + str(fc0_output[i]))
+
+print('\n--- FC1 OUT ---')
+for i in range(len(fc1_output)):
+    print("Neuron " + str(i) + ": " + str(fc1_output[i]))
+
+print('\n--- FC2 OUT ---')
+for i in range(len(fc2_output)):
+    print("Neuron " + str(i) + ": " + str(fc2_output[i]))
 #
 print('\n--- FC2 NEURON GRADIENTS ---')
 for i in range(len(gradients)):
@@ -317,9 +317,9 @@ for i in range(len(gradients)):
 ##    for j in range(len(weight_grad[i])):
 ##        print(str(j) + ": " + str(weight_grad[i][j]))
 ##
-print ('\n--- FC1 NEURON GRADIENTS ---')
-for i in range(len(fc1_grad)):
-    print(str(i) + ": " + str(fc1_grad[i]))
+#print ('\n--- FC1 NEURON GRADIENTS ---')
+#for i in range(len(fc1_grad)):
+#    print(str(i) + ": " + str(fc1_grad[i]))
 #
 ##print('\n--- FC1 WEIGHT GRADIENTS ---')
 ###for i in range(98):
@@ -328,9 +328,9 @@ for i in range(len(fc1_grad)):
 ###        print(str(j) + ": " + str(fc1_w_grad[j][i]))
 ##
 ##
-print ('\n--- FC0 NEURON GRADIENTS ---')
-for i in range(len(fc0_grad)):
-    print(str(i) + ": " + str(fc0_grad[i]))
+#print ('\n--- FC0 NEURON GRADIENTS ---')
+#for i in range(len(fc0_grad)):
+#    print(str(i) + ": " + str(fc0_grad[i]))
 #
 #print('\n--- FC0 WEIGHT GRADIENTS ---')
 #for i in range(784):

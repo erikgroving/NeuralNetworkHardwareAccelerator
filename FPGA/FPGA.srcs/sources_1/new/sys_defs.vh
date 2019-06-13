@@ -4,18 +4,15 @@
 `define DEBUG
 
 // Precision defines
-`define PREC                    16
-`define MULT_BITS               32  // 2 * PREC
-`define INTERNAL_PREC           31  // bits used for internal precision
-`define ACT_SAT_BIT             27  // INTERNAL_PREC - (ACT_INT_BITS + 1)
-`define GRAD_SAT_BIT            28  // MULT_BITS - (ACT_INT_BITS + 1)
-`define ACT_INT_BITS            8
-`define ACT_FRAC_BITS           8
-`define WEIGHT_INT_BITS         3
-`define WEIGHT_FRAC_BITS        13
-`define ONE                     16'h2000
-`define MAX_VAL                 16'h7fff
-`define MIN_VAL                 16'h8000
+`define PREC                    18
+`define MULT_BITS               36  // 2 * PREC
+`define ACT_INT_BITS            6
+`define ACT_FRAC_BITS           12
+`define GRAD_INT_BITS           6
+`define GRAD_FRAC_BITS          12
+`define ONE                     18'h00_1000
+`define MAX_VAL                 18'h1f_ffff
+`define MIN_VAL                 18'h20_0000
 
 // FC0 defines
 `define FC0_N_KERNELS           196

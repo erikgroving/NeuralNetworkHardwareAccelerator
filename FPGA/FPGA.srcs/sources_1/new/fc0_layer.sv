@@ -294,7 +294,7 @@ module fc0_layer(
                 .rst(rst),
                 .activation_i(kern_mult2[i]),
                 .weight(kern_mult1[i]),
-                .bias(0/*kern_bias[i]*/),
+                .bias(23'b0/*kern_bias[i]*/),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),

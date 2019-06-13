@@ -2,12 +2,10 @@ from random import seed
 from random import gauss
 import math
 
-n_neurons = 1
-params_per_neuron = 784
+n_neurons = 10
+params_per_neuron = 64
 r_width = 1
-fan_in = 256
-int_bits = 3
-dec_bits = 13
+fan_in = 64
 
 def intToBinaryString(x, l):
     str = ""
@@ -39,8 +37,8 @@ for i in range(n_neurons):
         params.append(param)
 
 for p in params:
-    b = int(p * (2**13))
-    binary_params.append(intToBinaryString(b, 16))
+    b = int(p * (2**17))
+    binary_params.append(intToBinaryString(b, 23))
 print(params[0])
 print(binary_params[0])
 

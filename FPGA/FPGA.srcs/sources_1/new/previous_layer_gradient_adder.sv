@@ -51,7 +51,7 @@ module previous_layer_gradient_adder (
             stage1_bp_mode      <= 0;
         end
         else begin
-            for (i = 0, n = 0; i < `PREC ; i = i + 2, n = n + 1) begin
+            for (i = 0, n = 0; i < 16; i = i + 2, n = n + 1) begin
                 stage1_grad[n]  <= $signed(grad_i[i]) + $signed(grad_i[i + 1]);
             end
             stage1_valid        <= valid_i & (bp_mode_i == NEURON_MODE);

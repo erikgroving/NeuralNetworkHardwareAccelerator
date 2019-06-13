@@ -251,7 +251,7 @@ module fc2_layer(
         .neuron_id(neuron_id)
         
     ); 
-    
+    /*
      biases_fc2_blk_mem biases_fc2_blk_mem_i (
         .addra(bias_ptr),
         .clka(clk),
@@ -260,7 +260,7 @@ module fc2_layer(
         .ena(1'b1),
         .wea(1'b0)
     );
-    
+    */
     assign b_weight_we = &b_kern_valid_o & kern_bp_mode_o == WEIGHT_MODE;
     assign fc2_weight_grad_addr[0] = ({6'b0, b_neuron_id[3][0]} << 6) + b_act_id[3];
     assign fc2_weight_grad_addr[1] = ({6'b0, b_neuron_id[3][1]} << 6) + b_act_id[3];

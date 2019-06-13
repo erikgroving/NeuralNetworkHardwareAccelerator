@@ -9,7 +9,7 @@ module neural_net_top_tb(
     neural_net_top neural_net_top_i (
         .clock_in(clock),
         .rst(reset),
-        .sw_i(8'h01),
+        .sw_in(8'h01),
         .led_o()
     );
  
