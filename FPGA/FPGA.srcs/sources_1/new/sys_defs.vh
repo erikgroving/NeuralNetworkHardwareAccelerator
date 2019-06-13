@@ -27,7 +27,6 @@
 `define FC0_ADDR                10
 `define FC0_BIAS_ADDR           1
 
-
 // FC1 defines
 `define FC1_N_KERNELS           16
 `define FC1_ADDR                10

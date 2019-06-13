@@ -31,6 +31,7 @@ public:
 
     const uint32_t getBatchSize() const { return batch_size; }
     std::vector< std::vector<double> > getOlGradient() const { return ol_gradient; }
+    std::vector< std::vector< std::vector<double> > > getActivations() const { return activations; }
     std::vector<Layer*> getLayers() { return layers; }
     void setLearningRate(double lr) { learning_rate = lr; };
     const double getLearningRate() const& { return learning_rate; };
