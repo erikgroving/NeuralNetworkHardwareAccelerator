@@ -312,12 +312,12 @@ for i in range(len(gradients)):
     print(str(i) + ": " + str(gradients[i]))
 #
 #
-##print('\n--- FC2 WEIGHT GRADIENTS ---')
-##for i in range(len(weight_grad)):
-##    print("Neuron " + str(i))
-##    for j in range(len(weight_grad[i])):
-##        print(str(j) + ": " + str(weight_grad[i][j]))
-##
+print('\n--- FC2 WEIGHT GRADIENTS ---')
+for i in range(len(weight_grad)):
+    print("Neuron " + str(i))
+    for j in range(len(weight_grad[i])):
+        print(str(j) + ": " + str(weight_grad[i][j]))
+
 print ('\n--- FC1 NEURON GRADIENTS ---')
 for i in range(len(fc1_grad)):
     print(str(i) + ": " + str(fc1_grad[i]))

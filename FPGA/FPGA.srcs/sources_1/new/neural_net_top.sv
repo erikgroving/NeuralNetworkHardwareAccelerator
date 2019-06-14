@@ -190,7 +190,7 @@ module neural_net_top(
     logic               epoch_fin;
     mmcm_50_mhz mmcm_50_mhz_i (
         .clk_in1(fab_clk),
-        //.clk_in1(clock_in),
+       // .clk_in1(clock_in),
         .clk_out1(clk)
     );
     
@@ -306,22 +306,21 @@ module neural_net_top(
     
     always_comb begin
         input_data_a    <= sw_i[0] ? net_input_bram_dout_a  : 
-                            {6'b0, img1_unpacked[fc0_addr_a], 9'b0};
+                            {6'b0, img1_unpacked[fc0_addr_a], 4'b0};
         input_data_b    <= sw_i[0] ? net_input_bram_dout_b : 
-                            {6'b0, img1_unpacked[fc0_addr_b], 9'b0};
+                            {6'b0, img1_unpacked[fc0_addr_b], 4'b0};
     end
 
    
     always_ff @(posedge clk) begin
         if (reset) begin
-            fc0_activation_i    <= 0;
             fc0_valid           <= 0;
             fc0_valid_i         <= 0;
         end
         else begin
-            fc0_activation_i    <= {{`FC0_NEURONS{input_data_b}}, {`FC0_NEURONS{input_data_a}}};
             fc0_valid           <= fc0_start;
-            fc0_valid_i         <= fc0_valid;
+            fc0_valid_i         <= fc0_valid;            
+            fc0_activation_i    <= {input_data_b, input_data_a};
         end
     end
     
@@ -762,7 +761,7 @@ module neural_net_top(
     logic [4: 0]        max_valid;
     
     bit [3: 0] k;
-    bit [3: 0] j;
+    bit [3: 0] j, t;
     logic [7: 0] led_o_r;
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -805,6 +804,11 @@ module neural_net_top(
         end       
         else if (max_valid[4]) begin
             correct    <= fc2_act_o_buf[img_label] == max;
+            for (t = 0; t < `FC2_NEURONS; t=t+1) begin
+                if (fc2_act_o_buf[t] == max && t != img_label) begin
+                    correct <= 1'b0;
+                end
+            end
             for (j = 0; j < 8; j=j+1) begin
                 led_o_r[j] <= fc2_act_o_buf[j] == max;
             end

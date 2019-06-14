@@ -13,7 +13,7 @@
 #define UPDATE      4
 #define IDLE        5
 #define SET_SIZE    70000
-#define TRAIN_SIZE  60000
+#define TRAIN_SIZE  5000
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -78,8 +78,8 @@ int main() {
     ddr_ptr->start = 0;
     usleep(100);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 5;
-    ddr_ptr->learning_rate = 8;
+    ddr_ptr->n_epochs = 15;
+    ddr_ptr->learning_rate = 5;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
@@ -90,7 +90,7 @@ int main() {
         // Print data if epoch just finished
         if ((id == 0) && epoch != 0) {        
             gettimeofday(&end, NULL);
-            
+            print_debug_data(ddr_ptr);
             
             corr_tr     = ddr_ptr->num_correct_train;
             corr_test   = ddr_ptr->num_correct_test;
@@ -98,20 +98,21 @@ int main() {
                     ": %d/%d\nAccuracy: %f%%\n"
                     "@@@Test Images: %d/%d\n"
                     "Accuracy: %f%%\n", epoch, corr_tr, TRAIN_SIZE, 
-                    (float)(corr_tr/(float)TRAIN_SIZE) * 100., corr_test, 10000, 
-                    ((float)corr_test/10000.) * 100.);
+                    (float)(corr_tr/(float)TRAIN_SIZE) * 100., corr_test, SET_SIZE - TRAIN_SIZE, 
+                    ((float)corr_test/(float)(SET_SIZE - TRAIN_SIZE)) * 100.);
      
                    
             uint32_t active = ddr_ptr->active_cycles;
             uint32_t idle = ddr_ptr->idle_cycles;
             printf("Active Cycles: %d\t Idle Cycles: %d\n", active, idle);
-            printf("Active Cycle Percentage: %f%%\n", (float)active / ((float)idle + (float)active));      
+            printf("Active Cycle Percentage: %f%%\n", (float)active / (100.*(float)idle + (float)active));      
             //print_debug_data(ddr_ptr);            
             printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
             gettimeofday(&start, NULL);
+            usleep(5e5);
         }
              
-        ddr_ptr->training_mode = (id < 60000);  
+        ddr_ptr->training_mode = (id < TRAIN_SIZE);  
        
         
         if (id < 60000) {

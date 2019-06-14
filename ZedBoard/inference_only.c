@@ -78,8 +78,7 @@ int main() {
     ddr_ptr->start = 0;
     usleep(10);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 5;
-    ddr_ptr->learning_rate = 4;
+    ddr_ptr->n_epochs = 1;
     ddr_ptr->training_mode = 0;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
@@ -93,7 +92,7 @@ int main() {
             
             corr_tr     = ddr_ptr->num_correct_train;
             corr_test   = ddr_ptr->num_correct_test;
-            printf("\n\n@@@ EPOCH %d\n@@@ Images"
+            printf("Images"
                     ": %d/%d\nAccuracy: %f%%\n", epoch, corr_test, 70000, 
                     ((float)corr_test/70000.) * 100.);
      
@@ -102,7 +101,6 @@ int main() {
             uint32_t idle = ddr_ptr->idle_cycles;
             printf("Active Cycles: %d\t Idle Cycles: %d\n", active, idle);
             printf("Active Cycle Percentage: %f%%\n", (float)active / ((float)idle + (float)active));      
-            //print_debug_data(ddr_ptr);            
             printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
             gettimeofday(&start, NULL);
         }
