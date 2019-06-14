@@ -3,11 +3,12 @@ import math
 import random
 
 integer_bits = 6
+int_bits_grad = 3
 
 # Set activations in
 fc0_fan_in = 28*28
 activations_i = []
-f = open('../FPGA/FPGA.srcs/sources_1/ip/rand_input23.coe')
+f = open('../FPGA/FPGA.srcs/sources_1/ip/rand_input_6.12.coe')
 next(f)
 next(f)
 for line in f:
@@ -34,7 +35,7 @@ n_offset = 0
 
 
 # read fc0
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc0_weights23.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc0_weights_3.15.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -43,12 +44,12 @@ for fname in glob.glob(path):
     for line in f:
         for i in range(fc0_n_neurons):
             curr_neuron = i
-            st_bit = i * 23
-            end_bit = (i + 1) * 23
+            st_bit = i * 18
+            end_bit = (i + 1) * 18
 
             bit_str = line[st_bit: end_bit]
             weight_val = 0
-            bit_val = 2 ** (integer_bits - 1)
+            bit_val = 2 ** (int_bits_grad - 1)
 
             if (bit_str[0] == '1'):
                 weight_val -= bit_val
@@ -71,7 +72,7 @@ n_offset = 0
 
 
 # read fc1
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights23.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights_3.15.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -80,12 +81,12 @@ for fname in glob.glob(path):
     for line in f:
         for i in range(8):
             curr_neuron = n_offset + (7 - i)
-            st_bit = i * 23
-            end_bit = (i + 1) * 23
+            st_bit = i * 18
+            end_bit = (i + 1) * 18
 
             bit_str = line[st_bit: end_bit]
             weight_val = 0
-            bit_val = 2 ** (integer_bits - 1)
+            bit_val = 2 ** (int_bits_grad - 1)
 
             if (bit_str[0] == '1'):
                 weight_val -= bit_val
@@ -109,7 +110,7 @@ n_offset = 0
 
 
 # read fc2
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc2_weights23.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc2_weights_3.15.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -118,7 +119,7 @@ for fname in glob.glob(path):
     curr_neuron = n_offset
     for line in f:
         weight_val = 0
-        bit_val = 2 ** (integer_bits - 1)
+        bit_val = 2 ** (int_bits_grad - 1)
 
         if (line[0] == '1'):
             weight_val -= bit_val
@@ -317,26 +318,26 @@ for i in range(len(gradients)):
 ##    for j in range(len(weight_grad[i])):
 ##        print(str(j) + ": " + str(weight_grad[i][j]))
 ##
-#print ('\n--- FC1 NEURON GRADIENTS ---')
-#for i in range(len(fc1_grad)):
-#    print(str(i) + ": " + str(fc1_grad[i]))
+print ('\n--- FC1 NEURON GRADIENTS ---')
+for i in range(len(fc1_grad)):
+    print(str(i) + ": " + str(fc1_grad[i]))
 #
-##print('\n--- FC1 WEIGHT GRADIENTS ---')
-###for i in range(98):
-###    print("Activation: " + str(i))
-###    for j in range(64):
-###        print(str(j) + ": " + str(fc1_w_grad[j][i]))
+print('\n--- FC1 WEIGHT GRADIENTS ---')
+for i in range(98):
+    print("Activation: " + str(i))
+    for j in range(64):
+        print(str(j) + ": " + str(fc1_w_grad[j][i]))
 ##
 ##
-#print ('\n--- FC0 NEURON GRADIENTS ---')
-#for i in range(len(fc0_grad)):
-#    print(str(i) + ": " + str(fc0_grad[i]))
+print ('\n--- FC0 NEURON GRADIENTS ---')
+for i in range(len(fc0_grad)):
+    print(str(i) + ": " + str(fc0_grad[i]))
 #
-#print('\n--- FC0 WEIGHT GRADIENTS ---')
-#for i in range(784):
-#    print("Activation: " + str(i))
-#    for j in range(98):
-#        print(str(j) + ": " + str(fc0_w_grad[j][i]))
+print('\n--- FC0 WEIGHT GRADIENTS ---')
+for i in range(784):
+    print("Activation: " + str(i))
+    for j in range(98):
+        print(str(j) + ": " + str(fc0_w_grad[j][i]))
 #print(len(fc1_neurons))
 #print(len(fc1_neurons[0]))
 #for i in range(len(fc1_neurons)):

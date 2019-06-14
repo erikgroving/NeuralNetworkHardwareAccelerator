@@ -11,15 +11,15 @@ module softmax(
     output logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   grad_o
     );
     
-    logic [`FC2_NEURONS - 1: 0][`PREC: 0]          act_in_norm;
-    logic [`FC2_NEURONS - 1: 0][`PREC: 0]          fixed_exp_res;
+    logic [`FC2_NEURONS - 1: 0][23: 0]          act_in_norm;
+    logic [`FC2_NEURONS - 1: 0][23: 0]          fixed_exp_res;
     logic [`FC2_NEURONS - 1: 0][31: 0]          act_in_norm_float;
     logic [31: 0]                               float_o;
     logic [31: 0]                               float_exp_o;
     logic                                       float_valid_o;
     logic                                       float_exp_valid_o;
     logic [23: 0]                               fixed_exp_o;
-    logic [31: 0]                               fixed_exp_sum;
+    logic [23: 0]                               fixed_exp_sum;
     logic                                       fixed_exp_valid_o;
     logic [3: 0]                                fp_in_ptr;
     logic [3: 0]                                fixed_exp_ptr;
@@ -153,8 +153,8 @@ module softmax(
     end
     
     `ifdef DEBUG       
-    localparam sf = 2.0**-17.0;
-    localparam sf2 = 2.0**-17.0;
+    localparam sf = 2.0**-12.0;
+    localparam sf2 = 2.0**-15.0;
 
     integer it;
     always_ff @(posedge clk) begin

@@ -199,9 +199,9 @@ module fc1_layer(
                     weight_grad[a]  = {{11{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:11]};
                     weight_grad[c]  = {{11{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:11]};
                 end
-                5'd12: begin
-                    weight_grad[a]  = {{12{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:12]};
-                    weight_grad[c]  = {{12{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:12]};
+                5'd7: begin
+                    weight_grad[a]  = {{7{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:7]};
+                    weight_grad[c]  = {{7{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:7]};
                 end
                 default: begin
                     weight_grad[a]  = {{8{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:8]};
@@ -344,11 +344,12 @@ module fc1_layer(
                 .rst(rst),
                 .activation_i(kern_mult2[i]),
                 .weight(kern_mult1[i]),
-                .bias(23'b0/*kern_bias[i]*/),
+                .bias(18'b0/*kern_bias[i]*/),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
-                .b_valid_i(b_valid[2]),
+                .b_valid_i(b_valid[2]),                
+                .bp_mode(bp_mode),
                 // output
                 .b_gradient_o(b_kern_grad_o[i]),
                 .b_valid_o(b_kern_valid_o[i]),
@@ -447,7 +448,7 @@ module fc1_layer(
         $display("update_weights[0]: %04h", update_weights[0]);
         $display("update_weights[1]: %04h", update_weights[1]);
         */        
-        localparam sf = 2.0**-13.0;  
+        localparam sf = 2.0**-15.0;  
 
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS1 ---");

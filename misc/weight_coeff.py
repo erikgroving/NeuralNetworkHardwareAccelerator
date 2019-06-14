@@ -37,8 +37,8 @@ for i in range(n_neurons):
         params.append(param)
 
 for p in params:
-    b = int(p * (2**17))
-    binary_params.append(intToBinaryString(b, 23))
+    b = int(p * (2**15))
+    binary_params.append(intToBinaryString(b, 18))
 print(params[0])
 print(binary_params[0])
 

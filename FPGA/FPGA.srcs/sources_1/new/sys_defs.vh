@@ -8,11 +8,11 @@
 `define MULT_BITS               36  // 2 * PREC
 `define ACT_INT_BITS            6
 `define ACT_FRAC_BITS           12
-`define GRAD_INT_BITS           6
-`define GRAD_FRAC_BITS          12
-`define ONE                     18'h00_1000
-`define MAX_VAL                 18'h1f_ffff
-`define MIN_VAL                 18'h20_0000
+`define GRAD_INT_BITS           3
+`define GRAD_FRAC_BITS          15
+`define ONE                     18'h0_8000
+`define MAX_VAL                 18'h1_ffff
+`define MIN_VAL                 18'h2_0000
 
 // FC0 defines
 `define FC0_N_KERNELS           196

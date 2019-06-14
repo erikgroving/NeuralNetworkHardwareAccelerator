@@ -79,12 +79,11 @@ module neural_net_top(
     logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_b_activation_i;
     logic [9: 0]                            fc0_b_activation_id_i;
     logic [9: 0]                            fc0_b_activation_id_o;
-    logic [`FC0_N_KERNELS - 1: 0][6: 0]     fc0_b_neuron_id_i;
     logic                                   fc0_b_valid_i;
     logic                                   fc0_b_start;
     logic                                   fc0_b_start_r;
     logic [3: 0]                            fc0_loops;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_gradients_i;
+    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]    fc0_gradients_i;
     logic                                   fc0_gradients_rdy;
     logic [6: 0]                            fc0_n_loop_offset;
     logic                                   fc0_bp_done;
@@ -165,7 +164,7 @@ module neural_net_top(
     logic [2: 0]    next_fc2_state;
     
     localparam sf = 2.0**-12.0;
-    localparam sf2 = 2.0**-12.0;
+    localparam sf2 = 2.0**-15.0;
     
     // Backward pass states
     localparam WEIGHT_MODE = 0;
@@ -190,15 +189,15 @@ module neural_net_top(
     logic               img_rdy;  
     logic               epoch_fin;
     mmcm_50_mhz mmcm_50_mhz_i (
-        //.clk_in1(fab_clk),
-        .clk_in1(clock_in),
+        .clk_in1(fab_clk),
+        //.clk_in1(clock_in),
         .clk_out1(clk)
     );
     
     logic sim;
     logic [7: 0] sw_i;
     
-    assign sw_i = sw_in;
+    assign sw_i = 0;//sw_in;
 
     
     assign start        = sw_i[0] ? 1'b1 : start_bus;
@@ -260,14 +259,14 @@ module neural_net_top(
     net_input_bram net_input_bram_i (
         .addra(fc0_addr_a),
         .clka(clk),
-        .dina(23'b0),
+        .dina(18'b0),
         .douta(net_input_bram_dout_a),
         .ena(1'b1),
         .wea(1'b0),
         
         .addrb(fc0_addr_b),
         .clkb(clk),
-        .dinb(23'b0),
+        .dinb(18'b0),
         .doutb(net_input_bram_dout_b),
         .enb(1'b1),
         .web(1'b0)
@@ -364,9 +363,6 @@ module neural_net_top(
         
         for (q = 0, r = `FC0_PORT_WIDTH; q < `FC0_PORT_WIDTH; q=q+1, r=r+1) begin
             fc0_gradients_i[q]      <= fc0_gradients[q];
-            fc0_gradients_i[r]      <= fc0_gradients[q];
-            fc0_b_neuron_id_i[q]    <= q;      
-            fc0_b_neuron_id_i[r]    <= q;
         end
         fc0_b_activation_id_o       <= fc0_b_activation_id_i << 1;
     end
@@ -417,7 +413,6 @@ module neural_net_top(
         .b_gradient_i(fc0_gradients_i),
         .b_activation_i(fc0_b_activation_i),
         .b_activation_id(fc0_b_activation_id_o),
-        .b_neuron_id_i(fc0_b_neuron_id_i),
         .b_valid_i(fc0_b_start_r),
        
         // outputs
@@ -848,8 +843,13 @@ module neural_net_top(
         end
         
         if (sm_valid_o) begin
-            fc2_gradients               <= sm_grad_o;
-            fc2_gradients[img_label]    <= $signed(sm_grad_o[img_label]) - $signed(`ONE);
+            //fc2_gradients               <= sm_grad_o;
+            for (u = 0; u < `FC2_NEURONS; u=u+1) begin
+                fc2_gradients[u]    <= (fc2_act_o_buf[img_label] == `MIN_VAL) ? 0 :
+                                            sm_grad_o[u];
+            end
+            fc2_gradients[img_label]    <= (fc2_act_o_buf[img_label] == `MAX_VAL) ? 0 : 
+                                            $signed(sm_grad_o[img_label]) - $signed(`ONE);
         end
     end
     /*assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
@@ -1338,11 +1338,11 @@ system_wrapper system_wrapper_i
     n_epochs,
     num_correct_test,
     num_correct_train,
-    {9'b0, fc2_out[0]},
-    {9'b0, fc2_out[2]},
-    {9'b0, fc2_out[4]},
-    {9'b0, fc2_out[6]},
-    {9'b0, fc2_out[8]},
+    {fc2_out[1][17:2], fc2_out[0][17:2]},
+    {fc2_out[3][17:2], fc2_out[2][17:2]},
+    {fc2_out[5][17:2], fc2_out[4][17:2]},
+    {fc2_out[7][17:2], fc2_out[6][17:2]},
+    {fc2_out[9][17:2], fc2_out[8][17:2]},
     start_bus,
     status_block,
     training_mode_bus);

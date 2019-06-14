@@ -202,9 +202,9 @@ module fc2_layer(
                 weight_grad[0]  = {{11{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:11]};
                 weight_grad[1]  = {{11{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:11]};
             end
-            5'd12: begin
-                weight_grad[0]  = {{12{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:12]};
-                weight_grad[1]  = {{12{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:12]};
+            5'd7: begin
+                weight_grad[0]  = {{7{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:7]};
+                weight_grad[1]  = {{7{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:7]};
             end
             default: begin
                 weight_grad[0]  = {{8{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:8]};
@@ -353,6 +353,7 @@ module fc2_layer(
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
                 .b_valid_i(b_valid[2]),
+                .bp_mode(bp_mode),
                 // output
                 .b_gradient_o(b_kern_grad_o[i]),
                 .b_valid_o(b_kern_valid_o[i]),
@@ -385,15 +386,15 @@ module fc2_layer(
     `ifdef DEBUG
     integer it, it2;
     always_ff @(negedge clk) begin
-        localparam sf = 2.0**-13.0; 
-        $display("\n--- BACKWARD PASS2 ---");
+        localparam sf = 2.0**-15.0; 
+        /*$display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
         $display("Gradient\t\tNeuronID\t\tAct_I");
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%f\t\t\t%01d\t\t\t\t%f", $itor($signed(b_gradient_i[it])), 
             b_neuron_id_i[it], $itor($signed(b_activation_i[it]))) ;
-        end
+        end*/
         /*
         $display("KERNEL INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_act_id[2], b_valid[2]);
