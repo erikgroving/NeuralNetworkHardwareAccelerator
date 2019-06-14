@@ -25,7 +25,7 @@ module softmax(
     logic [3: 0]                                fixed_exp_ptr;
     logic [3: 0]                                div_ptr;
     logic                                       in_prog;
-    logic [39: 0]                               div_o;
+    logic [47: 0]                               div_o;
     logic                                       div_valid_o;
     
     bit [3: 0] i;
@@ -154,7 +154,7 @@ module softmax(
     
     `ifdef DEBUG       
     localparam sf = 2.0**-12.0;
-    localparam sf2 = 2.0**-15.0;
+    localparam sf2 = 2.0**-17.0;
 
     integer it;
     always_ff @(posedge clk) begin

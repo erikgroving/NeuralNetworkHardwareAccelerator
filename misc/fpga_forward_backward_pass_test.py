@@ -3,7 +3,7 @@ import math
 import random
 
 integer_bits = 6
-int_bits_grad = 3
+int_bits_grad = 1
 
 # Set activations in
 fc0_fan_in = 28*28
@@ -35,7 +35,7 @@ n_offset = 0
 
 
 # read fc0
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc0_weights_3.15.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc0_weights_1.17.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -72,7 +72,7 @@ n_offset = 0
 
 
 # read fc1
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights_3.15.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc1_weights2_1.17.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')
@@ -110,7 +110,7 @@ n_offset = 0
 
 
 # read fc2
-path = '../FPGA/FPGA.srcs/sources_1/ip/fc2_weights_3.15.coe'
+path = '../FPGA/FPGA.srcs/sources_1/ip/fc2_weights_1.17.coe'
 for fname in glob.glob(path):
     print(fname)
     f = open(fname, 'r')

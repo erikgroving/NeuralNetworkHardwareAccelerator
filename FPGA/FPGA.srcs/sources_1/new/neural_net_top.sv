@@ -37,7 +37,7 @@ module neural_net_top(
     logic                                   forward;
     // Logics for the fc0 layer
     logic                                   fc0_start;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_activation_i;
+    logic [1: 0][`PREC - 1: 0]              fc0_activation_i;
     logic                                   fc0_valid;
     logic                                   fc0_valid_i;    
     logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]      fc0_activation_o ;
@@ -164,7 +164,7 @@ module neural_net_top(
     logic [2: 0]    next_fc2_state;
     
     localparam sf = 2.0**-12.0;
-    localparam sf2 = 2.0**-15.0;
+    localparam sf2 = 2.0**-17.0;
     
     // Backward pass states
     localparam WEIGHT_MODE = 0;
@@ -190,14 +190,14 @@ module neural_net_top(
     logic               epoch_fin;
     mmcm_50_mhz mmcm_50_mhz_i (
         .clk_in1(fab_clk),
-       // .clk_in1(clock_in),
+        //.clk_in1(clock_in),
         .clk_out1(clk)
     );
     
     logic sim;
     logic [7: 0] sw_i;
     
-    assign sw_i = 0;//sw_in;
+    assign sw_i = 0; //sw_in;
 
     
     assign start        = sw_i[0] ? 1'b1 : start_bus;

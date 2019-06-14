@@ -32,7 +32,7 @@ module fc_kernel #(
     
     
     logic [35: 0]               mult_res;
-    logic [35: 0]               mac_res;
+    logic [33: 0]               mac_res;
     
     logic                       last;
     logic                       prev_valid_i;
@@ -71,14 +71,14 @@ module fc_kernel #(
             end
         end
         else begin
-             if ({mult_res[35], &mult_res[34: 32]} == 2'b10) begin // negative saturation
+             if ({mult_res[35], mult_res[34]} == 2'b10) begin // negative saturation
                 b_gradient_o    <= `MIN_VAL;
             end
-            else if ({mult_res[35], |mult_res[34: 32]} == 2'b01) begin // positive saturation
+            else if ({mult_res[35], mult_res[34]} == 2'b01) begin // positive saturation
                 b_gradient_o    <= `MAX_VAL;
             end
             else begin
-                b_gradient_o    <= mult_res[32: 15];
+                b_gradient_o    <= mult_res[34: 17];
             end      
         end
 
@@ -100,13 +100,13 @@ module fc_kernel #(
     
     assign kernel_in    = has_bias ? {14'b0, bias} : dsp_o;
     assign mult_res     = $signed(weight) * $signed(activation_i);
-    assign mac_res      = $signed(mult_res[35:1]) + $signed(kernel_in);
+    assign mac_res      = $signed(mult_res[35:3]) + $signed(kernel_in);
     
     always_ff @(posedge clk) begin
-        if ({mac_res[35], &mac_res[34: 31]} == 2'b10) begin // negative saturation
+        if ({mac_res[33], &mac_res[32: 31]} == 2'b10) begin // negative saturation
             dsp_o   <= 32'h8000_0000;
         end
-        else if ({mac_res[35], |mac_res[34: 31]} == 2'b01) begin // positive saturation
+        else if ({mac_res[33], |mac_res[32: 31]} == 2'b01) begin // positive saturation
             dsp_o   <= 32'h7FFF_FFFF;
         end
         else begin

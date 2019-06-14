@@ -190,43 +190,36 @@ module fc2_layer(
     
     always_comb begin
         case(lrate_shifts)
-            /*5'd9: begin
-                weight_grad[0]  = {{9{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:9]};
-                weight_grad[1]  = {{9{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:9]};
-            end
-            5'd10: begin
-                weight_grad[0]  = {{10{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:10]};
-                weight_grad[1]  = {{10{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:10]};
-            end*/
-            /*5'd11: begin
-                weight_grad[0]  = {{11{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:11]};
-                weight_grad[1]  = {{11{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:11]};
-            end*/
-            5'd7: begin
-                weight_grad[0]  = {{7{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:7]};
-                weight_grad[1]  = {{7{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:7]};
-            end
-            5'd2: begin
-                weight_grad[0]  = {{2{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:2]};
-                weight_grad[1]  = {{2{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:2]};
-            end
-            5'd6: begin
-                weight_grad[0]  = {{6{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:6]};
-                weight_grad[1]  = {{6{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:6]};
-            end
-            5'd5: begin
-                weight_grad[0]  = {{5{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:5]};
-                weight_grad[1]  = {{5{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:5]};
-            end
             5'd4: begin
-                weight_grad[0]  = {{4{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:4]};
-                weight_grad[1]  = {{4{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:4]};
-            end
+                weight_grad[0] = weight_grad_o[0] >>> 4;
+                weight_grad[1] = weight_grad_o[1] >>> 4;        
+            end        
+            5'd5: begin
+                weight_grad[0] = weight_grad_o[0] >>> 5;
+                weight_grad[1] = weight_grad_o[1] >>> 5;        
+            end        
+            5'd6: begin
+                weight_grad[0] = weight_grad_o[0] >>> 6;
+                weight_grad[1] = weight_grad_o[1] >>> 6;        
+            end        
+            5'd7: begin
+                weight_grad[0] = weight_grad_o[0] >>> 7;
+                weight_grad[1] = weight_grad_o[1] >>> 7;        
+            end        
+            5'd8: begin
+                weight_grad[0] = weight_grad_o[0] >>> 8;
+                weight_grad[1] = weight_grad_o[1] >>> 8;        
+            end        
+            5'd9: begin
+                weight_grad[0] = weight_grad_o[0] >>> 9;
+                weight_grad[1] = weight_grad_o[1] >>> 9;        
+            end 
             default: begin
-                weight_grad[0]  = {{3{weight_grad_o[0][`PREC - 1]}}, weight_grad_o[0][`PREC - 1:3]};
-                weight_grad[1]  = {{3{weight_grad_o[1][`PREC - 1]}}, weight_grad_o[1][`PREC - 1:3]};
-            end
+                weight_grad[0] = weight_grad_o[0] >>> 10;
+                weight_grad[1] = weight_grad_o[1] >>> 10;        
+            end       
         endcase
+
         update_weights_sat[0]   = $signed(data_out[0]) - $signed(weight_grad[0]);
         update_weights_sat[1]   = $signed(data_out[1]) - $signed(weight_grad[1]);
     end
@@ -402,7 +395,7 @@ module fc2_layer(
     `ifdef DEBUG
     integer it, it2;
     always_ff @(negedge clk) begin
-        localparam sf = 2.0**-15.0; 
+        localparam sf = 2.0**-17.0; 
         /*$display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);

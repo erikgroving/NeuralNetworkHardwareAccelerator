@@ -10,7 +10,7 @@
 `define ACT_FRAC_BITS           12
 `define GRAD_INT_BITS           3
 `define GRAD_FRAC_BITS          15
-`define ONE                     18'h0_8000
+`define ONE                     18'h1_ffff
 `define MAX_VAL                 18'h1_ffff
 `define MIN_VAL                 18'h2_0000
 

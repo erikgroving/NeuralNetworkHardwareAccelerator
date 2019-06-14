@@ -187,45 +187,37 @@ module fc1_layer(
     always_comb begin
         for (a = 0, c =`FC1_PORT_WIDTH; a < `FC1_PORT_WIDTH; a = a + 1, c=c+1) begin
             case(lrate_shifts)
+                5'd4: begin
+                    weight_grad[a] = weight_grad_o[a] >>> 4;
+                    weight_grad[c] = weight_grad_o[c] >>> 4;        
+                end        
+                5'd5: begin
+                    weight_grad[a] = weight_grad_o[a] >>> 5;
+                    weight_grad[c] = weight_grad_o[c] >>> 5;        
+                end        
                 5'd6: begin
-                    weight_grad[a]  = {{6{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:6]};
-                    weight_grad[c]  = {{6{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:6]};
-                end
+                    weight_grad[a] = weight_grad_o[a] >>> 6;
+                    weight_grad[c] = weight_grad_o[c] >>> 6;        
+                end        
                 5'd7: begin
-                    weight_grad[a]  = {{7{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:7]};
-                    weight_grad[c]  = {{7{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:7]};
-                end
-                5'd4: begin
-                    weight_grad[a]  = {{4{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:4]};
-                    weight_grad[c]  = {{4{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:4]};
-                end
-                5'd2: begin
-                    weight_grad[a]  = {{2{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:2]};
-                    weight_grad[c]  = {{2{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:2]};
-                end
-               /* 5'd8: begin
-                    weight_grad[a]  = {{8{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:8]};
-                    weight_grad[c]  = {{8{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:8]};
-                end
-                5'd6: begin
-                    weight_grad[a]  = {{6{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:6]};
-                    weight_grad[c]  = {{6{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:6]};
-                end
-                5'd4: begin
-                    weight_grad[a]  = {{4{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:4]};
-                    weight_grad[c]  = {{4{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:4]};
-                end*/
-                5'd3: begin
-                    weight_grad[a]  = {{6{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:6]};
-                    weight_grad[c]  = {{6{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:6]};
-                end
+                    weight_grad[a] = weight_grad_o[a] >>> 7;
+                    weight_grad[c] = weight_grad_o[c] >>> 7;        
+                end        
+                5'd8: begin
+                    weight_grad[a] = weight_grad_o[a] >>> 8;
+                    weight_grad[c] = weight_grad_o[c] >>> 8;        
+                end        
+                5'd9: begin
+                    weight_grad[a] = weight_grad_o[a] >>> 9;
+                    weight_grad[c] = weight_grad_o[c] >>> 9;        
+                end    
                 default: begin
-                    weight_grad[a]  = {{5{weight_grad_o[a][`PREC - 1]}}, weight_grad_o[a][`PREC - 1:5]};
-                    weight_grad[c]  = {{5{weight_grad_o[c][`PREC - 1]}}, weight_grad_o[c][`PREC - 1:5]};
+                    weight_grad[a] = weight_grad_o[a] >>> 10;
+                    weight_grad[c] = weight_grad_o[c] >>> 10;        
                 end
             endcase
-            update_weights_sat[a]   = $signed(data_out_a[a])/* - $signed(weight_grad[a])*/;
-            update_weights_sat[c]   = $signed(data_out_b[a])/* - $signed(weight_grad[c])*/;
+            update_weights_sat[a]   = $signed(data_out_a[a]) - $signed(weight_grad[a]);
+            update_weights_sat[c]   = $signed(data_out_b[a]) - $signed(weight_grad[c]);
         end 
     end
     
@@ -464,7 +456,7 @@ module fc1_layer(
         $display("update_weights[0]: %04h", update_weights[0]);
         $display("update_weights[1]: %04h", update_weights[1]);
         */        
-        localparam sf = 2.0**-15.0;  
+        localparam sf = 2.0**-17.0;  
 
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS1 ---");
