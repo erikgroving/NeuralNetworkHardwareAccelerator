@@ -171,34 +171,27 @@ module fc0_layer(
     always_comb begin
         for (a = 0, c =`FC0_PORT_WIDTH; a < `FC0_PORT_WIDTH; a = a + 1, c=c+1) begin
             case(lrate_shifts)
-                5'd4: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 4;
-                    weight_grad[c] = weight_grad_o[c] >>> 4;        
-                end        
-                5'd5: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 5;
-                    weight_grad[c] = weight_grad_o[c] >>> 5;        
-                end        
-                5'd6: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 6;
-                    weight_grad[c] = weight_grad_o[c] >>> 6;        
-                end        
                 5'd7: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 7;
-                    weight_grad[c] = weight_grad_o[c] >>> 7;        
-                end        
-                5'd8: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 8;
-                    weight_grad[c] = weight_grad_o[c] >>> 8;        
-                end        
+                    weight_grad[a] = {{7{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 7]}};
+                    weight_grad[c] = {{7{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 7]}};     
+                end  
+
                 5'd9: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 9;
-                    weight_grad[c] = weight_grad_o[c] >>> 9;        
-                end    
+                    weight_grad[a] = {{9{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 9]}};
+                    weight_grad[c] = {{9{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 9]}};     
+                end  
+                5'd11: begin
+                    weight_grad[a] = {{11{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 11]}};
+                    weight_grad[c] = {{11{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 11]}};     
+                end      
+                5'd13: begin
+                    weight_grad[a] = {{13{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 13]}};
+                    weight_grad[c] = {{13{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 13]}};     
+                end        
                 default: begin
-                    weight_grad[a] = weight_grad_o[a] >>> 10;
-                    weight_grad[c] = weight_grad_o[c] >>> 10;        
-                end    
+                    weight_grad[a] = {{5{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 5]}};
+                    weight_grad[c] = {{5{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 5]}}; 
+                end  
             endcase
             update_weights_sat[a]   = $signed(data_out_a[a]) - $signed(weight_grad[a]);
             update_weights_sat[c]   = $signed(data_out_b[a]) - $signed(weight_grad[c]);

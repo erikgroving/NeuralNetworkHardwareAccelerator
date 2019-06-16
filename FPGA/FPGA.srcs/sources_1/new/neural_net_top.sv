@@ -188,6 +188,7 @@ module neural_net_top(
     logic [9: 0]        img_label;
     logic               img_rdy;  
     logic               epoch_fin;
+    
     mmcm_50_mhz mmcm_50_mhz_i (
         .clk_in1(fab_clk),
         //.clk_in1(clock_in),
@@ -197,21 +198,22 @@ module neural_net_top(
     logic sim;
     logic [7: 0] sw_i;
     
-    assign sw_i = 0; //sw_in;
+    assign sw_i = 0;//sw_in;
 
     
-    assign start        = sw_i[0] ? 1'b1 : start_bus;
-    assign training_mode = sw_i[0] ? 1'b1 : training_mode_bus;
+    assign start        = /*sw_i[0] ? 1'b1 : */start_bus;
+    assign training_mode = /*sw_i[0] ? 1'b1 : */training_mode_bus;
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
     assign img_rdy      = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == img_set_size);
     assign new_img      = start & all_idle & img_rdy;
-    assign epoch_fin    = sw_i[0] ? 1'b0 : epoch == n_epochs;
+    assign epoch_fin    =/* sw_i[0] ? 1'b0 : */epoch == n_epochs;
     
     logic reset_i;
     logic reset;
     always_ff @(posedge clk) begin
         reset_i   <= rst;
+        lrate_shifts <= /*sw_i[0] ? 5'd4 : */lrate_shifts_bus;
     end
     
     always_ff @(posedge clk) begin
@@ -1355,12 +1357,10 @@ system_wrapper system_wrapper_i
         if (reset) begin
             img_id          <= img_set_size;
             img_label       <= 0;
-            lrate_shifts    <= 0;
         end
         else if (new_img) begin
             img_id          <= img1_id;
             img_label       <= img1_label;
-            lrate_shifts    <= lrate_shifts_bus;
         end
         if (new_img) begin
             img1_unpacked[0]	<= img1_blk0_0[7:0];

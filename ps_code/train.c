@@ -13,7 +13,7 @@
 #define UPDATE      4
 #define IDLE        5
 #define SET_SIZE    70000
-#define TRAIN_SIZE  60000
+#define TRAIN_SIZE  10000
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -79,7 +79,7 @@ int main() {
     usleep(100);
     ddr_ptr->start = 1;
     ddr_ptr->n_epochs = 15;
-    ddr_ptr->learning_rate = 7;
+    ddr_ptr->learning_rate = 9;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
@@ -196,7 +196,7 @@ void print_debug_data(volatile ddr_data_t* ddr_ptr) {
     float max_out = -100;
     int max_out_id = 0;
     for (int i = 0; i < 10; i++) {
-        output[i] = (float)(ddr_ptr->out[i]) / pow(2, 8);
+        output[i] = (float)(ddr_ptr->out[i]) / pow(2, 10);
         if (output[i] > max_out) {
             max_out = output[i];
             max_out_id = i;
