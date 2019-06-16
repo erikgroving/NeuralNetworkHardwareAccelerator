@@ -105,7 +105,7 @@ int main() {
             printf("Active Cycle Percentage: %f%%\n", (float)active / ((float)idle + (float)active));      
             print_debug_data(ddr_ptr);            
             printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
-            usleep(2e6);
+            usleep(2e5);
             gettimeofday(&start, NULL);
         }
         

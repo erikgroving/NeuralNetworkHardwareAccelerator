@@ -169,6 +169,7 @@ module fc0_layer(
     assign addr_b           = (head_ptr << 1) + 1'b1;    
     bit [7: 0] a,c;
     always_comb begin
+        weight_grad = 0;
         for (a = 0, c =`FC0_PORT_WIDTH; a < `FC0_PORT_WIDTH; a = a + 1, c=c+1) begin
             case(lrate_shifts)
                 5'd7: begin
