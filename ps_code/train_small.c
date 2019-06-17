@@ -12,8 +12,8 @@
 #define BACKWARD    3
 #define UPDATE      4
 #define IDLE        5
-#define SET_SIZE    100
-#define TRAIN_SIZE  100
+#define SET_SIZE    60
+#define TRAIN_SIZE  60
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -78,8 +78,8 @@ int main() {
     ddr_ptr->start = 0;
     usleep(100);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 30;
-    ddr_ptr->learning_rate = 9;
+    ddr_ptr->n_epochs = 35;
+    ddr_ptr->learning_rate = 7;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;

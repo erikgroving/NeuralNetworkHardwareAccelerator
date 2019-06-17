@@ -13,7 +13,8 @@
 #define UPDATE      4
 #define IDLE        5
 #define SET_SIZE    70000
-#define TRAIN_SIZE  3000
+#define TRAIN_SIZE  2000
+#define START_LRATE 9
 
 typedef struct ddr_data {
     // written to by fpga                  Offset   Desc
@@ -78,8 +79,8 @@ int main() {
     ddr_ptr->start = 0;
     usleep(100);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 15;
-    ddr_ptr->learning_rate = 7;
+    ddr_ptr->n_epochs = 20;
+    ddr_ptr->learning_rate = START_LRATE;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
@@ -90,7 +91,7 @@ int main() {
         // Print data if epoch just finished
         if ((id == 0) && epoch != 0) {        
             gettimeofday(&end, NULL);
-            print_debug_data(ddr_ptr);
+            //print_debug_data(ddr_ptr);
             
             corr_tr     = ddr_ptr->num_correct_train;
             corr_test   = ddr_ptr->num_correct_test;
@@ -109,7 +110,6 @@ int main() {
             //print_debug_data(ddr_ptr);            
             printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
             gettimeofday(&start, NULL);
-            usleep(5e5);
         }
              
         ddr_ptr->training_mode = (id < TRAIN_SIZE);  
