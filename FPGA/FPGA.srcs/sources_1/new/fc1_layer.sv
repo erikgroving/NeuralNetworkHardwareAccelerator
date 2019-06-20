@@ -205,8 +205,8 @@ module fc1_layer(
                     weight_grad[c] = {{13{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 13]}};     
                 end        
                 default: begin
-                    weight_grad[a] = {{5{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 5]}};
-                    weight_grad[c] = {{5{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 5]}}; 
+                    weight_grad[a] = {{8{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 8]}};
+                    weight_grad[c] = {{8{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 8]}}; 
                 end  
             endcase
             update_weights_sat[a]   = $signed(data_out_a[a]) - $signed(weight_grad[a]);

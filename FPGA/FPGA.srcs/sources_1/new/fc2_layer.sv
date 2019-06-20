@@ -208,8 +208,8 @@ module fc2_layer(
                 weight_grad[1] = {{13{weight_grad_o[1][`PREC - 1]}}, {weight_grad_o[1][`PREC - 1: 13]}};     
             end        
             default: begin
-                weight_grad[0] = {{5{weight_grad_o[0][`PREC - 1]}}, {weight_grad_o[0][`PREC - 1: 5]}};
-                weight_grad[1] = {{5{weight_grad_o[1][`PREC - 1]}}, {weight_grad_o[1][`PREC - 1: 5]}}; 
+                weight_grad[0] = {{8{weight_grad_o[0][`PREC - 1]}}, {weight_grad_o[0][`PREC - 1: 8]}};
+                weight_grad[1] = {{8{weight_grad_o[1][`PREC - 1]}}, {weight_grad_o[1][`PREC - 1: 8]}}; 
             end  
         endcase
 

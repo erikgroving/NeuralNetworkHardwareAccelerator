@@ -19,7 +19,6 @@ module interlayer_activation_buffer #(
     
     
     output logic [N_KERNELS_O - 1: 0][`PREC - 1: 0]            activation_o,
-    output logic [N_KERNELS_O - 1: 0][ID_WIDTH - 1: 0]  neuron_id_o,
     output logic                                        valid_o,
     
     output logic [`PREC - 1: 0]                                b_act_o,
@@ -80,7 +79,6 @@ module interlayer_activation_buffer #(
     always_ff @(posedge clk) begin
         for (j = 0; j < N_KERNELS_O; j=j+1) begin
             activation_o[j] <= buffer[buff_ptr];
-            neuron_id_o     <= j;
         end
         valid_o <= read_o;
     end

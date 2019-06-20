@@ -52,7 +52,6 @@ module neural_net_top(
     logic                                   fc1_start;
     logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_activation_i ;
     logic                                   fc1_valid_i;    
-    logic [`FC1_N_KERNELS - 1: 0][6: 0]     fc1_neuron_id_i; 
     logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_activation_o;
     logic [`FC1_N_KERNELS - 1: 0][5: 0]     fc1_neuron_id_o ;
     logic                                   fc1_valid_act_o;
@@ -64,7 +63,6 @@ module neural_net_top(
     logic                                   fc2_start;
     logic                                   fc2_buff_rdy;
     logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_activation_i;
-    logic [`FC2_N_KERNELS - 1: 0][5: 0]     fc2_neuron_id_i;
     logic                                   fc2_valid_i;
     logic                                   fc2_busy;
 
@@ -451,7 +449,6 @@ module neural_net_top(
         .b_ptr(fc1_b_activation_id_i),
         // outputs
         .activation_o(fc1_activation_i),
-        .neuron_id_o(fc1_neuron_id_i),
         .valid_o(fc1_valid_i),
         
         .b_act_o(fc1_b_activation_i),
@@ -600,7 +597,6 @@ module neural_net_top(
         // outputs
         
         .activation_o(fc2_activation_i),
-        .neuron_id_o(fc2_neuron_id_i),
         .valid_o(fc2_valid_i),
         
         .b_act_o(fc2_b_activation_i),
