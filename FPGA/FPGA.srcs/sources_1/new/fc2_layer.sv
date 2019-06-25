@@ -431,7 +431,7 @@ module fc2_layer(
 
     */    
  
-
+/*
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
@@ -448,7 +448,7 @@ module fc2_layer(
             for (it = 1; it < 2; it=it+1) begin
                 $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
-        end
+        end*/
         /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d\t\tsch_valid_i: %01b", head_ptr, mid_ptr, bias_ptr, sch_valid_i);

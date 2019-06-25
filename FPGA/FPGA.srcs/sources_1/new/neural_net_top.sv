@@ -188,30 +188,30 @@ module neural_net_top(
     logic               epoch_fin;
     
     mmcm_50_mhz mmcm_50_mhz_i (
-        .clk_in1(fab_clk),
-        //.clk_in1(clock_in),
+        //.clk_in1(fab_clk),
+        .clk_in1(clock_in),
         .clk_out1(clk)
     );
     
     logic sim;
     logic [7: 0] sw_i;
     
-    assign sw_i = 0;//sw_in;
+    assign sw_i = sw_in;
 
     
-    assign start        = /*sw_i[0] ? 1'b1 : */start_bus;
-    assign training_mode = /*sw_i[0] ? 1'b1 : */training_mode_bus;
+    assign start        = sw_i[0] ? 1'b1 : start_bus;
+    assign training_mode = sw_i[0] ? 1'b1 : training_mode_bus;
     assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
     assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
     assign img_rdy      = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == img_set_size);
     assign new_img      = start & all_idle & img_rdy;
-    assign epoch_fin    =/* sw_i[0] ? 1'b0 : */epoch == n_epochs;
+    assign epoch_fin    = sw_i[0] ? 1'b0 : epoch == n_epochs;
     
     logic reset_i;
     logic reset;
     always_ff @(posedge clk) begin
         reset_i   <= rst;
-        lrate_shifts <= /*sw_i[0] ? 5'd4 : */lrate_shifts_bus;
+        lrate_shifts <= sw_i[0] ? 5'd7 : lrate_shifts_bus;
     end
     
     always_ff @(posedge clk) begin
@@ -389,9 +389,6 @@ module neural_net_top(
             fc0_state   <= IDLE;
         end
         else begin
-            $display("fc0 state: %01d", fc0_state);
-            $display("fc1 state: %01d", fc1_state);
-            $display("fc2 state: %01d", fc2_state);
             fc0_state   <= next_fc0_state;           
         end
     end
@@ -528,7 +525,6 @@ module neural_net_top(
             fc1_state   <= IDLE;
         end
         else begin
-            $display("fc1 state: %01d", fc1_state);
             fc1_state   <= next_fc1_state;           
         end
     end
@@ -572,7 +568,6 @@ module neural_net_top(
             fc2_start   <= 1'b0;
         end
         else begin
-            $display("fc2_buff_rdy: %01b\tfc2_busy: %01b", fc2_buff_rdy, fc2_busy);
             fc2_start   <= fc2_state == FORWARD & fc2_buff_rdy;
         end
     end 
@@ -793,9 +788,9 @@ module neural_net_top(
                
 
         end  
-        $display("---MAX CIRCUIT---");  
+        /*$display("---MAX CIRCUIT---");  
         $display("max_valid: %05b", max_valid);
-        $display("max: %0.4f", $itor($signed(max)) * sf);
+        $display("max: %0.4f", $itor($signed(max)) * sf);*/
         if (reset) begin
             led_o_r     <= 0;
             correct     <= 1'b0;
@@ -860,7 +855,6 @@ module neural_net_top(
     `ifdef DEBUG
      integer clk_cycle;
      integer it;
-
      always_ff @(posedge clk) begin
         if (reset) begin
             clk_cycle   <= 0;
@@ -868,8 +862,8 @@ module neural_net_top(
         else begin
             clk_cycle   <=  clk_cycle + 1'b1;
         end
-        $display("\n\n------ CYCLE %04d ------", clk_cycle);
-  /*
+  /*      $display("\n\n------ CYCLE %04d ------", clk_cycle);
+  
         $display("\n--- FC0 ---");
         $display("FC0_act_i: %04h\t\tFC0_valid_i: %01b", fc0_activation_i[0], fc0_valid_i);
         $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
@@ -892,17 +886,18 @@ module neural_net_top(
         end
         */    
 
-        $display("---FC2 GRADIENTS---");    
+        /*$display("---FC2 GRADIENTS---");    
         $display("img_label: %d", img_label);    
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
             $display("%02d:\t%f", it, $itor($signed(fc2_gradients[it])) * sf2);
+        end*/
+        if ({fc2_buf_valid, prev_fc2_buf_valid} == 2'b10) begin
+            $display("--- FC2 OUT ---");        
+            $display("fc2_buf_valid: %01b" , fc2_buf_valid);
+            for (it= 0; it < `FC2_NEURONS; it=it+1) begin
+                $display("%02d: %f", it, $itor($signed(fc2_act_o_buf[it])) * sf); 
+            end
         end
-        $display("--- FC2 OUT ---");        
-        $display("fc2_buf_valid: %01b" , fc2_buf_valid);
-        for (it= 0; it < `FC2_NEURONS; it=it+1) begin
-            $display("%02d: %f", it, $itor($signed(fc2_act_o_buf[it])) * sf); 
-        end
-        $display("LEDS: %08b", led_o);
      end 
     `endif    
    

@@ -210,7 +210,7 @@ for i in range(len(fc0_neurons)):
 #    #pick random weight in layer 0
 #    n_idx = random.randint(0, len(fc0_neurons) - 1)
 #    w_idx = random.randint(0, len(fc0_neurons) - 1)
-#    print('Calc grad: ' + str(fc0_w_grad[n_idx][w_idx]))
+#    print('Calculated gradient:\t' + str(fc0_w_grad[n_idx][w_idx]))
 #    eps = 1e-4
 #    fc0_neurons[n_idx][w_idx] += eps
 #    fc0_output = []
@@ -292,20 +292,28 @@ for i in range(len(fc0_neurons)):
 #
 #    gradients[0] -= 1
 #    loss3 = -math.log(gradients[0] + 1.)
-#    print('Numer grad: ' + str((loss2 - loss3) / (2*eps)) + '\n')
+#    print('Numerical gradient:\t' + str((loss2 - loss3) / (2*eps)) + '\n')
 
 
-print('\n--- FC0 OUT ---')
-for i in range(len(fc0_output)):
-    print("Neuron " + str(i) + ": " + str(fc0_output[i]))
-
-print('\n--- FC1 OUT ---')
-for i in range(len(fc1_output)):
-    print("Neuron " + str(i) + ": " + str(fc1_output[i]))
-
-print('\n--- FC2 OUT ---')
-for i in range(len(fc2_output)):
-    print("Neuron " + str(i) + ": " + str(fc2_output[i]))
+#print('\n--- FC0 OUT ---')
+#print('Neuron\t\tActivation')
+#for i in range(len(fc0_output)):
+#    print(str(i) + "\t\t\t" + str(fc0_output[i]))
+#
+#print('\n--- FC1 OUT ---')
+#print('Neuron\t\tActivation')
+#for i in range(len(fc1_output)):
+#    print(str(i) + "\t\t\t" + str(fc1_output[i]))
+#
+#print('\n--- FC2 OUT ---')
+#print('Neuron\t\tActivation')
+#for i in range(len(fc2_output)):
+#    print(str(i) + "\t\t\t" + str(fc2_output[i]))
+#
+#print('\n--- SOFTMAX OUT ---')
+#print('Neuron\t\tActivation')
+#for i in range(len(sm_output)):
+#    print(str(i) + "\t\t\t" + str(sm_output[i]))
 #
 print('\n--- FC2 NEURON GRADIENTS ---')
 for i in range(len(gradients)):
@@ -338,7 +346,7 @@ for i in range(784):
     print("Activation: " + str(i))
     for j in range(98):
         print(str(j) + ": " + str(fc0_w_grad[j][i]))
-#print(len(fc1_neurons))
-#print(len(fc1_neurons[0]))
-#for i in range(len(fc1_neurons)):
-#    print(str(i) + ":\t" + str(fc1_grad[i]/abs(fc1_grad[i])) + "\t\t" + str(fc1_neurons[i][20]/abs(fc1_neurons[i][20])))
+print(len(fc1_neurons))
+print(len(fc1_neurons[0]))
+for i in range(len(fc1_neurons)):
+    print(str(i) + ":\t" + str(fc1_grad[i]/abs(fc1_grad[i])) + "\t\t" + str(fc1_neurons[i][20]/abs(fc1_neurons[i][20])))

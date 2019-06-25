@@ -450,7 +450,7 @@ module fc1_layer(
         $display("update_weights[1]: %04h", update_weights[1]);
         */        
         localparam sf = 2.0**-17.0;  
-
+/*
         if (pl_grad_valid) begin
             $display("\n--- NEURON GRADIENTS1 ---");
             $display("pl_grad_valid: %01b", pl_grad_valid);
@@ -469,7 +469,7 @@ module fc1_layer(
             for (it = 8; it < `PREC; it=it+1) begin
                 $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
-        end
+        end*/
     /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);

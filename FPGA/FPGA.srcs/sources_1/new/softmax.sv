@@ -157,9 +157,10 @@ module softmax(
     localparam sf2 = 2.0**-17.0;
 
     integer it;
+    reg prev_valid_o;
     always_ff @(posedge clk) begin
-
-        
+        prev_valid_o    <= valid_o;
+        /*
         $display("in_prog: %01b\t", in_prog);
         $display("valid_o: %01b", valid_o);
         $display("fp_in_ptr: %02d, fp_in_valid: %01b, float_valid_o: %01b", fp_in_ptr, in_prog & fp_in_ptr != `FC2_NEURONS, float_valid_o);
@@ -179,10 +180,12 @@ module softmax(
         $display("fixed_exp_res");        
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
             $display("%02d:\t%f", it, $itor($signed(fixed_exp_res[it])) * sf2);
-        end 
-        $display("GRADIENT OUT");        
-        for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
-            $display("%02d:\t%f", it, $itor($signed(grad_o[it])) * sf2);
+        end */
+        if({valid_o, prev_valid_o} == 2'b10) begin
+            $display("SOFTMAX OUT");        
+            for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
+                $display("%02d:\t%f", it, $itor($signed(grad_o[it])) * sf2);
+            end
         end
     end
     `endif
