@@ -390,18 +390,19 @@ module fc0_layer(
         $display("update_weights[0]: %04h", update_weights[0]);
         $display("update_weights[1]: %04h", update_weights[1]);*/
         localparam sf = 2.0**-17.0;
-        /*if (wg_we) begin
+        /*
+        if (wg_we) begin
             $display("WEIGHT GRADS0");
-            $display("Activation ID: %03d", fc0_weight_grad_addr[0]);
+            $display("Weight ID: %03d", wg_addr_a);
             for (it = 0; it < 98; it=it+1) begin
                 $display("%02d: %f", it, $itor($signed(b_kern_grad_o[it])) * sf);
             end
-            $display("Activation ID: %03d", fc0_weight_grad_addr[1]);
+            $display("Weight ID: %03d", wg_addr_b);
             for (it = 98; it < 196; it=it+1) begin
                 $display("%02d: %f", it-98, $itor($signed(b_kern_grad_o[it])) * sf);
             end
-        end*/
-
+        end
+*/
    /*
         $display("\n--- SCHEDULER ---");
         $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);    

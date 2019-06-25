@@ -886,18 +886,18 @@ module neural_net_top(
         end
         */    
 
-        /*$display("---FC2 GRADIENTS---");    
+        $display("---FC2 GRADIENTS---");    
         $display("img_label: %d", img_label);    
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
             $display("%02d:\t%f", it, $itor($signed(fc2_gradients[it])) * sf2);
-        end*/
-        if ({fc2_buf_valid, prev_fc2_buf_valid} == 2'b10) begin
+        end
+        /*if ({fc2_buf_valid, prev_fc2_buf_valid} == 2'b10) begin
             $display("--- FC2 OUT ---");        
             $display("fc2_buf_valid: %01b" , fc2_buf_valid);
             for (it= 0; it < `FC2_NEURONS; it=it+1) begin
                 $display("%02d: %f", it, $itor($signed(fc2_act_o_buf[it])) * sf); 
             end
-        end
+        end*/
      end 
     `endif    
    

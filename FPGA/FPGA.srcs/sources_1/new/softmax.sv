@@ -181,12 +181,12 @@ module softmax(
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
             $display("%02d:\t%f", it, $itor($signed(fixed_exp_res[it])) * sf2);
         end */
-        if({valid_o, prev_valid_o} == 2'b10) begin
+        /*if({valid_o, prev_valid_o} == 2'b10) begin
             $display("SOFTMAX OUT");        
             for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
                 $display("%02d:\t%f", it, $itor($signed(grad_o[it])) * sf2);
             end
-        end
+        end*/
     end
     `endif
 

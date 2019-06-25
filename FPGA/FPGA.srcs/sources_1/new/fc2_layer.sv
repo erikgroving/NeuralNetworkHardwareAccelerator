@@ -387,8 +387,10 @@ module fc2_layer(
 
     `ifdef DEBUG
     integer it, it2;
+    logic prev_pl_grad_valid;
     always_ff @(negedge clk) begin
         localparam sf = 2.0**-17.0; 
+        prev_pl_grad_valid <= pl_grad_valid;
         /*$display("\n--- BACKWARD PASS2 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
@@ -432,7 +434,7 @@ module fc2_layer(
     */    
  
 /*
-        if (pl_grad_valid) begin
+        if ({pl_grad_valid, prev_pl_grad_valid} == 2'b10) begin
             $display("\n--- NEURON GRADIENTS2 ---");
             for (it = 0; it < `FC1_NEURONS; it=it+1) begin
                 $display("%02d:\t%f", it, $itor($signed(pl_gradients[it])) * sf);
@@ -440,11 +442,11 @@ module fc2_layer(
         end
         if (wg_we) begin
             $display("WEIGHT GRADS2");
-            $display("Activation ID: %03d", fc2_weight_grad_addr[0]);
+            $display("Weight ID: %03d", wg_addr_a % `FC1_NEURONS);
             for (it = 0; it < 1; it=it+1) begin
                 $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
-            $display("Activation ID: %03d", fc2_weight_grad_addr[1]);
+            $display("Weight ID: %03d", wg_addr_b % `FC1_NEURONS);
             for (it = 1; it < 2; it=it+1) begin
                 $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end

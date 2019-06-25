@@ -315,28 +315,28 @@ for i in range(len(fc0_neurons)):
 #for i in range(len(sm_output)):
 #    print(str(i) + "\t\t\t" + str(sm_output[i]))
 #
-print('\n--- FC2 NEURON GRADIENTS ---')
-for i in range(len(gradients)):
-    print(str(i) + ": " + str(gradients[i]))
-#
-#
-print('\n--- FC2 WEIGHT GRADIENTS ---')
-for i in range(len(weight_grad)):
-    print("Neuron " + str(i))
-    for j in range(len(weight_grad[i])):
-        print(str(j) + ": " + str(weight_grad[i][j]))
+#print('\n--- FC2 NEURON GRADIENTS ---')
+#for i in range(len(gradients)):
+#    print(str(i) + ": " + str(gradients[i]))
+##
+##
+#print('\n--- FC2 WEIGHT GRADIENTS ---')
+#for i in range(len(weight_grad)):
+#    print("Neuron " + str(i))
+#    for j in range(len(weight_grad[i])):
+#        print(str(j) + ": " + str(weight_grad[i][j]))
 
-print ('\n--- FC1 NEURON GRADIENTS ---')
-for i in range(len(fc1_grad)):
-    print(str(i) + ": " + str(fc1_grad[i]))
-#
-print('\n--- FC1 WEIGHT GRADIENTS ---')
-for i in range(98):
-    print("Activation: " + str(i))
-    for j in range(64):
-        print(str(j) + ": " + str(fc1_w_grad[j][i]))
+#print ('\n--- FC1 NEURON GRADIENTS ---')
+#for i in range(len(fc1_grad)):
+#    print(str(i) + ": " + str(fc1_grad[i]))
 ##
-##
+#print('\n--- FC1 WEIGHT GRADIENTS ---')
+#for i in range(98):
+#    print("Activation: " + str(i))
+#    for j in range(64):
+#        print(str(j) + ": " + str(fc1_w_grad[j][i]))
+###
+###
 print ('\n--- FC0 NEURON GRADIENTS ---')
 for i in range(len(fc0_grad)):
     print(str(i) + ": " + str(fc0_grad[i]))
@@ -346,7 +346,3 @@ for i in range(784):
     print("Activation: " + str(i))
     for j in range(98):
         print(str(j) + ": " + str(fc0_w_grad[j][i]))
-print(len(fc1_neurons))
-print(len(fc1_neurons[0]))
-for i in range(len(fc1_neurons)):
-    print(str(i) + ":\t" + str(fc1_grad[i]/abs(fc1_grad[i])) + "\t\t" + str(fc1_neurons[i][20]/abs(fc1_neurons[i][20])))

@@ -267,9 +267,7 @@ module fc1_layer(
     assign fc1_weight_grad_addr_offset[0] = ({6'b0, b_neuron_id[3][0][5:3]} << 6) +
                                             ({6'b0, b_neuron_id[3][0][5:3]} << 5) +
                                             ({6'b0, b_neuron_id[3][0][5:3]} << 1);
-    assign fc1_weight_grad_addr_offset[1] = ({6'b0, b_neuron_id[3][8][5:3]} << 6) +
-                                            ({6'b0, b_neuron_id[3][8][5:3]} << 5) +
-                                            ({6'b0, b_neuron_id[3][8][5:3]} << 1);
+    assign fc1_weight_grad_addr_offset[1] = fc1_weight_grad_addr_offset[0] + `FC1_MID_PTR_OFFSET;
     
     assign fc1_weight_grad_addr[0] = fc1_weight_grad_addr_offset[0] + b_act_id[3];
     assign fc1_weight_grad_addr[1] = fc1_weight_grad_addr_offset[1] + b_act_id[3];
@@ -409,6 +407,7 @@ module fc1_layer(
     
     
     `ifdef DEBUG
+    logic prev_pl_grad_valid;
     integer it;
     always_ff @(posedge clk) begin
     /*
@@ -450,10 +449,10 @@ module fc1_layer(
         $display("update_weights[1]: %04h", update_weights[1]);
         */        
         localparam sf = 2.0**-17.0;  
+        prev_pl_grad_valid  <= pl_grad_valid;
 /*
-        if (pl_grad_valid) begin
+        if ({pl_grad_valid, prev_pl_grad_valid} == 2'b10) begin
             $display("\n--- NEURON GRADIENTS1 ---");
-            $display("pl_grad_valid: %01b", pl_grad_valid);
             for (it = 0; it < `FC0_NEURONS; it=it+1) begin
                 $display("%02d:\t%f", it, $itor($signed(pl_gradients[it])) * sf);
             end
@@ -461,12 +460,12 @@ module fc1_layer(
         
         if (wg_we) begin
             $display("WEIGHT GRADS1");
-            $display("Activation ID: %03d", fc1_weight_grad_addr[0]);
+            $display("Weight ID: %03d", wg_addr_a % `FC0_NEURONS);
             for (it = 0; it < 8; it=it+1) begin
                 $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
-            $display("Activation ID: %03d", fc1_weight_grad_addr[1]);
-            for (it = 8; it < `PREC; it=it+1) begin
+            $display("Weight ID: %03d", wg_addr_b % `FC0_NEURONS);
+            for (it = 8; it < 16; it=it+1) begin
                 $display("%02d: %f", b_neuron_id[3][it], $itor($signed(b_kern_grad_o[it])) * sf);
             end
         end*/
