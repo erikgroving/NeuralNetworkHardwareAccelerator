@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <math.h> 
 #include <sys/time.h>
+#include <time.h>
 
 #define FORWARD     1
 #define WAITING     2
@@ -72,14 +73,16 @@ int main() {
     test_labels = parse_mnist_labels("data/t10k-labels.idx1-ubyte");
     printf("@@@ Loading complete!\n");
 
-
+    struct timespec sleep;
+    sleep.tv_sec = 0;
+    sleep.tv_nsec = 1000;
 
     // Start training! 
     ddr_ptr->start = 0;
     usleep(100);
     ddr_ptr->start = 1;
     ddr_ptr->n_epochs = 35;
-    ddr_ptr->learning_rate = 7;
+    ddr_ptr->learning_rate = 8;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
     struct timeval start, end;
@@ -115,6 +118,8 @@ int main() {
             ddr_ptr->img[i] = train_images[id][i];
         }
         ddr_ptr->img_label  = train_labels[id];
+        
+        nanosleep(&sleep, NULL);
 
         ddr_ptr->img_id     = id;            
 

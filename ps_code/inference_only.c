@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <math.h> 
 #include <sys/time.h>
+#include <time.h>
+#include <string.h>
 
 #define FORWARD     1
 #define WAITING     2
@@ -72,7 +74,9 @@ int main() {
     test_labels = parse_mnist_labels("data/t10k-labels.idx1-ubyte");
     printf("@@@ Loading complete!\n");
 
-
+    struct timespec sleep;
+    sleep.tv_sec = 0;
+    sleep.tv_nsec = 100;
 
     // Start training! 
     ddr_ptr->start = 0;
@@ -105,21 +109,26 @@ int main() {
             gettimeofday(&start, NULL);
         }
              
-        if (id < 60000) {
+        if (id < 60000) {            
+            memcpy((void*)ddr_ptr->img, train_images[id], sizeof(uint32_t) * 196);
+/*
             #pragma unroll
             for (int i = 0; i < 196; i++) {
                 ddr_ptr->img[i] = train_images[id][i];
-            }
+            }*/
             ddr_ptr->img_label  = train_labels[id];
         }
         else {
-            test_idx = id - 60000;            
-            #pragma unroll
+            test_idx = id - 60000;       
+            memcpy((void*)ddr_ptr->img, test_images[test_idx],  sizeof(uint32_t) * 196);
+            /*#pragma unroll
             for (int i = 0; i < 196; i++) {
                 ddr_ptr->img[i] = test_images[test_idx][i];
-            }
+            }*/
             ddr_ptr->img_label  = test_labels[test_idx];
-        }
+        }      
+        
+        nanosleep(&sleep, NULL);
         ddr_ptr->img_id     = id;            
 
     } while (epoch < ddr_ptr->n_epochs);

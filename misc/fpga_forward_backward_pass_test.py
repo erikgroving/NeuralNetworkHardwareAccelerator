@@ -205,144 +205,144 @@ for i in range(len(fc0_neurons)):
         fc0_w_grad[i].append(de_dnet * fc0_grad[i] * activations_i[j])
 
 
-#for i in range(10):
-#
-#    #pick random weight in layer 0
-#    n_idx = random.randint(0, len(fc0_neurons) - 1)
-#    w_idx = random.randint(0, len(fc0_neurons) - 1)
-#    print('Calculated gradient:\t' + str(fc0_w_grad[n_idx][w_idx]))
-#    eps = 1e-4
-#    fc0_neurons[n_idx][w_idx] += eps
-#    fc0_output = []
-#    for neuron in fc0_neurons:
-#        n_out = 0
-#        for j in range(len(activations_i[0: fc0_fan_in])):
-#            n_out += activations_i[j + 0*fc0_fan_in] * neuron[j]
-#        fc0_output.append(max(n_out, 0))
-#
-#
-#    fc1_output = []
-#    for neuron in fc1_neurons:
-#        n_out = 0
-#        for j in range(len(fc0_output)):
-#            n_out += fc0_output[j] * neuron[j]
-#        fc1_output.append(max(n_out, 0))
-#
-#    fc2_output = []
-#    for neuron in fc2_neurons:
-#        n_out = 0
-#        for j in range(len(fc1_output)):
-#            n_out += fc1_output[j] * neuron[j]
-#        fc2_output.append(n_out)
-#
-#    gradients = []
-#    sm_output = []
-#    sm_sum = 0.
-#    max_v = max(fc2_output)
-#    for output in fc2_output:
-#        sm_sum += math.exp(output - max_v)
-#
-#    for output in fc2_output:
-#        sm_output.append(math.exp(output - max_v) / sm_sum)
-#
-#    for output in sm_output:
-#        gradients.append(output)
-#        
-#
-#    gradients[0] -= 1
-#    loss2 = -math.log(gradients[0] + 1.)
-#
-#
-#    fc0_neurons[n_idx][w_idx] -= (2 * eps)
-#    fc0_output = []
-#    for neuron in fc0_neurons:
-#        n_out = 0
-#        for j in range(len(activations_i[0: fc0_fan_in])):
-#            n_out += activations_i[j + 0*fc0_fan_in] * neuron[j]
-#        fc0_output.append(max(n_out, 0))
-#
-#
-#    fc1_output = []
-#    for neuron in fc1_neurons:
-#        n_out = 0
-#        for j in range(len(fc0_output)):
-#            n_out += fc0_output[j] * neuron[j]
-#        fc1_output.append(max(n_out, 0))
-#
-#    fc2_output = []
-#    for neuron in fc2_neurons:
-#        n_out = 0
-#        for j in range(len(fc1_output)):
-#            n_out += fc1_output[j] * neuron[j]
-#        fc2_output.append(n_out)
-#
-#    gradients = []
-#    sm_output = []
-#    sm_sum = 0.
-#    max_v = max(fc2_output)
-#    for output in fc2_output:
-#        sm_sum += math.exp(output - max_v)
-#
-#    for output in fc2_output:
-#        sm_output.append(math.exp(output - max_v) / sm_sum)
-#
-#    for output in sm_output:
-#        gradients.append(output)
-#        
-#
-#    gradients[0] -= 1
-#    loss3 = -math.log(gradients[0] + 1.)
-#    print('Numerical gradient:\t' + str((loss2 - loss3) / (2*eps)) + '\n')
+for i in range(10):
+
+    #pick random weight in layer 0
+    n_idx = random.randint(0, len(fc0_neurons) - 1)
+    w_idx = random.randint(0, len(fc0_neurons) - 1)
+    print('Calculated gradient:\t' + str(fc0_w_grad[n_idx][w_idx]))
+    eps = 1e-4
+    fc0_neurons[n_idx][w_idx] += eps
+    fc0_output = []
+    for neuron in fc0_neurons:
+        n_out = 0
+        for j in range(len(activations_i[0: fc0_fan_in])):
+            n_out += activations_i[j + 0*fc0_fan_in] * neuron[j]
+        fc0_output.append(max(n_out, 0))
 
 
-#print('\n--- FC0 OUT ---')
-#print('Neuron\t\tActivation')
-#for i in range(len(fc0_output)):
-#    print(str(i) + "\t\t\t" + str(fc0_output[i]))
-#
-#print('\n--- FC1 OUT ---')
-#print('Neuron\t\tActivation')
-#for i in range(len(fc1_output)):
-#    print(str(i) + "\t\t\t" + str(fc1_output[i]))
-#
-#print('\n--- FC2 OUT ---')
-#print('Neuron\t\tActivation')
-#for i in range(len(fc2_output)):
-#    print(str(i) + "\t\t\t" + str(fc2_output[i]))
-#
-#print('\n--- SOFTMAX OUT ---')
-#print('Neuron\t\tActivation')
-#for i in range(len(sm_output)):
-#    print(str(i) + "\t\t\t" + str(sm_output[i]))
-#
-#print('\n--- FC2 NEURON GRADIENTS ---')
-#for i in range(len(gradients)):
-#    print(str(i) + ": " + str(gradients[i]))
-##
-##
-#print('\n--- FC2 WEIGHT GRADIENTS ---')
-#for i in range(len(weight_grad)):
-#    print("Neuron " + str(i))
-#    for j in range(len(weight_grad[i])):
-#        print(str(j) + ": " + str(weight_grad[i][j]))
+    fc1_output = []
+    for neuron in fc1_neurons:
+        n_out = 0
+        for j in range(len(fc0_output)):
+            n_out += fc0_output[j] * neuron[j]
+        fc1_output.append(max(n_out, 0))
 
-#print ('\n--- FC1 NEURON GRADIENTS ---')
-#for i in range(len(fc1_grad)):
-#    print(str(i) + ": " + str(fc1_grad[i]))
-##
-#print('\n--- FC1 WEIGHT GRADIENTS ---')
-#for i in range(98):
-#    print("Activation: " + str(i))
-#    for j in range(64):
-#        print(str(j) + ": " + str(fc1_w_grad[j][i]))
-###
-###
+    fc2_output = []
+    for neuron in fc2_neurons:
+        n_out = 0
+        for j in range(len(fc1_output)):
+            n_out += fc1_output[j] * neuron[j]
+        fc2_output.append(n_out)
+
+    gradients = []
+    sm_output = []
+    sm_sum = 0.
+    max_v = max(fc2_output)
+    for output in fc2_output:
+        sm_sum += math.exp(output - max_v)
+
+    for output in fc2_output:
+        sm_output.append(math.exp(output - max_v) / sm_sum)
+
+    for output in sm_output:
+        gradients.append(output)
+        
+
+    gradients[0] -= 1
+    loss2 = -math.log(gradients[0] + 1.)
+
+
+    fc0_neurons[n_idx][w_idx] -= (2 * eps)
+    fc0_output = []
+    for neuron in fc0_neurons:
+        n_out = 0
+        for j in range(len(activations_i[0: fc0_fan_in])):
+            n_out += activations_i[j + 0*fc0_fan_in] * neuron[j]
+        fc0_output.append(max(n_out, 0))
+
+
+    fc1_output = []
+    for neuron in fc1_neurons:
+        n_out = 0
+        for j in range(len(fc0_output)):
+            n_out += fc0_output[j] * neuron[j]
+        fc1_output.append(max(n_out, 0))
+
+    fc2_output = []
+    for neuron in fc2_neurons:
+        n_out = 0
+        for j in range(len(fc1_output)):
+            n_out += fc1_output[j] * neuron[j]
+        fc2_output.append(n_out)
+
+    gradients = []
+    sm_output = []
+    sm_sum = 0.
+    max_v = max(fc2_output)
+    for output in fc2_output:
+        sm_sum += math.exp(output - max_v)
+
+    for output in fc2_output:
+        sm_output.append(math.exp(output - max_v) / sm_sum)
+
+    for output in sm_output:
+        gradients.append(output)
+        
+
+    gradients[0] -= 1
+    loss3 = -math.log(gradients[0] + 1.)
+    print('Numerical gradient:\t' + str((loss2 - loss3) / (2*eps)) + '\n')
+
+
+print('\n--- FC0 OUT ---')
+print('Neuron\t\tActivation')
+for i in range(len(fc0_output)):
+    print(str(i) + "\t\t\t" + str(fc0_output[i]))
+
+print('\n--- FC1 OUT ---')
+print('Neuron\t\tActivation')
+for i in range(len(fc1_output)):
+    print(str(i) + "\t\t\t" + str(fc1_output[i]))
+
+print('\n--- FC2 OUT ---')
+print('Neuron\t\tActivation')
+for i in range(len(fc2_output)):
+    print(str(i) + "\t\t\t" + str(fc2_output[i]))
+
+print('\n--- SOFTMAX OUT ---')
+print('Neuron\t\tActivation')
+for i in range(len(sm_output)):
+    print(str(i) + "\t\t\t" + str(sm_output[i]))
+
+print('\n--- FC2 NEURON GRADIENTS ---')
+for i in range(len(gradients)):
+    print(str(i) + ": " + str(gradients[i]))
+#
+#
+print('\n--- FC2 WEIGHT GRADIENTS ---')
+for i in range(len(weight_grad)):
+    print("Neuron " + str(i))
+    for j in range(len(weight_grad[i])):
+        print(str(j) + ": " + str(weight_grad[i][j]))
+
+print ('\n--- FC1 NEURON GRADIENTS ---')
+for i in range(len(fc1_grad)):
+    print(str(i) + ": " + str(fc1_grad[i]))
+#
+print('\n--- FC1 WEIGHT GRADIENTS ---')
+for i in range(64):
+    print("Neuron " + str(i))
+    for j in range(98):
+        print(str(j) + ": " + str(fc1_w_grad[i][j]))
+#
+#
 print ('\n--- FC0 NEURON GRADIENTS ---')
 for i in range(len(fc0_grad)):
     print(str(i) + ": " + str(fc0_grad[i]))
 #
 print('\n--- FC0 WEIGHT GRADIENTS ---')
-for i in range(784):
-    print("Activation: " + str(i))
-    for j in range(98):
-        print(str(j) + ": " + str(fc0_w_grad[j][i]))
+for i in range(98):
+    print("Neuron " + str(i))
+    for j in range(784):
+        print(str(j) + ": " + str(fc0_w_grad[i][j]))

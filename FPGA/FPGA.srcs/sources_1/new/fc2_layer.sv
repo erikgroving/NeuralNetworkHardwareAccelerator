@@ -203,9 +203,9 @@ module fc2_layer(
                 weight_grad[0] = {{11{weight_grad_o[0][`PREC - 1]}}, {weight_grad_o[0][`PREC - 1: 11]}};
                 weight_grad[1] = {{11{weight_grad_o[1][`PREC - 1]}}, {weight_grad_o[1][`PREC - 1: 11]}};     
             end      
-            5'd13: begin
-                weight_grad[0] = {{13{weight_grad_o[0][`PREC - 1]}}, {weight_grad_o[0][`PREC - 1: 13]}};
-                weight_grad[1] = {{13{weight_grad_o[1][`PREC - 1]}}, {weight_grad_o[1][`PREC - 1: 13]}};     
+            5'd10: begin
+                weight_grad[0] = {{10{weight_grad_o[0][`PREC - 1]}}, {weight_grad_o[0][`PREC - 1: 10]}};
+                weight_grad[1] = {{10{weight_grad_o[1][`PREC - 1]}}, {weight_grad_o[1][`PREC - 1: 10]}};     
             end        
             default: begin
                 weight_grad[0] = {{8{weight_grad_o[0][`PREC - 1]}}, {weight_grad_o[0][`PREC - 1: 8]}};

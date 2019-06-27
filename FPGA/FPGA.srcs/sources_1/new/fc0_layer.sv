@@ -185,9 +185,9 @@ module fc0_layer(
                     weight_grad[a] = {{11{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 11]}};
                     weight_grad[c] = {{11{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 11]}};     
                 end      
-                5'd13: begin
-                    weight_grad[a] = {{13{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 13]}};
-                    weight_grad[c] = {{13{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 13]}};     
+                5'd10: begin
+                    weight_grad[a] = {{10{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 10]}};
+                    weight_grad[c] = {{10{weight_grad_o[c][`PREC - 1]}}, {weight_grad_o[c][`PREC - 1: 10]}};     
                 end        
                 default: begin
                     weight_grad[a] = {{8{weight_grad_o[a][`PREC - 1]}}, {weight_grad_o[a][`PREC - 1: 8]}};

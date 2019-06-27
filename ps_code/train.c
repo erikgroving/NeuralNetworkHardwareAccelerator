@@ -5,7 +5,9 @@
 #include "parse_mnist.h"
 #include <unistd.h>
 #include <math.h> 
+#include <string.h>
 #include <sys/time.h>
+#include <time.h>
 
 #define FORWARD     1
 #define WAITING     2
@@ -13,7 +15,7 @@
 #define UPDATE      4
 #define IDLE        5
 #define SET_SIZE    70000
-#define TRAIN_SIZE  2000
+#define TRAIN_SIZE  4000
 #define START_LRATE 9
 
 typedef struct ddr_data {
@@ -52,7 +54,7 @@ int main() {
     uint32_t* test_labels;    
 
     int handle = open("/dev/mem", O_RDWR | O_SYNC); 
-    volatile ddr_data_t* ddr_ptr = mmap(NULL, 134217728, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0x40000000);
+    ddr_data_t* ddr_ptr = mmap(NULL, 134217728, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0x40000000);
     
     
     uint32_t* ptr = (uint32_t*)ddr_ptr;   
@@ -73,13 +75,15 @@ int main() {
     test_labels = parse_mnist_labels("data/t10k-labels.idx1-ubyte");
     printf("@@@ Loading complete!\n");
 
-
+    struct timespec sleep;
+    sleep.tv_sec = 0;
+    sleep.tv_nsec = 1000;
 
     // Start training! 
     ddr_ptr->start = 0;
     usleep(100);
     ddr_ptr->start = 1;
-    ddr_ptr->n_epochs = 20;
+    ddr_ptr->n_epochs = 5;
     ddr_ptr->learning_rate = START_LRATE;
     ddr_ptr->training_mode = 1;  
     ddr_ptr->img_set_size = SET_SIZE - 1;
@@ -106,7 +110,7 @@ int main() {
             uint32_t active = ddr_ptr->active_cycles;
             uint32_t idle = ddr_ptr->idle_cycles;
             printf("Active Cycles: %d\t Idle Cycles: %d\n", active, idle);
-            printf("Active Cycle Percentage: %f%%\n", (float)active / (100.*(float)idle + (float)active));      
+            printf("Active Cycle Percentage: %f%%\n", 100.*(float)active / ((float)idle + (float)active));      
             //print_debug_data(ddr_ptr);            
             printf("Elapsed time: %.5f seconds\n", (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) * 1e-6));
             gettimeofday(&start, NULL);
@@ -115,21 +119,25 @@ int main() {
         ddr_ptr->training_mode = (id < TRAIN_SIZE);  
        
         
-        if (id < 60000) {
+        if (id < 60000) {            
+            memcpy((void*)ddr_ptr->img, train_images[id], sizeof(uint32_t) * 196);
+/*
             #pragma unroll
             for (int i = 0; i < 196; i++) {
                 ddr_ptr->img[i] = train_images[id][i];
-            }
+            }*/
             ddr_ptr->img_label  = train_labels[id];
         }
         else {
-            test_idx = id - 60000;            
-            #pragma unroll
+            test_idx = id - 60000;       
+            memcpy((void*)ddr_ptr->img, test_images[test_idx],  sizeof(uint32_t) * 196);
+            /*#pragma unroll
             for (int i = 0; i < 196; i++) {
                 ddr_ptr->img[i] = test_images[test_idx][i];
-            }
+            }*/
             ddr_ptr->img_label  = test_labels[test_idx];
         }
+        nanosleep(&sleep, NULL);
         ddr_ptr->img_id     = id;            
 
     } while (epoch < ddr_ptr->n_epochs);
