@@ -2,54 +2,54 @@
 `include "sys_defs.vh"
 
 module fc1_layer(
-        input                                       clk,
-        input                                       rst,
-        input                                       forward,
-        input                                       update,
-        input  [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]       activations_i,
-        input                                       valid_i,        
-        input  [4: 0]                               lrate_shifts,    
+        input                                               clk,
+        input                                               rst,
+        input                                               forward,
+        input                                               update,
+        input  [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        activations_i,
+        input                                               valid_i,        
+        input  [4: 0]                                       lrate_shifts,    
 
 
-        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        b_gradient_i,
-        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        b_activation_i,
-        input [6: 0]                                b_activation_id,
-        input [`FC1_N_KERNELS - 1: 0][5: 0]         b_neuron_id_i,
-        input                                       b_valid_i,
-        input                                       bp_mode,
+        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]         b_gradient_i,
+        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]         b_activation_i,
+        input [6: 0]                                        b_activation_id,
+        input [`FC1_N_KERNELS - 1: 0][5: 0]                 b_neuron_id_i,
+        input                                               b_valid_i,
+        input                                               bp_mode,
 
         
-        output logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0] activation_o,
-        output logic [`FC1_N_KERNELS - 1: 0][5: 0]  neuron_id_o,
-        output logic                                valid_act_o,
-        output logic                                fc1_busy,
-        output logic                                bp_done,
-        output logic                                update_done,
+        output logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]  activation_o,
+        output logic [`FC1_N_KERNELS - 1: 0][5: 0]          neuron_id_o,
+        output logic                                        valid_act_o,
+        output logic                                        fc1_busy,
+        output logic                                        bp_done,
+        output logic                                        update_done,
         
-        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   pl_gradients,
-        output logic                                pl_grad_valid
+        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]    pl_gradients,
+        output logic                                        pl_grad_valid
 
     );
     
-    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_in_a;
-    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_in_b;
-    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_out_a;
-    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_out_b;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_in_a;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_in_b;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_out_a;
+    logic   [`FC1_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_out_b;
 
-    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          weights;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]   weights;
     logic   [`FC1_ADDR - 1: 0]                      head_ptr;
     logic   [`FC1_ADDR - 1: 0]                      mid_ptr;
     logic   [`FC1_BIAS_ADDR - 1: 0]                 bias_ptr;
    
-    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          sch_activations;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]   sch_activations;
     logic                                           sch_valid;
-    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          bram_activations;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]   bram_activations;
     logic                                           bram_valid;    
-    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_activations;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]   kern_activations;
     logic                                           kern_valid;
     
-    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          bias;
-    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_bias;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]   bias;
+    logic   [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]   kern_bias;
     logic   [255: 0]                                bias_container;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
@@ -60,16 +60,16 @@ module fc1_layer(
 
     logic   [`FC1_N_KERNELS - 1: 0]                 valid;
     
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_activation_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     kern_activation_o;
     
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient_pl;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act;   
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act_pl;   
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_act;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_gradient;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_gradient_pl;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_kern_grad;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_act;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_act_pl;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_kern_act;   
     
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     b_kern_grad_o;
     logic [`FC1_N_KERNELS - 1: 0]                   b_kern_valid_o;
     logic [2: 0]                                    b_valid;
     logic [3: 0][6: 0]                              b_act_id;
@@ -83,15 +83,15 @@ module fc1_layer(
     logic                                           kern_bp_mode;
     logic                                           kern_bp_mode_o;
     
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult1;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult2;   
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad_o;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     kern_mult1;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     kern_mult2;   
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     weight_grad;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     weight_grad_o;
     logic [1: 0][9: 0]                              fc1_weight_grad_addr;    
     logic [1: 0][9: 0]                              fc1_weight_grad_addr_offset;
     logic [`FC1_NEURONS - 1: 0]                     act_o_sign;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC: 0]            update_weights_sat;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]            update_weights;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC: 0]         update_weights_sat;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]     update_weights;
   
     logic                                           sch_valid_i;
     
@@ -448,9 +448,9 @@ module fc1_layer(
         $display("update_weights[0]: %04h", update_weights[0]);
         $display("update_weights[1]: %04h", update_weights[1]);
         */        
-        localparam sf = 2.0**-17.0;  
+/*        localparam sf = 2.0**-17.0;  
         prev_pl_grad_valid  <= pl_grad_valid;
-/*
+
         if ({pl_grad_valid, prev_pl_grad_valid} == 2'b10) begin
             $display("\n--- NEURON GRADIENTS1 ---");
             for (it = 0; it < `FC0_NEURONS; it=it+1) begin

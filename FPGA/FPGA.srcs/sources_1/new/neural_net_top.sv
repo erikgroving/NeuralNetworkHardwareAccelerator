@@ -2,167 +2,190 @@
 `include "sys_defs.vh"
 
 module neural_net_top(
-    inout [14:0]DDR_addr,
-    inout [2:0]DDR_ba,
-    inout DDR_cas_n,
-    inout DDR_ck_n,
-    inout DDR_ck_p,
-    inout DDR_cke,
-    inout DDR_cs_n,
-    inout [3:0]DDR_dm,
-    inout [31:0]DDR_dq,
-    inout [3:0]DDR_dqs_n,
-    inout [3:0]DDR_dqs_p,
-    inout DDR_odt,
-    inout DDR_ras_n,
-    inout DDR_reset_n,
-    inout DDR_we_n,
-    inout FIXED_IO_ddr_vrn,
-    inout FIXED_IO_ddr_vrp,
-    inout [53:0]FIXED_IO_mio,
-    inout FIXED_IO_ps_clk,
-    inout FIXED_IO_ps_porb,
-    inout FIXED_IO_ps_srstb,
+    inout                   [14:0]DDR_addr,
+    inout                   [2:0]DDR_ba,
+    inout                   DDR_cas_n,
+    inout                   DDR_ck_n,
+    inout                   DDR_ck_p,
+    inout                   DDR_cke,
+    inout                   DDR_cs_n,
+    inout                   [3:0]DDR_dm,
+    inout                   [31:0]DDR_dq,
+    inout                   [3:0]DDR_dqs_n,
+    inout                   [3:0]DDR_dqs_p,
+    inout                   DDR_odt,
+    inout                   DDR_ras_n,
+    inout                   DDR_reset_n,
+    inout                   DDR_we_n,
+    inout                   FIXED_IO_ddr_vrn,
+    inout                   FIXED_IO_ddr_vrp,
+    inout                   [53:0]FIXED_IO_mio,
+    inout                   FIXED_IO_ps_clk,
+    inout                   FIXED_IO_ps_porb,
+    inout                   FIXED_IO_ps_srstb,
 
-    input                       rst,
-    input           [7: 0]      sw_in,
-    input                       clock_in,
-    output  logic   [7: 0]      led_o
+    input                   rst,
+    input           [7: 0]  sw_in,
+    input                   clock_in,
+    output  logic   [7: 0]  led_o
     );
     
-    logic                                   fab_clk;
-    logic                                   clk;
-
-
-    logic                                   forward;
+    logic                                       fab_clk;
+    logic                                       clk;
+    logic                                       forward;
     // Logics for the fc0 layer
-    logic                                   fc0_start;
-    logic [1: 0][`PREC - 1: 0]              fc0_activation_i;
-    logic                                   fc0_valid;
-    logic                                   fc0_valid_i;    
-    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]      fc0_activation_o ;
-    logic [`FC0_NEURONS - 1: 0][6: 0]       fc0_neuron_id_o ;
-    logic                                   fc0_valid_act_o; 
-    logic                                   fc0_busy;    
-    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]      fc0_gradients;
-    logic                                   fc0_grad_valid; 
+    logic                                       fc0_start;
+    logic [1: 0][`PREC - 1: 0]                  fc0_activation_i;
+    logic                                       fc0_valid;
+    logic                                       fc0_valid_i;    
+    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   fc0_activation_o ;
+    logic [`FC0_NEURONS - 1: 0][6: 0]           fc0_neuron_id_o ;
+    logic                                       fc0_valid_act_o; 
+    logic                                       fc0_busy;    
+    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   fc0_gradients;
+    logic                                       fc0_grad_valid; 
 
     
     // Logics for the fc1 layer    
-    logic                                   fc1_start;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_activation_i ;
-    logic                                   fc1_valid_i;    
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_activation_o;
-    logic [`FC1_N_KERNELS - 1: 0][5: 0]     fc1_neuron_id_o ;
-    logic                                   fc1_valid_act_o;
-    logic                                   fc1_buff_rdy; 
-    logic                                   fc1_busy;   
-    logic                                   fc1_grad_valid; 
+    logic                                       fc1_start;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0] fc1_activation_i ;
+    logic                                       fc1_valid_i;    
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0] fc1_activation_o;
+    logic [`FC1_N_KERNELS - 1: 0][5: 0]         fc1_neuron_id_o ;
+    logic                                       fc1_valid_act_o;
+    logic                                       fc1_buff_rdy; 
+    logic                                       fc1_busy;   
+    logic                                       fc1_grad_valid; 
 
      // Logics for the fc2 layer (the last fc layer)
-    logic                                   fc2_start;
-    logic                                   fc2_buff_rdy;
-    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_activation_i;
-    logic                                   fc2_valid_i;
-    logic                                   fc2_busy;
+    logic                                       fc2_start;
+    logic                                       fc2_buff_rdy;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0] fc2_activation_i;
+    logic                                       fc2_valid_i;
+    logic                                       fc2_busy;
 
-    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_activation_o;
-    logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_neuron_id_o;
-    logic                                   fc2_valid_o;       
-    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]      fc2_act_o_buf;
-    logic                                   fc2_buf_valid; 
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0] fc2_activation_o;
+    logic [`FC2_N_KERNELS - 1: 0][3: 0]         fc2_neuron_id_o;
+    logic                                       fc2_valid_o;       
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   fc2_act_o_buf;
+    logic                                       fc2_buf_valid; 
     
     // Backward pass logics
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_b_gradient_i;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]    fc0_b_activation_i;
-    logic [9: 0]                            fc0_b_activation_id_i;
-    logic [9: 0]                            fc0_b_activation_id_o;
-    logic                                   fc0_b_valid_i;
-    logic                                   fc0_b_start;
-    logic                                   fc0_b_start_r;
-    logic [3: 0]                            fc0_loops;
-    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]    fc0_gradients_i;
-    logic                                   fc0_gradients_rdy;
-    logic [6: 0]                            fc0_n_loop_offset;
-    logic                                   fc0_bp_done;
-    logic                                   fc0_update;
-    logic                                   fc0_update_done;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0] fc0_b_gradient_i;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0] fc0_b_activation_i;
+    logic [9: 0]                                fc0_b_activation_id_i;
+    logic [9: 0]                                fc0_b_activation_id_o;
+    logic                                       fc0_b_valid_i;
+    logic                                       fc0_b_start;
+    logic                                       fc0_b_start_r;
+    logic [3: 0]                                fc0_loops;
+    logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   fc0_gradients_i;
+    logic                                       fc0_gradients_rdy;
+    logic [6: 0]                                fc0_n_loop_offset;
+    logic                                       fc0_bp_done;
+    logic                                       fc0_update;
+    logic                                       fc0_update_done;
           
 
    
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_b_gradient_i;
-    logic [`PREC - 1: 0]                           fc1_b_activation_i;
-    logic [6: 0]                            fc1_b_activation_id_i;
-    logic [6: 0]                            fc1_b_activation_id_o;
-    logic [`FC1_N_KERNELS - 1: 0][5: 0]     fc1_b_neuron_id_i;
-    logic                                   fc1_b_valid_i;
-    logic                                   fc1_b_start;
-    logic                                   fc1_b_start_r;
-    logic [3: 0]                            fc1_loops;
-    logic [`FC1_NEURONS - 1: 0][`PREC - 1: 0]      fc1_gradients;
-    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]    fc1_gradients_i;
-    logic                                   fc1_gradients_rdy;
-    logic [5: 0]                            fc1_n_offset;
-    logic [5: 0]                            fc1_n_loop_offset;
-    logic                                   fc1_bp_mode;   
-    logic                                   fc1_bp_done;    
-    logic                                   fc1_update;
-    logic                                   fc1_update_done;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0] fc1_b_gradient_i;
+    logic [`PREC - 1: 0]                        fc1_b_activation_i;
+    logic [6: 0]                                fc1_b_activation_id_i;
+    logic [6: 0]                                fc1_b_activation_id_o;
+    logic [`FC1_N_KERNELS - 1: 0][5: 0]         fc1_b_neuron_id_i;
+    logic                                       fc1_b_valid_i;
+    logic                                       fc1_b_start;
+    logic                                       fc1_b_start_r;
+    logic [3: 0]                                fc1_loops;
+    logic [`FC1_NEURONS - 1: 0][`PREC - 1: 0]   fc1_gradients;
+    logic [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0] fc1_gradients_i;
+    logic                                       fc1_gradients_rdy;
+    logic [5: 0]                                fc1_n_offset;
+    logic [5: 0]                                fc1_n_loop_offset;
+    logic                                       fc1_bp_mode;   
+    logic                                       fc1_bp_done;    
+    logic                                       fc1_update;
+    logic                                       fc1_update_done;
           
 
    
-    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_b_gradient_i;
-    logic [`PREC - 1: 0]                           fc2_b_activation_i;
-    logic [5: 0]                            fc2_b_activation_id_i;
-    logic [5: 0]                            fc2_b_activation_id_o;
-    logic [`FC2_N_KERNELS - 1: 0][3: 0]     fc2_b_neuron_id_i;
-    logic                                   fc2_b_valid_i;
-    logic                                   fc2_b_start;
-    logic                                   fc2_b_start_r;
-    logic [3: 0]                            fc2_loops;
-    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]      fc2_gradients;
-    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]    fc2_gradients_i;
-    logic                                   fc2_gradients_rdy;
-    logic [3: 0]                            fc2_n_offset;
-    logic                                   fc2_bp_mode; 
-    logic                                   fc2_bp_done;
-    logic                                   fc2_update;
-    logic                                   fc2_update_done;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0] fc2_b_gradient_i;
+    logic [`PREC - 1: 0]                        fc2_b_activation_i;
+    logic [5: 0]                                fc2_b_activation_id_i;
+    logic [5: 0]                                fc2_b_activation_id_o;
+    logic [`FC2_N_KERNELS - 1: 0][3: 0]         fc2_b_neuron_id_i;
+    logic                                       fc2_b_valid_i;
+    logic                                       fc2_b_start;
+    logic                                       fc2_b_start_r;
+    logic [3: 0]                                fc2_loops;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   fc2_gradients;
+    logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0] fc2_gradients_i;
+    logic                                       fc2_gradients_rdy;
+    logic [3: 0]                                fc2_n_offset;
+    logic                                       fc2_bp_mode; 
+    logic                                       fc2_bp_done;
+    logic                                       fc2_update;
+    logic                                       fc2_update_done;
     
-    logic [7: 0]                            img1_unpacked[784];
-    logic new_img;
+    logic [7: 0]                                img1_unpacked[784];
+    logic                                       new_img; 
+    logic [9:0]                                 epoch;
+    logic [16:0]                                img_id;
+    logic [4: 0]                                lrate_shifts;
+    logic [4: 0]                                lrate_shifts_bus;
+    logic [31: 0]                               active_cycles;
+    logic [31: 0]                               idle_cycles;
+    logic                                       training_mode;
+    logic                                       training_mode_bus;
+    logic [16:0]                                img_set_size;
 
-
-
-    
-    logic [9:0]epoch;
-    logic [16:0] img_id;
-    logic [4: 0] lrate_shifts;
-    logic [4: 0] lrate_shifts_bus;
-    logic [31: 0] active_cycles;
-    logic [31: 0] idle_cycles;
-    logic         training_mode;
-    logic         training_mode_bus;
-    logic [16:0]  img_set_size;
-
-    logic [16:0]img1_id;
-    logic [9:0] img1_label;
-    logic [9:0] n_epochs;
-    logic [16:0]num_correct_test;
-    logic [16:0]num_correct_train;
-    logic start;
-    logic start_bus;
+    logic [16:0]                                img1_id;     
+    logic [16: 0]                               prev_img_id;
+    logic [9:0]                                 img1_label;
+    logic [9:0]                                 n_epochs;
+    logic [16:0]                                num_correct_test;
+    logic [16:0]                                num_correct_train;
+    logic                                       start;
+    logic                                       start_bus;
     
     // Layer States
-    logic [2: 0]    fc0_state;
-    logic [2: 0]    next_fc0_state;
-    logic [2: 0]    fc1_state;
-    logic [2: 0]    next_fc1_state;
-    logic [2: 0]    fc2_state;
-    logic [2: 0]    next_fc2_state;
+    logic [2: 0]                                fc0_state;
+    logic [2: 0]                                next_fc0_state;
+    logic [2: 0]                                fc1_state;
+    logic [2: 0]                                next_fc1_state;
+    logic [2: 0]                                fc2_state;
+    logic [2: 0]                                next_fc2_state;
+    logic all_idle;
     
-    localparam sf = 2.0**-12.0;
-    localparam sf2 = 2.0**-17.0;
+        
+    logic [9: 0]                                input_addr;
+    logic [`PREC - 1: 0]                        net_input_bram_dout_a;
+    logic [`PREC - 1: 0]                        net_input_bram_dout_b;
+    logic [`PREC - 1: 0]                        input_data_a;
+    logic [`PREC - 1: 0]                        input_data_b;
+    logic [9: 0]                                img_label;
+    logic                                       img_rdy;  
+    logic                                       epoch_fin;
+    logic                                       correct;
+    logic [12: 0]                               fc0_ptr_a;
+    logic [12: 0]                               fc0_ptr_b;
+    logic [9: 0]                                fc0_addr_a;
+    logic [9: 0]                                fc0_addr_b;   
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   fc2_out;
+    logic [4: 0][`PREC - 1: 0]                  max1;
+    logic [2: 0][`PREC - 1: 0]                  max2;
+    logic [1: 0][`PREC - 1: 0]                  max3;    
+    logic [`PREC - 1: 0]                        max4;   
+    logic [`PREC - 1: 0]                        max;
+    logic [4: 0]                                max_valid;
+    logic [7: 0]                                led_o_r;
+    logic                                       sm_valid_o;
+    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   sm_grad_o;     
+    logic [31: 0]                               status_block;
+    
+     
+    localparam sf   = 2.0**-12.0;
+    localparam sf2  = 2.0**-17.0;
     
     // Backward pass states
     localparam WEIGHT_MODE = 0;
@@ -175,17 +198,6 @@ module neural_net_top(
     localparam UPDATE   = 4;
     localparam IDLE     = 5;
 
-    logic all_idle;
-    
-        
-    logic [9: 0]        input_addr;
-    logic [`PREC - 1: 0]       net_input_bram_dout_a;
-    logic [`PREC - 1: 0]       net_input_bram_dout_b;
-    logic [`PREC - 1: 0]       input_data_a;
-    logic [`PREC - 1: 0]       input_data_b;
-    logic [9: 0]        img_label;
-    logic               img_rdy;  
-    logic               epoch_fin;
     
     mmcm_50_mhz mmcm_50_mhz_i (
         .clk_in1(fab_clk),
@@ -193,25 +205,23 @@ module neural_net_top(
         .clk_out1(clk)
     );
     
-    logic sim;
-    logic [7: 0] sw_i;
-    
+    logic [7: 0] sw_i; // so simulation uses net_input_bram   
     assign sw_i = sw_in;
 
     
-    assign start        = /*sw_i[0] ? 1'b1 :*/ start_bus;
-    assign training_mode = /*sw_i[0] ? 1'b1 :*/ training_mode_bus;
-    assign forward      = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
-    assign all_idle     = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
-    assign img_rdy      = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == img_set_size);
-    assign new_img      = start & all_idle & img_rdy;
-    assign epoch_fin    = /*sw_i[0] ? 1'b0 :*/ epoch == n_epochs;
+    assign start            = sw_i[0] ? 1'b1 : start_bus;
+    assign training_mode    = sw_i[0] ? 1'b1 : training_mode_bus;
+    assign forward          = fc0_state == FORWARD || fc1_state == FORWARD || fc2_state == FORWARD;
+    assign all_idle         = (fc0_state == IDLE) && (fc1_state == IDLE) && (fc2_state == IDLE);
+    assign img_rdy          = (img1_id == (img_id + 1'b1)) | (img1_id == 0 && img_id == img_set_size);
+    assign new_img          = start & all_idle & img_rdy;
+    assign epoch_fin        = sw_i[0] ? 1'b0 : epoch == n_epochs;
     
     logic reset_i;
     logic reset;
     always_ff @(posedge clk) begin
-        reset_i   <= rst;
-        lrate_shifts <= /*sw_i[0] ? 5'd7 :*/ lrate_shifts_bus;
+        reset_i         <= rst;
+        lrate_shifts    <= sw_i[0] ? 5'd7 : lrate_shifts_bus;
     end
     
     always_ff @(posedge clk) begin
@@ -247,11 +257,7 @@ module neural_net_top(
     
     
 
-    logic correct;
-    logic [12: 0] fc0_ptr_a;
-    logic [12: 0] fc0_ptr_b;
-    logic [9: 0] fc0_addr_a;
-    logic [9: 0] fc0_addr_b;
+
     assign fc0_addr_a = (forward) ? input_addr << 1 : fc0_b_activation_id_i << 1; 
     assign fc0_addr_b = fc0_addr_a + 1'b1;
     
@@ -274,7 +280,7 @@ module neural_net_top(
 
   
         
-    logic [16: 0] prev_img_id;
+
     always_ff @(posedge clk) begin
         if (reset) begin
             prev_img_id <= img_set_size;
@@ -735,7 +741,6 @@ module neural_net_top(
         end
     end
     
-    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0] fc2_out;
     always @(posedge clk) begin
         if (fc2_buf_valid) begin
             fc2_out <= fc2_act_o_buf;
@@ -745,17 +750,9 @@ module neural_net_top(
     
     
     
-    // LED Logic
-    logic [4: 0][`PREC - 1: 0] max1;
-    logic [2: 0][`PREC - 1: 0] max2;
-    logic [1: 0][`PREC - 1: 0] max3;    
-    logic [`PREC - 1: 0]       max4;   
-    logic [`PREC - 1: 0]       max;
-    logic [4: 0]        max_valid;
-    
+    // LED Logic    
     bit [3: 0] k;
     bit [3: 0] j, t;
-    logic [7: 0] led_o_r;
     always_ff @(posedge clk) begin
         if (reset) begin
             max         <= 0;
@@ -812,8 +809,7 @@ module neural_net_top(
         led_o[7:0]  <= led_o_r[7: 0];
     end
     
-    logic                               sm_valid_o;
-    logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]  sm_grad_o;
+
     softmax softmax_i (
         .clk(clk),
         .reset(reset),
@@ -824,9 +820,7 @@ module neural_net_top(
         .valid_o(sm_valid_o),
         .grad_o(sm_grad_o)
     );
-    
-   /* assign fc2_gradients        = {16'h0700, 16'h0678, 16'h0531, 16'hFA00, 16'h0300,
-                                    16'hF930, 16'hF712, 16'hF374, 16'h0538, 16'h0395};*/   
+ 
     bit [3: 0] u;                                        
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -840,7 +834,6 @@ module neural_net_top(
         end
         
         if (sm_valid_o) begin
-            //fc2_gradients               <= sm_grad_o;
             for (u = 0; u < `FC2_NEURONS; u=u+1) begin
                 fc2_gradients[u]    <= (fc2_act_o_buf[img_label] == `MIN_VAL) ? 0 :
                                             sm_grad_o[u];
@@ -849,12 +842,12 @@ module neural_net_top(
                                             $signed(sm_grad_o[img_label]) - $signed(`ONE);
         end
     end
-    /*assign fc2_gradients        = {{9{16'h2000}}, 16'hE000};
-    assign fc2_gradients_rdy    = 1'b1;*/    
     
     `ifdef DEBUG
      integer clk_cycle;
      integer it;
+     logic prev_all_idle;
+     logic prev_forward;
      always_ff @(posedge clk) begin
         if (reset) begin
             clk_cycle   <= 0;
@@ -862,8 +855,20 @@ module neural_net_top(
         else begin
             clk_cycle   <=  clk_cycle + 1'b1;
         end
-  /*      $display("\n\n------ CYCLE %04d ------", clk_cycle);
-  
+        prev_all_idle <= all_idle;
+        prev_forward    <= 1'b0;
+        $display("\n\n------ CYCLE %04d ------", clk_cycle);
+        if (fc0_state != IDLE & next_fc0_state == IDLE) begin
+            $display("Training cycle finished.\n");
+        end
+        else if ({prev_all_idle, all_idle} == 2'b10) begin
+            $display("Training cycle starting.\n");
+        end
+        
+        if ( fc2_gradients_rdy) begin
+            $display("Forward finished.\n");
+        end
+  /*
         $display("\n--- FC0 ---");
         $display("FC0_act_i: %04h\t\tFC0_valid_i: %01b", fc0_activation_i[0], fc0_valid_i);
         $display("ACT_O\t\tNEUR_ID\t\tVALID_O");
@@ -884,7 +889,7 @@ module neural_net_top(
         for (it = 0; it < `FC2_N_KERNELS; it=it+1) begin
             $display("%04h\t\t%04d\t\t%01b", fc2_activation_o[it], fc2_neuron_id_o[it], fc2_valid_o);
         end
-        */    
+  */         
 
         $display("---FC2 GRADIENTS---");    
         $display("img_label: %d", img_label);    
@@ -901,7 +906,6 @@ module neural_net_top(
      end 
     `endif    
    
-  logic [31: 0] status_block;
   assign status_block = {5'b0, led_o_r, fc0_state, fc1_state, fc2_state, forward, fc0_start,
                          fc1_start, fc2_start, fc0_busy, fc1_busy, fc2_busy, new_img, 
                          all_idle, img_rdy};

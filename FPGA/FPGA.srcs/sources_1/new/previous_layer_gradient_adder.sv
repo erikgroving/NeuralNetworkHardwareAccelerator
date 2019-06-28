@@ -1,43 +1,43 @@
 `timescale 1ns / 1ps
 
 module previous_layer_gradient_adder (
-        input                                       clk,
-        input                                       rst,
-        input                                       forward,
-        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]        grad_i,
-        input [6: 0]                                neuron_id_i,
-        input                                       valid_i,
-        input                                       bp_mode_i,
+        input                                               clk,
+        input                                               rst,
+        input                                               forward,
+        input [`FC1_N_KERNELS - 1: 0][`PREC - 1: 0]         grad_i,
+        input [6: 0]                                        neuron_id_i,
+        input                                               valid_i,
+        input                                               bp_mode_i,
         
-        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   pl_gradients,
-        output logic                                pl_grad_valid
+        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]    pl_gradients,
+        output logic                                        pl_grad_valid
 );
     
     localparam WEIGHT_MODE = 0;
     localparam NEURON_MODE = 1;  
     
-    logic [7: 0][`PREC - 1: 0] stage1_grad;
-    logic               stage1_valid;
-    logic [6: 0]        stage1_neuron_id;
-    logic               stage1_bp_mode;
+    logic [7: 0][`PREC - 1: 0]  stage1_grad;
+    logic                       stage1_valid;
+    logic [6: 0]                stage1_neuron_id;
+    logic                       stage1_bp_mode;
     
-    logic [3: 0][`PREC - 1: 0] stage2_grad;
-    logic               stage2_valid;
-    logic [6: 0]        stage2_neuron_id;
-    logic               stage2_bp_mode;
+    logic [3: 0][`PREC - 1: 0]  stage2_grad;
+    logic                       stage2_valid;
+    logic [6: 0]                stage2_neuron_id;
+    logic                       stage2_bp_mode;
     
-    logic [1: 0][`PREC - 1: 0] stage3_grad;
-    logic               stage3_valid;
-    logic [6: 0]        stage3_neuron_id;
-    logic               stage3_bp_mode;
+    logic [1: 0][`PREC - 1: 0]  stage3_grad;
+    logic                       stage3_valid;
+    logic [6: 0]                stage3_neuron_id;
+    logic                       stage3_bp_mode;
     
-    logic [`PREC - 1: 0]       stage4_grad;
-    logic               stage4_valid;
-    logic               prev_stage4_valid;
-    logic [6: 0]        stage4_neuron_id;
-    logic               stage4_bp_mode;
+    logic [`PREC - 1: 0]        stage4_grad;
+    logic                       stage4_valid;
+    logic                       prev_stage4_valid;
+    logic [6: 0]                stage4_neuron_id;
+    logic                       stage4_bp_mode;
     
-    logic               prev_bp_mode_i;
+    logic                       prev_bp_mode_i;
     
     bit [4: 0] i, j, m, n, o, p;  
     always_ff @(posedge clk) begin

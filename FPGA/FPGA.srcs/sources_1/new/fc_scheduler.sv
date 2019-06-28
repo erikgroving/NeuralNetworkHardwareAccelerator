@@ -6,34 +6,33 @@ module fc_scheduler #(
     parameter MID_PTR_OFFSET    = 0,
     parameter FAN_IN            = 0    
 )(
-    input                                                           clk,
-    input                                                           rst,
-    input                                                           forward,
-    input                                                           valid_i,
+    input                               clk,
+    input                               rst,
+    input                               forward,
+    input                               valid_i,
     
-    output logic    [ADDR - 1: 0]                                   head_ptr,
-    output logic    [ADDR - 1: 0]                                   mid_ptr,
-    output logic    [BIAS_ADDR - 1: 0]                              bias_ptr,
-    output logic                                                    has_bias
+    output logic    [ADDR - 1: 0]       head_ptr,
+    output logic    [ADDR - 1: 0]       mid_ptr,
+    output logic    [BIAS_ADDR - 1: 0]  bias_ptr,
+    output logic                        has_bias
     
 );    
-    logic                          start;
-    logic   [ADDR - 1: 0]          h_thresh;
-    logic   [ADDR - 1: 0]          next_head_ptr;
-    logic   [ADDR - 1: 0]          next_mid_ptr;
-    logic   [BIAS_ADDR - 1: 0]     next_bias_ptr;
-    logic                          prev_forw;
-    logic                          mode_switch;
+    logic                      start;
+    logic   [ADDR - 1: 0]      h_thresh;
+    logic   [ADDR - 1: 0]      next_head_ptr;
+    logic   [ADDR - 1: 0]      next_mid_ptr;
+    logic   [BIAS_ADDR - 1: 0] next_bias_ptr;
+    logic                      prev_forw;
+    logic                      mode_switch;
+    
     
     assign h_thresh         = MID_PTR_OFFSET - 2;
     assign mode_switch      = prev_forw ^ forward;
     
     assign next_head_ptr    = (mode_switch || !start)   ? 0         : 
-                                (!valid_i)              ? head_ptr  : head_ptr + 1'b1;
-                                        
+                                (!valid_i)              ? head_ptr  : head_ptr + 1'b1;                                        
     assign next_mid_ptr     = (mode_switch || !start)   ? MID_PTR_OFFSET    : 
-                                (!valid_i)              ? mid_ptr           : mid_ptr + 1'b1;
-                                
+                                (!valid_i)              ? mid_ptr           : mid_ptr + 1'b1;                                
     assign next_bias_ptr    = (mode_switch || !start)   ? 0         :
                                 (!valid_i)              ? bias_ptr  : bias_ptr + 1'b1;
 

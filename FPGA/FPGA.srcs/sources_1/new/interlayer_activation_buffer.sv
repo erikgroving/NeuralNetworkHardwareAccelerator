@@ -7,30 +7,27 @@ module interlayer_activation_buffer #(
     parameter BUFF_SIZE = 0,
     parameter LOOPS = 0
 )(
-    input                                               clk,
-    input                                               rst,
-    
-    input                                               start,
-    input [N_KERNELS_I - 1: 0][`PREC - 1: 0]                   activation_i,
-    input [N_KERNELS_I - 1: 0][ID_WIDTH - 1: 0]         neuron_id_i,
-    input                                               valid_act_i,
-    
-    input  [ID_WIDTH - 1: 0]                            b_ptr,
+    input                                              clk,
+    input                                              rst,    
+    input                                              start,
+    input [N_KERNELS_I - 1: 0][`PREC - 1: 0]           activation_i,
+    input [N_KERNELS_I - 1: 0][ID_WIDTH - 1: 0]        neuron_id_i,
+    input                                              valid_act_i,    
+    input  [ID_WIDTH - 1: 0]                           b_ptr,
     
     
-    output logic [N_KERNELS_O - 1: 0][`PREC - 1: 0]            activation_o,
-    output logic                                        valid_o,
-    
-    output logic [`PREC - 1: 0]                                b_act_o,
-        
-    output logic                                        buff_rdy
+    output logic [N_KERNELS_O - 1: 0][`PREC - 1: 0]    activation_o,
+    output logic                                       valid_o,    
+    output logic [`PREC - 1: 0]                        b_act_o,        
+    output logic                                       buff_rdy
 );
-    logic   [ID_WIDTH - 1: 0]           buff_ptr;
-    logic   [BUFF_SIZE - 1: 0][`PREC - 1: 0]   buffer;
-    logic                               read_o;
-    logic   [LOOPS: 0]                  loop_cnt;
-    bit     [ID_WIDTH: 0]               i;
+    logic   [ID_WIDTH - 1: 0]                   buff_ptr;
+    logic   [BUFF_SIZE - 1: 0][`PREC - 1: 0]    buffer;
+    logic                                       read_o;
+    logic   [LOOPS: 0]                          loop_cnt;
     
+    
+    bit [ID_WIDTH: 0] i;    
     always_ff @(posedge clk) begin
         if (rst) begin
             buff_rdy    <= 0;

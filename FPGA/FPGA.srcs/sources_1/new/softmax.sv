@@ -1,32 +1,33 @@
 `timescale 1ns / 1ps
 
 module softmax(
-    input                                       clk,
-    input                                       reset,
-    input                                       start,
-    input [`PREC - 1: 0]                               max,
-    input [`FC2_NEURONS - 1: 0][`PREC - 1: 0]          act_in,
+    input                                               clk,
+    input                                               reset,
+    input                                               start,
+    input [`PREC - 1: 0]                                max,
+    input [`FC2_NEURONS - 1: 0][`PREC - 1: 0]           act_in,
     
-    output logic                                valid_o,
-    output logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]   grad_o
+    output logic                                        valid_o,
+    output logic [`FC2_NEURONS - 1: 0][`PREC - 1: 0]    grad_o
     );
     
-    logic [`FC2_NEURONS - 1: 0][23: 0]          act_in_norm;
-    logic [`FC2_NEURONS - 1: 0][23: 0]          fixed_exp_res;
-    logic [`FC2_NEURONS - 1: 0][31: 0]          act_in_norm_float;
-    logic [31: 0]                               float_o;
-    logic [31: 0]                               float_exp_o;
-    logic                                       float_valid_o;
-    logic                                       float_exp_valid_o;
-    logic [23: 0]                               fixed_exp_o;
-    logic [23: 0]                               fixed_exp_sum;
-    logic                                       fixed_exp_valid_o;
-    logic [3: 0]                                fp_in_ptr;
-    logic [3: 0]                                fixed_exp_ptr;
-    logic [3: 0]                                div_ptr;
-    logic                                       in_prog;
-    logic [47: 0]                               div_o;
-    logic                                       div_valid_o;
+    
+    logic [`FC2_NEURONS - 1: 0][23: 0]  act_in_norm;
+    logic [`FC2_NEURONS - 1: 0][23: 0]  fixed_exp_res;
+    logic [`FC2_NEURONS - 1: 0][31: 0]  act_in_norm_float;
+    logic [31: 0]                       float_o;
+    logic [31: 0]                       float_exp_o;
+    logic                               float_valid_o;
+    logic                               float_exp_valid_o;
+    logic [23: 0]                       fixed_exp_o;
+    logic [23: 0]                       fixed_exp_sum;
+    logic                               fixed_exp_valid_o;
+    logic [3: 0]                        fp_in_ptr;
+    logic [3: 0]                        fixed_exp_ptr;
+    logic [3: 0]                        div_ptr;
+    logic                               in_prog;
+    logic [47: 0]                       div_o;
+    logic                               div_valid_o;
     
     bit [3: 0] i;
     always_ff @(posedge clk) begin
@@ -155,12 +156,11 @@ module softmax(
     `ifdef DEBUG       
     localparam sf = 2.0**-12.0;
     localparam sf2 = 2.0**-17.0;
-
     integer it;
     reg prev_valid_o;
     always_ff @(posedge clk) begin
         prev_valid_o    <= valid_o;
-        /*
+       /* 
         $display("in_prog: %01b\t", in_prog);
         $display("valid_o: %01b", valid_o);
         $display("fp_in_ptr: %02d, fp_in_valid: %01b, float_valid_o: %01b", fp_in_ptr, in_prog & fp_in_ptr != `FC2_NEURONS, float_valid_o);
@@ -180,8 +180,8 @@ module softmax(
         $display("fixed_exp_res");        
         for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
             $display("%02d:\t%f", it, $itor($signed(fixed_exp_res[it])) * sf2);
-        end */
-        /*if({valid_o, prev_valid_o} == 2'b10) begin
+        end
+        if({valid_o, prev_valid_o} == 2'b10) begin
             $display("SOFTMAX OUT");        
             for (it = 0; it < `FC2_NEURONS; it = it + 1) begin
                 $display("%02d:\t%f", it, $itor($signed(grad_o[it])) * sf2);

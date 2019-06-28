@@ -2,48 +2,48 @@
 `include "sys_defs.vh"
 
 module fc0_layer(
-        input                                       clk,
-        input                                       rst,
-        input                                       forward,
-        input                                       update,
-        input  [1: 0][`PREC - 1: 0]                 activations_i,
-        input                                       valid_i,    
-        input  [4: 0]                               lrate_shifts,    
+        input                                               clk,
+        input                                               rst,
+        input                                               forward,
+        input                                               update,
+        input  [1: 0][`PREC - 1: 0]                         activations_i,
+        input                                               valid_i,    
+        input  [4: 0]                                       lrate_shifts,    
 
-        input [`FC0_NEURONS - 1: 0][`PREC - 1: 0]        b_gradient_i,
-        input [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]        b_activation_i,
-        input [9: 0]                                b_activation_id,
-        input                                       b_valid_i,
+        input [`FC0_NEURONS - 1: 0][`PREC - 1: 0]           b_gradient_i,
+        input [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]         b_activation_i,
+        input [9: 0]                                        b_activation_id,
+        input                                               b_valid_i,
         
-        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]   activation_o,
-        output logic [`FC0_NEURONS - 1: 0][6: 0]    neuron_id_o,
-        output logic                                valid_act_o,
-        output logic                                fc0_busy,
-        output logic                                bp_done,
-        output logic                                update_done
+        output logic [`FC0_NEURONS - 1: 0][`PREC - 1: 0]    activation_o,
+        output logic [`FC0_NEURONS - 1: 0][6: 0]            neuron_id_o,
+        output logic                                        valid_act_o,
+        output logic                                        fc0_busy,
+        output logic                                        bp_done,
+        output logic                                        update_done
     );
     
-    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_in_a;
-    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_in_b;
-    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_out_a;
-    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]         data_out_b;
+    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_in_a;
+    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_in_b;
+    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_out_a;
+    logic   [`FC0_PORT_WIDTH - 1: 0][`PREC - 1: 0]  data_out_b;
 
-    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]          weights;
+    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]   weights;
     logic   [`FC0_ADDR - 1: 0]                      head_ptr;
     logic   [`FC0_ADDR - 1: 0]                      mid_ptr;    
     logic   [`FC0_ADDR - 1: 0]                      addr_a;
     logic   [`FC0_ADDR - 1: 0]                      addr_b;
     logic   [`FC0_BIAS_ADDR - 1: 0]                 bias_ptr;
    
-    logic   [1: 0][`PREC - 1: 0]          sch_activations;
+    logic   [1: 0][`PREC - 1: 0]                    sch_activations;
     logic                                           sch_valid;
-    logic   [1: 0][`PREC - 1: 0]          bram_activations;
+    logic   [1: 0][`PREC - 1: 0]                    bram_activations;
     logic                                           bram_valid;    
-    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_activations;
+    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]   kern_activations;
     logic                                           kern_valid;
     
-    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]          bias;
-    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_bias;
+    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]   bias;
+    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]   kern_bias;
     logic   [255: 0]                                bias_container;
     logic                                           sch_has_bias;
     logic                                           bram_has_bias;
@@ -53,34 +53,34 @@ module fc0_layer(
     logic   [`FC0_N_KERNELS - 1: 0]                 last_weight;
 
     logic   [`FC0_N_KERNELS - 1: 0]                 valid;
-    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]          kern_activation_o;
-    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]          activation_o_rel;
+    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]   kern_activation_o;
+    logic   [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]   activation_o_rel;
     logic   [`FC0_N_KERNELS - 1: 0][6: 0]           kern_neuron_id_o;   
     
     
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_gradient_pl;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act;   
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_act_pl;   
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_act;   
-    
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            b_kern_grad_o;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_gradient;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_gradient_pl;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_kern_grad;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_act;   
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_act_pl;   
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_kern_act;   
+   
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     b_kern_grad_o;
     logic [`FC0_N_KERNELS - 1: 0]                   b_kern_valid_o;
     logic [2: 0]                                    b_valid;
     logic [3: 0][9: 0]                              b_act_id;
    
     logic                                           b_weight_we;
     
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult1;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            kern_mult2;   
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad_o;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            weight_grad;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     kern_mult1;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     kern_mult2;   
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     weight_grad_o;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     weight_grad;
     logic [1: 0][9: 0]                              fc0_weight_grad_addr;    
     logic [1: 0][9: 0]                              fc0_weight_grad_addr_offset;
     logic [`FC0_NEURONS - 1: 0]                     act_o_sign;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC: 0]            update_weights_sat;
-    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]            update_weights;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC: 0]         update_weights_sat;
+    logic [`FC0_N_KERNELS - 1: 0][`PREC - 1: 0]     update_weights;
   
     logic                                           sch_valid_i; 
     localparam WEIGHT_MODE = 0;
@@ -295,7 +295,7 @@ module fc0_layer(
                 .rst(rst),
                 .activation_i(kern_mult2[i]),
                 .weight(kern_mult1[i]),
-                .bias(18'b0/*kern_bias[i]*/),
+                .bias(18'b0),
                 .neuron_id_i(kern_neuron_id[i]),
                 .has_bias(kern_has_bias),
                 .valid_i(kern_valid),
@@ -355,14 +355,12 @@ module fc0_layer(
         
     `ifdef DEBUG
     integer it;
-    always_ff @(posedge clk) begin
-       /* $display("\n--- BACKWARD PASS0 ---");
+    always_ff @(posedge clk) begin        
+        localparam sf = 2.0**-17.0;
+/*
+        $display("\n--- BACKWARD PASS0 ---");
         $display("INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_activation_id, b_valid_i);
-        $display("Gradient\t\tNeuronID\t\tAct_I");
-        for (it = 0; it < 10; it=it+1) begin
-            $display("%04h\t\t\t%01d\t\t\t\t%04h", b_gradient_i[it], b_neuron_id_i[it], b_activation_i[it]) ;
-        end
         $display("KERNEL INPUT");
         $display("Activation id: %02d\t\tValid: %01b", b_act_id[2], b_valid[2]);
         $display("Gradient\t\tWeight");
@@ -370,15 +368,10 @@ module fc0_layer(
             $display("%04h\t\t\t%04h", b_kern_grad[it], weights[it]);
         end        
         $display("OUTPUT");
-        $display("Gradient\t\tNeuronID\t\tActID\t\tValid");
-        for (it = 0; it < 10; it=it+1) begin
-            $display("%04h\t\t\t%01d\t\t\t\t%02d\t\t\t%01b", b_kern_grad_o[it], b_neuron_id[3], 
-                    b_act_id[3], b_kern_valid_o[it]);
-        end
         $display("--- GBRAM ---");
         $display("addr_a: %02d\t\twe: %01b", fc0_weight_grad_addr[0], b_weight_we);
-        $display("addr_b: %02d\t\twe: %01b", fc0_weight_grad_addr[1], b_weight_we);*/
-        /*$display("--- UPDATE0 ---");
+        $display("addr_b: %02d\t\twe: %01b", fc0_weight_grad_addr[1], b_weight_we);
+        $display("--- UPDATE0 ---");
         $display("update: %01b", update);
         $display("u_addr_a: %03d\t\tu_addr_b: %03d", update_addr_a, update_addr_b);
         $display("w_addr_a: %03d\t\tw_addr_b: %03d", w_addr_a, w_addr_b);
@@ -388,9 +381,8 @@ module fc0_layer(
         $display("data_out[0]: %04h\t\tweight_grad_o[0]: %04h", data_out_a[0], weight_grad_o[0]);
         $display("data_out[1]: %04h\t\tweight_grad_o[1]: %04h", data_out_a[1], weight_grad_o[1]);
         $display("update_weights[0]: %04h", update_weights[0]);
-        $display("update_weights[1]: %04h", update_weights[1]);*/
-        localparam sf = 2.0**-17.0;
-        /*
+        $display("update_weights[1]: %04h", update_weights[1]);
+        
         if (wg_we) begin
             $display("WEIGHT GRADS0");
             $display("Weight ID: %03d", wg_addr_a);
@@ -403,29 +395,6 @@ module fc0_layer(
             end
         end
 */
-   /*
-        $display("\n--- SCHEDULER ---");
-        $display("head_ptr: %04d\t\tmid_ptr: %04d\t\tbias_ptr: %01d", head_ptr, mid_ptr, bias_ptr);    
-        $display("Addr_a: %03d Addr_b: %03d", addr_a, addr_b);
-        $display("\n--- MEMORY CONTROLLER ---");
-        $display("data_out_a\t\tdata_out_b");
-        for (it = 0; it < 5; it = it + 1) begin
-            $display("%04h\t\t\t%04h", data_out_a[it], data_out_b[it]);       
-        end
- 
-        $display("\n--- KERNELS---");
-        $display("has_bias: %01b", kern_has_bias);
-        $display("ACT_I\t\tWEIGHT\t\tBIAS\t\tKERN_VALID");
-        for (it = 0; it < 10; it=it+1) begin
-            $display("%04h\t\t%04h\t\t%04h\t\t\t%01b",
-            bram_activations[it], weights[it], bias[it], kern_valid);
-        end
-            
-        $display("\nACT_O\t\tNEURON_ID_O\t\tVALID_ACT_O");
-        for (it = 0; it < 10; it=it+1) begin
-            $display("%04h\t\t%02d\t\t\t\t%01b",
-            activation_o[it], neuron_id_o[it], valid_act_o);
-        end   */     
      end
     `endif 
 endmodule

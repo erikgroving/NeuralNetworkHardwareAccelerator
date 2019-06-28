@@ -65,7 +65,7 @@ int main () {
     net.addLayer(fc2);
     net.addLayer(fc3);
 
-    trainNet(net, trainX, trainY, testX, testY, n_epochs, 12, .1);
+    trainNet(net, trainX, trainY, testX, testY, n_epochs, 25, .1);
 
     printAccuracy(net, testX, testY);   
 }
@@ -114,38 +114,6 @@ void trainNet(Net& net, std::vector< std::vector<double> >& in, std::vector<int>
         std::cout << "\n--- Test Stats ---\n";    
         double test_loss = printAccuracy(net, in_test, out_test);
         std::cout << "Elapsed time: " << (float)diff / CLOCKS_PER_SEC << std::endl;
-        /*net(in_test);
-        auto acts = net.getActivations();
-        double max = -10;
-        double min = 10;
-        for (auto test : acts) {
-            for (auto r : test) {
-                for (auto t : r) {
-                    max = max > t ? max : t;
-                    min = min < t ? min : t;
-                }
-            }
-        }
-        std::cout << "Max outputs: \n";
-        std::cout << max << "\n" << min << std::endl;
-
-        max = -10;
-        min = 10;
-
-        for (auto l : net.getLayers()) {
-            for (auto i : l->getNeurons()) {
-                for (auto p : i.getWeights()) {
-                    max = max > p ? max : p;
-                    min = min < p ? min : p;
-                }
-            }
-        }
-        std::cout << "Max weights: \n";
-        std::cout << max << "\n" << min << std::endl;
-
-        net.clearSavedData();
-        
-       */ 
         std::cout << "Loss: " << test_loss / (double)in_test.size() << std::endl << std::endl;
         if ( (i + 1) % epochs_per_change == 0) {
             std::cout << "Learning rate changed from " << net.getLearningRate();

@@ -16,13 +16,13 @@ module fc2_weight_bram_controller (
     input                                               en_b,
     input                                               we_b,
     
-    output logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]         data_out,
+    output logic [`FC2_N_KERNELS - 1: 0][`PREC - 1: 0]  data_out,
     output logic [`FC2_N_KERNELS - 1: 0][3: 0]          neuron_id
     
     );
     
-    logic [`FC2_BRAM - 1: 0][`PREC - 1: 0]              data_out_a;
-    logic [`FC2_BRAM - 1: 0][`PREC - 1: 0]              data_out_b;
+    logic [`FC2_BRAM - 1: 0][`PREC - 1: 0]  data_out_a;
+    logic [`FC2_BRAM - 1: 0][`PREC - 1: 0]  data_out_b;
     
     assign data_out = {data_out_b, data_out_a};
    

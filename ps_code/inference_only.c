@@ -76,7 +76,7 @@ int main() {
 
     struct timespec sleep;
     sleep.tv_sec = 0;
-    sleep.tv_nsec = 100;
+    sleep.tv_nsec = 1000;
 
     // Start training! 
     ddr_ptr->start = 0;
