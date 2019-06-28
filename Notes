@@ -1,5 +1,0 @@
-- Weight initialization method
-- Google test
-- https://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/
-- Added momentum, trains to perfect corrects on random 50 samples quite fast
-- Gradient clipping
