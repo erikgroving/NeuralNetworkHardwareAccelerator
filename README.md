@@ -1,6 +1,7 @@
-# Application Specific Hardware for Accelerating Neural Network Training Time
+# Application-Specific Hardware for Accelerating Neural Network Training
 
 ## Overview
+
 ### FPGA (SystemVerilog) 
 This folder contains the HDL for implementing my accelerator on an FPGA.
 
@@ -40,4 +41,4 @@ This folder contains the Vivado generated AXI slave the communicates with the AX
 This folder contains scripts that I have been using to debug the FPGA simulation output as well as a script to generate coefficient files for initializing the weights in the BRAM
 
 ### ps_code (C)
-This folder contain 
+This folder contains the C code that runs on the PS
